@@ -1,0 +1,13 @@
+@layer base {
+    body {
+        @apply bg-beige-light text-dark-black text-base;
+    }
+
+    h1 {
+        @apply font-display text-xl tracking-tight;
+    }
+
+    h2 {
+        @apply font-display text-lg tracking-tight;
+    }
+}

@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@import "./fonts.css";
+@import "./base.css";
+
+@theme {
+    --color-purple: #c7a1cc;
+    --color-blue: #9bd2fa;
+    --color-green: #79D482;
+    --color-yellow: #f8e57a;
+    --color-beige-light: #fffced;
+    --color-orange: #fa8e6f;
+    --color-pink-lighter: #ffede9;
+    --color-pink-light: #fee5df;
+    --color-pink: #ffa6d6;
+    --color-dark-black: #0a0d16;
+
+    --font-display: 'Fraunces', serif;
+    --font-sans: 'Plus Jakarta Sans', sans-serif;
+
+    --text-*: initial;
+    --text-base: 15px;
+    --text-md: 18px;
+    --text-lg: 24px;
+    --text-xl: 48px;
+    --text-2xl: 64px;
+    --text-3xl: 72px;
+
+    --radius-*: initial;
+    --radius-sm: 20px;
+    --radius: 30px;
+    --radius-full: 999px;
+}

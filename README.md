@@ -26,7 +26,8 @@ npm run lint
 
 ### V1
 
-[Wireframe](https://id-preview-4a937b51--3100ca05-ec40-4340-b75f-a960c655361f.lovable.app/)
+[Wireframe 1](https://id-preview-4a937b51--3100ca05-ec40-4340-b75f-a960c655361f.lovable.app/)
+[Wireframe 2](https://id-preview--3100ca05-ec40-4340-b75f-a960c655361f.lovable.app/)
 
 Layout:
 
