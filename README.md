@@ -1,59 +1,85 @@
-# Budget
+# 💸 Budget
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.4.
+This project is made with **Angular** (version 21.0.4).
 
-## Development server
+## Development
 
 To start a local development server, run:
 
 ```bash
-ng serve
+npm run start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+To build the project, run:
 
 ```bash
-ng generate component component-name
+npm run build
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+To lint the project, run :
 
 ```bash
-ng generate --help
+npm run lint
 ```
 
-## Building
+## Planning
 
-To build the project run:
+### V1
 
-```bash
-ng build
-```
+[Wireframe](https://id-preview-4a937b51--3100ca05-ec40-4340-b75f-a960c655361f.lovable.app/)
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Layout:
 
-## Running unit tests
+- [ ] Responsive
+- [ ] Desktop: sidebar with menu / Mobile: floating menu bar bottom
+- [ ] Dark mode
+- [ ] Logo
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Auth:
 
-```bash
-ng test
-```
+- [ ] Simple lock with a password
 
-## Running end-to-end tests
+Dashboard:
 
-For end-to-end (e2e) testing, run:
+- [ ] Last 10 transactions of the current month
+- [ ] Balance left
+- [ ] Stats: number of transactions, total amount spent, total amount earned, subscriptions (number and amount)
+- [ ] View of the 7 next days
+- [ ] Transactions by category: cards, pie chart
+- [ ] Savings goals
+- [ ] Based on month earnings, do the 50/30/20 rule
 
-```bash
-ng e2e
-```
+Transactions:
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+- [ ] Search bar with filters by category and tag
+- [ ] List of transactions grouped by day, one page per month
+- [ ] CRUD modal: add, edit, delete
 
-## Additional Resources
+Transaction CRUD modal:
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- [ ] Expense / income selector
+- [ ] Amount input
+- [ ] Description input
+- [ ] Which account
+- [ ] Category selector
+- [ ] Date picker
+- [ ] Tag selector
+- [ ] Subscription?
+
+Savings goals:
+
+- [ ] List of goals (cards)
+- [ ] CRUD modal: add, edit, delete
+
+Yearly view:
+
+- [ ] Stats: amount spent, amount earned, real amount of money gained (after all the transactions)
+- [ ] Charts
+- [ ] Detail month by month (cards, table)
+
+Parameters:
+
+- [ ] Manage bank accounts
+- [ ] Manage categories
+- [ ] Manage tags
+- [ ] Manage currencies
