@@ -1,3 +1,141 @@
-<main>
-    <router-outlet/>
-</main>
+@if (authService.isAuthenticated()) {
+    <header class="lg:hidden border-b border-gray-light py-3 px-5 flex justify-between">
+        <a routerLink="" class="flex items-center gap-2">
+            <div class="rounded-full bg-yellow p-1.5 aspect-square flex items-center justify-center">
+                <img src="icons/favicon.svg" alt="Logo Budget" width="25">
+            </div>
+            <p class="font-display text-lg tracking-tight">Budget</p>
+        </a>
+
+        <div class="flex items-center gap-2">
+            <button
+                app-button
+                routerLink="parametres"
+                routerLinkActive="bg-blue"
+                shape="round"
+                variant="outline"
+            >
+                <svg lucideSettings [size]="22"></svg>
+            </button>
+
+            <button
+                app-button
+                shape="round"
+                variant="outline"
+            >
+                <svg lucideMoon [size]="22"></svg>
+            </button>
+        </div>
+    </header>
+}
+
+<div class="flex min-h-screen">
+    @if (authService.isAuthenticated()) {
+        <aside
+            class="hidden h-screen sticky top-0 px-6 py-5 lg:flex flex-col gap-6 bg-beige-lighter border-r border-gray-light">
+            <div class="flex items-center justify-between gap-2 border-b border-gray-light pb-5">
+                <a routerLink="" class="flex items-center gap-2">
+                    <div class="rounded-full bg-yellow p-1.5 aspect-square flex items-center justify-center">
+                        <img src="icons/favicon.svg" alt="Logo Budget" width="25">
+                    </div>
+                    <p class="font-display text-lg tracking-tight">Budget</p>
+                </a>
+
+                <button
+                    app-button
+                    shape="round"
+                    variant="outline"
+                >
+                    <svg lucideMoon [size]="22"></svg>
+                </button>
+            </div>
+
+            <button app-button variant="secondary" shape="bigPill">
+                <svg lucidePlus [size]="20"></svg>
+                Nouvelle transaction
+            </button>
+
+            <nav>
+                <ul class="space-y-2">
+                    @for (link of links; track link.label) {
+                        <li>
+                            <a
+                                app-button
+                                routerLink="{{ link.path }}"
+                                routerLinkActive="bg-blue/50 text-black-dark! [&>svg]:bg-yellow"
+                                [routerLinkActiveOptions]="{exact: true}"
+                                variant="sidebar"
+                                class="[&>svg]:rounded-full [&>svg]:p-1.5 [&>svg]:border [&>svg]:border-black-dark [&>svg]:text-black-dark"
+                            >
+                                @switch (link.icon) {
+                                    @case ('lucideHome') {
+                                        <svg lucideHome [size]="30"></svg>
+                                    }
+                                    @case ('lucideList') {
+                                        <svg lucideList [size]="30"></svg>
+                                    }
+                                    @case ('lucideTarget') {
+                                        <svg lucideTarget [size]="30"></svg>
+                                    }
+                                    @case ('lucideChartColumnIncreasing') {
+                                        <svg lucideChartColumnIncreasing [size]="30"></svg>
+                                    }
+                                    @case ('lucideSettings') {
+                                        <svg lucideSettings [size]="30"></svg>
+                                    }
+                                }
+                                {{ link.label }}
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        </aside>
+    }
+
+    <main class="flex-1 [&>section]:p-5">
+        <router-outlet/>
+    </main>
+</div>
+
+@if (authService.isAuthenticated()) {
+    <nav
+        class="lg:hidden fixed left-0 right-0 bottom-5 mx-5 bg-black-dark text-beige-light rounded-full py-2 px-6 flex items-center justify-evenly gap-2">
+        @for (link of links; track link.label; let i = $index; let isLast = $last) {
+            @if (!isLast) {
+                @if (i === 2) {
+                    <button
+                        class="-translate-y-6 cursor-pointer transition-all hover:bg-pink-dark bg-pink text-black-dark border border-black-dark rounded-full p-3"
+                    >
+                        <svg lucidePlus [size]="30"></svg>
+                    </button>
+                }
+
+                <a
+                    routerLink="{{ link.path }}"
+                    routerLinkActive="text-yellow"
+                    [routerLinkActiveOptions]="{exact: true}"
+                    class="flex flex-col items-center gap-1 transition-all hover:text-gray-light/75"
+                >
+                    @switch (link.icon) {
+                        @case ('lucideHome') {
+                            <svg lucideHome [size]="24"></svg>
+                        }
+                        @case ('lucideList') {
+                            <svg lucideList [size]="24"></svg>
+                        }
+                        @case ('lucideTarget') {
+                            <svg lucideTarget [size]="24"></svg>
+                        }
+                        @case ('lucideChartColumnIncreasing') {
+                            <svg lucideChartColumnIncreasing [size]="24"></svg>
+                        }
+                    }
+                    <span class="text-xs">
+                        {{ link.shortLabel }}
+                    </span>
+                </a>
+            }
+        }
+    </nav>
+}

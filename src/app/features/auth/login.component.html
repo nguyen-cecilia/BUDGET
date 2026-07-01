@@ -1,0 +1,40 @@
+<div class="min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-sm bg-beige-lighter border border-gray-light rounded shadow-2xl shadow-black-dark/10 p-8">
+        <form [formGroup]="loginForm" (ngSubmit)="login()" class="space-y-6">
+            <label>
+                <p>Email</p>
+                <input
+                    type="email"
+                    formControlName="email"
+                    placeholder="votre@email.com"
+                    [disabled]="isLoading()"
+                />
+            </label>
+
+            <label>
+                <p>Mot de passe</p>
+                <input
+                    type="password"
+                    formControlName="password"
+                    placeholder="Votre mot de passe"
+                    [disabled]="isLoading()"
+                />
+            </label>
+
+            <button
+                app-button
+                type="submit"
+                [disabled]="isLoading()"
+                class="w-full"
+            >
+                {{ isLoading() ? 'Connexion en cours...' : 'Se connecter' }}
+            </button>
+
+            @if (error()) {
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                    {{ error() }}
+                </div>
+            }
+        </form>
+    </div>
+</div>

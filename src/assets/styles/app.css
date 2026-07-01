@@ -2,23 +2,34 @@
 
 @import "./fonts.css";
 @import "./base.css";
+@import "./form.css";
+
+@plugin "@tailwindcss/forms" {
+    strategy: "class";
+}
 
 @theme {
     --color-purple: #c7a1cc;
     --color-blue: #9bd2fa;
     --color-green: #79D482;
     --color-yellow: #f8e57a;
-    --color-beige-light: #fffced;
+    --color-beige-lighter: #fffcf3;
+    --color-beige-light: #fcf7e4;
     --color-orange: #fa8e6f;
     --color-pink-lighter: #ffede9;
     --color-pink-light: #fee5df;
     --color-pink: #ffa6d6;
-    --color-dark-black: #0a0d16;
+    --color-pink-dark: #fa8cc8;
+    --color-gray-light: #dcd7c9;
+    --color-gray: #515869;
+    --color-black-dark: #0a0d16;
 
     --font-display: 'Fraunces', serif;
     --font-sans: 'Plus Jakarta Sans', sans-serif;
 
     --text-*: initial;
+    --text-xs: 11px;
+    --text-sm: 14px;
     --text-base: 15px;
     --text-md: 18px;
     --text-lg: 24px;
