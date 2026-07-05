@@ -11,15 +11,19 @@
 @theme {
     --color-purple: #c7a1cc;
     --color-blue: #9bd2fa;
+    --color-blue-dark: #909ecf;
     --color-green: #79D482;
+    --color-green-yellow: #ced063;
     --color-yellow: #f8e57a;
     --color-beige-lighter: #fffcf3;
     --color-beige-light: #fcf7e4;
-    --color-orange: #fa8e6f;
+    --color-orange: #f8813b;
     --color-pink-lighter: #ffede9;
     --color-pink-light: #fee5df;
     --color-pink: #ffa6d6;
     --color-pink-dark: #fa8cc8;
+    --color-pink-darker: #e24c71;
+    --color-brown: #c7976f;
     --color-gray-light: #dcd7c9;
     --color-gray: #515869;
     --color-black-dark: #0a0d16;
@@ -28,14 +32,16 @@
     --font-sans: 'Plus Jakarta Sans', sans-serif;
 
     --text-*: initial;
-    --text-xs: 11px;
+    --text-xxs: 11px;
+    --text-xs: 12px;
     --text-sm: 14px;
     --text-base: 15px;
     --text-md: 18px;
     --text-lg: 24px;
-    --text-xl: 48px;
-    --text-2xl: 64px;
-    --text-3xl: 72px;
+    --text-xl: 30px;
+    --text-2xl: 48px;
+    --text-3xl: 64px;
+    --text-4xl: 72px;
 
     --radius-*: initial;
     --radius-sm: 20px;

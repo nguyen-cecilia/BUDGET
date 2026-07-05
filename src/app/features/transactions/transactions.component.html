@@ -1,1 +1,127 @@
-<p>transactions works!</p>
+<section class="space-y-6">
+    <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-6">
+        <div>
+            <h1>Transactions</h1>
+            <p class="text-gray">10 résultats</p>
+        </div>
+
+        <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-center">
+                <label class="relative w-full lg:w-2/3">
+                    <input
+                        type="text"
+                        placeholder="Rechercher"
+                        class="pl-9"
+                    >
+                    <svg lucideSearch [size]="16" class="absolute bottom-0 top-3 left-3"></svg>
+                </label>
+
+                <label for="type" class="flex-1 flex items-center gap-4 rounded-full bg-beige-light px-4 text-sm">
+                    <p class="text-gray uppercase m-0">Type</p>
+                    <select name="type" id="type" class="flex-1 font-medium">
+                        <option value="test">Tout</option>
+                        <option value="test">Dépense</option>
+                        <option value="test">Revenu</option>
+                        <option value="test">Abonnement</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="flex flex-wrap gap-3">
+                <button app-badge category="all">Toutes</button>
+                <button app-badge category="house">Maison</button>
+                <button app-badge category="health">Santé</button>
+                <button app-badge category="work">Professionnel</button>
+                <button app-badge category="grocery">Courses</button>
+                <button app-badge category="transportation">Transport</button>
+                <button app-badge category="shopping">Shopping</button>
+                <button app-badge category="eatout">Restaurants</button>
+                <button app-badge category="leisure">Loisirs</button>
+                <button app-badge category="gifts">Cadeaux</button>
+            </div>
+
+            <div class="flex flex-wrap gap-3">
+                <button app-badge variant="outline">#vacances</button>
+                <button app-badge variant="outline">#meubles</button>
+                <button app-badge variant="outline">#smiskis</button>
+                <button app-badge variant="outline">#southkorea2027</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-3">
+        <div class="flex items-center justify-between gap-6">
+            <h2>4 juillet</h2>
+
+            <p class="font-bold">-30€</p>
+        </div>
+
+        <div class="space-y-1">
+            <div class="flex items-center justify-between gap-6 rounded px-2 py-4 transition-all hover:bg-beige-light">
+                <div class="flex items-center gap-6">
+                    <div class="aspect-square border rounded-full p-3 bg-orange">
+                        <svg lucideArrowUpRight [size]="20"></svg>
+                    </div>
+                    <div>
+                        <p class="text-md font-bold">Brussels fries</p>
+                        <p class="text-sm text-gray">Restaurants</p>
+                    </div>
+                </div>
+
+                <p class="font-display text-md">-16€</p>
+            </div>
+
+            <div class="flex items-center justify-between gap-6 rounded px-2 py-4 transition-all hover:bg-beige-light">
+                <div class="flex items-center gap-6">
+                    <div class="aspect-square border rounded-full p-3 bg-green">
+                        <svg lucideArrowUpRight [size]="20"></svg>
+                    </div>
+                    <div>
+                        <p class="text-md font-bold">Carrefour</p>
+                        <p class="text-sm text-gray">Courses</p>
+                    </div>
+                </div>
+
+                <p class="font-display text-md">-14€</p>
+            </div>
+
+            <div class="flex items-center justify-between gap-6 rounded px-2 py-4 transition-all hover:bg-beige-light">
+                <div class="flex items-center gap-6">
+                    <div class="aspect-square border rounded-full p-3 bg-green-yellow">
+                        <svg lucideArrowUpRight [size]="20"></svg>
+                    </div>
+                    <div>
+                        <p class="text-md font-bold">Carrefour</p>
+                        <p class="text-sm text-gray">Courses</p>
+                    </div>
+                </div>
+
+                <p class="font-display text-md">-14€</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-3">
+        <div class="flex items-center justify-between gap-6">
+            <h2>2 juillet</h2>
+
+            <p class="font-bold">+3000€</p>
+        </div>
+
+        <div class="space-y-1">
+            <div class="flex items-center justify-between gap-6 rounded px-2 py-4 transition-all hover:bg-beige-light">
+                <div class="flex items-center gap-6">
+                    <div class="aspect-square border rounded-full p-3 bg-blue">
+                        <svg lucideArrowDownLeft [size]="20"></svg>
+                    </div>
+                    <div>
+                        <p class="text-md font-bold">Salaire</p>
+                        <p class="text-sm text-gray">Professionnel</p>
+                    </div>
+                </div>
+
+                <p class="font-display text-md">+3000€</p>
+            </div>
+        </div>
+    </div>
+</section>

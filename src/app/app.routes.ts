@@ -6,7 +6,7 @@ import {TransactionsComponent} from './features/transactions/transactions.compon
 
 export const routes: Routes = [
     {
-        path: 'login',
+        path: 'connexion',
         component: LoginComponent,
     },
     {

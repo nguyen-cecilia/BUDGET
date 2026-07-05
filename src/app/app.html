@@ -4,7 +4,7 @@
             <div class="rounded-full bg-yellow p-1.5 aspect-square flex items-center justify-center">
                 <img src="icons/favicon.svg" alt="Logo Budget" width="25">
             </div>
-            <p class="font-display text-lg tracking-tight">Budget</p>
+            <p class="font-display text-xl tracking-tight">Budget</p>
         </a>
 
         <div class="flex items-center gap-2">
@@ -38,7 +38,7 @@
                     <div class="rounded-full bg-yellow p-1.5 aspect-square flex items-center justify-center">
                         <img src="icons/favicon.svg" alt="Logo Budget" width="25">
                     </div>
-                    <p class="font-display text-lg tracking-tight">Budget</p>
+                    <p class="font-display text-xl tracking-tight">Budget</p>
                 </a>
 
                 <button
@@ -93,7 +93,7 @@
         </aside>
     }
 
-    <main class="flex-1 [&>section]:p-5">
+    <main class="flex-1 [&_section]:p-5 pb-30 lg:pb-15">
         <router-outlet/>
     </main>
 </div>
@@ -107,7 +107,7 @@
                     <button
                         class="-translate-y-6 cursor-pointer transition-all hover:bg-pink-dark bg-pink text-black-dark border border-black-dark rounded-full p-3"
                     >
-                        <svg lucidePlus [size]="30"></svg>
+                        <svg lucidePlus [size]="34"></svg>
                     </button>
                 }
 
@@ -131,7 +131,7 @@
                             <svg lucideChartColumnIncreasing [size]="24"></svg>
                         }
                     }
-                    <span class="text-xs">
+                    <span class="text-xxs">
                         {{ link.shortLabel }}
                     </span>
                 </a>
