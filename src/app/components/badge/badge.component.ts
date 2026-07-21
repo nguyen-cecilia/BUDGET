@@ -1,8 +1,7 @@
-import {Component, inject, Input} from '@angular/core';
-import {CategoryColorService, CategoryType} from '../../core/category-color.service';
+import {Component, Input} from '@angular/core';
 
 @Component({
-    selector: 'button[app-badge], a[app-badge]',
+    selector: 'button[app-badge], a[app-badge], div[app-badge]',
     template: `
         <ng-content/>
     `,
@@ -13,21 +12,20 @@ import {CategoryColorService, CategoryType} from '../../core/category-color.serv
     },
 })
 export class BadgeComponent {
-    private categoryColorService = inject(CategoryColorService);
-
     @Input() type: 'button' | 'submit' | 'reset' = 'button';
     @Input() disabled = false;
-    @Input() variant: 'primary' | 'outline' = 'primary';
-    @Input() category: CategoryType | null = null;
+    @Input() variant: 'primary' | 'secondary' | 'tertiary' | 'outline' = 'primary';
 
     classes(): string {
-        const base = 'rounded-full px-3 py-1 text-xs font-bold text-gray cursor-pointer transition-all';
+        const base = 'flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold text-gray cursor-pointer transition-all';
 
         const variants = {
-            primary: '',
+            primary: 'bg-beige-light',
+            secondary: 'bg-yellow hover:bg-pink',
+            tertiary: 'bg-beige-light hover:bg-green',
             outline: 'border border-gray/25 hover:border-gray/50',
         };
 
-        return `${base} ${variants[this.variant]} ${this.categoryColorService.getColor(this.category)}`;
+        return `${base} ${variants[this.variant]}`;
     }
 }

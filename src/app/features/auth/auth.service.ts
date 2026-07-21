@@ -1,55 +1,25 @@
-import {inject, Injectable} from "@angular/core";
-import {SupabaseService} from "../../core/supabase.service";
-import {BehaviorSubject, Observable} from "rxjs";
+import {inject, Injectable} from '@angular/core';
+import {SupabaseService} from '../../core/supabase.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AuthService {
-    private supabaseService = inject(SupabaseService);
-    private supabase = this.supabaseService.getClient();
-    private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
-    public isAuthenticated$: Observable<boolean> = this.isAuthenticatedSubject.asObservable();
+    private supabase = inject(SupabaseService);
 
-    constructor() {
-        this.initializeAuth();
+    async signInWithPassword(email: string, password: string) {
+        return this.supabase.getClient().auth.signInWithPassword({email, password});
     }
 
-    private async initializeAuth(): Promise<void> {
-        const {data} = await this.supabase.auth.getSession();
-        this.isAuthenticatedSubject.next(!!data.session);
-
-        this.supabase.auth.onAuthStateChange((event, session) => {
-            this.isAuthenticatedSubject.next(!!session);
-        });
+    async signInWithOtp(email: string) {
+        return this.supabase.getClient().auth.signInWithOtp({email});
     }
 
-    async login(email: string, password: string): Promise<{ success: boolean; error?: string }> {
-        try {
-            const {error} = await this.supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
-
-            if (error) {
-                return {success: false, error: error.message};
-            }
-
-            return {success: true};
-        } catch (err) {
-            return {success: false, error: 'Une erreur est survenue'};
-        }
+    async signOut() {
+        return this.supabase.getClient().auth.signOut();
     }
 
-    async logout(): Promise<void> {
-        await this.supabase.auth.signOut();
-    }
-
-    isAuthenticated(): boolean {
-        return this.isAuthenticatedSubject.value;
-    }
-
-    getSession() {
-        return this.supabase.auth.getSession();
+    async updatePassword(newPassword: string) {
+        return this.supabase.getClient().auth.updateUser({password: newPassword});
     }
 }

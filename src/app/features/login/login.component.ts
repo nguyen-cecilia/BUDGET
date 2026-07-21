@@ -2,7 +2,7 @@ import {Component, inject, signal} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {AuthService} from './auth.service';
+import {AuthService} from '../auth/auth.service';
 import {ButtonComponent} from '../../components/button/button.component';
 
 @Component({
@@ -38,14 +38,14 @@ export class LoginComponent {
         this.isLoading.set(true);
 
         const {email, password} = this.loginForm.value;
-        const result = await this.authService.login(email, password);
+        const {error} = await this.authService.signInWithPassword(email, password);
 
-        if (result.success) {
-            await this.router.navigate(['']);
-        } else {
-            this.error.set(result.error || 'Erreur de connexion');
+        if (error) {
+            this.error.set(error.message || 'Erreur lors de la connexion.');
+            return;
         }
 
+        await this.router.navigate(['']);
         this.isLoading.set(false);
     }
 }

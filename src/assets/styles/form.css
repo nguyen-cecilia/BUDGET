@@ -9,11 +9,40 @@
 
     input[type="text"],
     input[type="password"],
-    input[type="email"] {
-        @apply form-input w-full bg-transparent border border-gray-light shadow-sm shadow-black-dark/5 rounded px-4 py-2 focus:border-gray-light focus:ring-offset-0 focus:ring-2 focus:ring-pink;
+    input[type="email"],
+    input[type="date"] {
+        @apply form-input w-full text-sm bg-transparent border border-gray-light shadow-sm shadow-black-dark/5 rounded px-3 py-1.5 focus:border-gray-light focus:ring-offset-0 focus:ring-2 focus:ring-pink;
     }
 
     select {
         @apply py-3 px-4 cursor-pointer focus:outline-none;
+
+        &.custom-select {
+            @apply form-select w-full text-sm bg-transparent border border-gray-light shadow-sm shadow-black-dark/5 rounded px-3 py-1.5 focus:border-gray-light focus:ring-offset-0 focus:ring-2 focus:ring-pink;
+        }
+    }
+
+    .tab-switch-input {
+        @apply flex items-center gap-1 bg-beige-light p-1 rounded shadow-sm shadow-black-dark/5;
+
+        & label {
+            @apply cursor-pointer flex-1 py-2 px-4 rounded-full text-center text-gray has-checked:text-black-dark transition-all;
+
+            & p {
+                @apply font-medium;
+            }
+        }
+
+        & input {
+            @apply invisible absolute pointer-events-none;
+        }
+    }
+
+    label:has(input[type="checkbox"]) {
+        @apply flex items-center gap-2 cursor-pointer;
+
+        input[type="checkbox"].switch {
+            @apply appearance-none bg-beige-light relative m-0 w-10 h-5.5 border border-gray-light rounded-full cursor-pointer transition-all checked:bg-blue checked:border-blue before:absolute before:top-0.5 before:left-0.5 before:transition-all before:border before:border-gray-light before:w-4 before:h-4 before:bg-white before:rounded-full checked:before:translate-x-4.5;
+        }
     }
 }

@@ -1,4 +1,4 @@
-@if (authService.isAuthenticated()) {
+@if (authState.isAuthenticated()) {
     <header class="lg:hidden border-b border-gray-light py-3 px-5 flex justify-between">
         <a routerLink="" class="flex items-center gap-2">
             <div class="rounded-full bg-yellow p-1.5 aspect-square flex items-center justify-center">
@@ -29,8 +29,15 @@
     </header>
 }
 
+<app-modal #editModal
+           title="Modifier la transaction"
+           [isOpen]="modalService.editModalOpen"
+>
+    <app-update-transaction/>
+</app-modal>
+
 <div class="flex min-h-screen">
-    @if (authService.isAuthenticated()) {
+    @if (authState.isAuthenticated()) {
         <aside
             class="hidden h-screen sticky top-0 px-6 py-5 lg:flex flex-col gap-6 bg-beige-lighter border-r border-gray-light">
             <div class="flex items-center justify-between gap-2 border-b border-gray-light pb-5">
@@ -50,7 +57,15 @@
                 </button>
             </div>
 
-            <button app-button variant="secondary" shape="bigPill">
+            <app-select
+                [options]="monthOptions()"
+                [value]="selectedMonth()"
+                (valueChange)="onMonthChange($event)"
+            ></app-select>
+
+            <hr class="text-gray-light">
+
+            <button app-button variant="secondary" shape="bigPill" (click)="modalService.openEditModal()">
                 <svg lucidePlus [size]="20"></svg>
                 Nouvelle transaction
             </button>
@@ -98,7 +113,7 @@
     </main>
 </div>
 
-@if (authService.isAuthenticated()) {
+@if (authState.isAuthenticated()) {
     <nav
         class="lg:hidden fixed left-0 right-0 bottom-5 mx-5 bg-black-dark text-beige-light rounded-full py-2 px-6 flex items-center justify-evenly gap-2">
         @for (link of links; track link.label; let i = $index; let isLast = $last) {
@@ -106,6 +121,7 @@
                 @if (i === 2) {
                     <button
                         class="-translate-y-6 cursor-pointer transition-all hover:bg-pink-dark bg-pink text-black-dark border border-black-dark rounded-full p-3"
+                        (click)="editModal.open()"
                     >
                         <svg lucidePlus [size]="34"></svg>
                     </button>
