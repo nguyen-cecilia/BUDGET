@@ -9,6 +9,9 @@ import {TransactionOptionsService} from './transaction-options.service';
 import {TransactionService} from './transaction.service';
 import {ModalService} from '../../components/modal/modal.service';
 import {TagService} from '../tags/tag.service';
+import {SubscriptionService} from '../subscriptions/subscription.service';
+import positiveNumber from '../../core/validators';
+import computeNextDate from '../../core/utilities';
 
 @Component({
     selector: 'app-update-transaction',
@@ -29,6 +32,7 @@ export class TransactionUpdateComponent implements OnInit {
     private optionsService = inject(TransactionOptionsService);
     private transactionService = inject(TransactionService);
     private tagService = inject(TagService);
+    private subscriptionService = inject(SubscriptionService);
     private modalService = inject(ModalService);
 
     transactionForm: FormGroup;
@@ -51,15 +55,19 @@ export class TransactionUpdateComponent implements OnInit {
 
         this.transactionForm = this.fb.group({
             type: ['expense', [Validators.required]],
-            amount: ['', [Validators.required]],
+            amount: ['', [Validators.required, positiveNumber]],
             amountCurrency: ['', [Validators.required]],
-            label: [''],
+            label: ['', [Validators.required]],
             date: [nowLocal, [Validators.required]],
             account: ['', [Validators.required]],
-            category: [''],
-            tags: [''],
+            category: ['', [Validators.required]],
             isSubscription: [false],
-            subscriptionFrequency: [''],
+            subscriptionFrequency: ['monthly'],
+            subscriptionNextDate: [computeNextDate('monthly')],
+        });
+
+        this.transactionForm.get('subscriptionFrequency')?.valueChanges.subscribe(freq => {
+            this.transactionForm.patchValue({ subscriptionNextDate: computeNextDate(freq) });
         });
 
         effect(() => {
@@ -111,6 +119,7 @@ export class TransactionUpdateComponent implements OnInit {
         const nowLocal = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
             .toISOString()
             .slice(0, 16);
+
         const currencies = this.currenciesOptions();
         const accounts = this.accountsOptions();
         const categories = this.categoriesOptions();
@@ -121,9 +130,9 @@ export class TransactionUpdateComponent implements OnInit {
             date: nowLocal,
             account: accounts.length > 0 ? accounts[0].value : '',
             category: categories.length > 0 ? categories[0].value : '',
-            tags: '',
             isSubscription: false,
-            subscriptionFrequency: '',
+            subscriptionFrequency: 'monthly',
+            subscriptionNextDate: computeNextDate('monthly'),
         });
     }
 
@@ -149,6 +158,43 @@ export class TransactionUpdateComponent implements OnInit {
         if (allTagIds.length > 0) {
             await this.transactionService.addTagsToTransaction(transactionId, allTagIds);
         }
+    }
+
+    private async handleSubscription(
+        userId: string,
+        label: string,
+        accountId: string,
+        categoryId: string | undefined,
+        frequency: string,
+        nextDate: string,
+    ): Promise<number | null> {
+        const existing = await this.subscriptionService.getAllSubscriptionsByUser(userId);
+
+        const match = existing.find(
+            s => s.label.toLowerCase() === label.toLowerCase()
+        );
+
+        if (match) {
+            await this.subscriptionService.updateSubscription(match.id, {
+                next_payment_date: nextDate,
+                frequency,
+                account_id: accountId,
+                category_id: categoryId,
+                is_active: true,
+            });
+            return match.id;
+        }
+
+        const created = await this.subscriptionService.createSubscription(userId, {
+            label,
+            next_payment_date: nextDate,
+            is_active: true,
+            account_id: accountId,
+            category_id: categoryId || '',
+            frequency,
+        });
+
+        return created.id;
     }
 
     availableTagsOptions = computed(() =>
@@ -212,6 +258,23 @@ export class TransactionUpdateComponent implements OnInit {
 
             const fv = this.transactionForm.value;
 
+            if (fv.isSubscription && !fv.subscriptionNextDate) {
+                this.errorMessage.set('Veuillez renseigner la date du prochain renouvellement');
+                return;
+            }
+
+            let subscriptionId: number | null = null;
+            if (fv.isSubscription) {
+                subscriptionId = await this.handleSubscription(
+                    userId,
+                    fv.label,
+                    fv.account,
+                    fv.category || undefined,
+                    fv.subscriptionFrequency,
+                    fv.subscriptionNextDate
+                );
+            }
+
             const transaction = await this.transactionService.createTransaction(userId, {
                 type: fv.type,
                 amount: parseFloat(fv.amount),
@@ -221,7 +284,7 @@ export class TransactionUpdateComponent implements OnInit {
                 account_id: fv.account,
                 category_id: fv.category || undefined,
                 is_subscription: fv.isSubscription,
-                subscription_frequency: fv.subscriptionFrequency || undefined,
+                subscription_id: subscriptionId,
             });
 
             await this.handleTags(userId, transaction.id);

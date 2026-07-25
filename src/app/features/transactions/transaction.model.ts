@@ -11,6 +11,7 @@ export interface Transaction {
     account_id: string;
     category_id: string;
     is_subscription: boolean;
+    subscription_id?: number | null;
     tags?: {
         id: string;
         label: string;

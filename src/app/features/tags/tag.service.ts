@@ -20,7 +20,7 @@ export class TagService {
         ;
 
         if (error) {
-            console.error('Erreur lors de la récupération des catégories:', error);
+            console.error('Erreur lors de la récupération des tags:', error);
             throw error;
         }
 

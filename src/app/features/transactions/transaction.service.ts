@@ -53,7 +53,7 @@ export class TransactionService {
         account_id: string;
         category_id?: string;
         is_subscription: boolean;
-        subscription_frequency?: string;
+        subscription_id?: number | null;
     }): Promise<Transaction> {
         const {data, error} = await this.supabase
             .from(TRANSACTIONS_TABLE)
@@ -68,7 +68,7 @@ export class TransactionService {
                     account_id: transaction.account_id,
                     category_id: transaction.category_id || null,
                     is_subscription: transaction.is_subscription,
-                    // subscription_frequency: transaction.subscription_frequency || null,
+                    subscription_id: transaction.subscription_id || null,
                 }
             ])
             .select()

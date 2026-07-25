@@ -79,7 +79,12 @@
                                     }
                                 </div>
                                 <div>
-                                    <p class="text-md font-bold">{{ transaction.label }}</p>
+                                    <div class="text-md font-bold flex items-center gap-1.5">
+                                        {{ transaction.label }}
+                                        @if (transaction.is_subscription) {
+                                            <svg lucideSparkles [size]="20"></svg>
+                                        }
+                                    </div>
                                     <p class="text-sm text-gray">
                                         {{ transaction.account.label }} ·
                                         <span class="font-semibold underline decoration-2 underline-offset-3 {{ this.colorService.getDecoration(transaction.category.color) }}">{{ transaction.category.label }}</span>

@@ -1,5 +1,5 @@
 import {Component, effect, inject, OnInit, signal} from '@angular/core';
-import {LucideArrowDownLeft, LucideArrowUpRight, LucideSearch} from '@lucide/angular';
+import {LucideArrowDownLeft, LucideArrowUpRight, LucideSearch, LucideSparkles} from '@lucide/angular';
 import {BadgeComponent} from '../../components/badge/badge.component';
 import {ModalService} from '../../components/modal/modal.service';
 import {TransactionsByMonth} from './transaction.model';
@@ -18,6 +18,7 @@ import {TransactionOptionsService} from './transaction-options.service';
         BadgeComponent,
         LucideArrowUpRight,
         LucideArrowDownLeft,
+        LucideSparkles,
         DatePipe,
         CurrencyPipe,
         SelectComponent
