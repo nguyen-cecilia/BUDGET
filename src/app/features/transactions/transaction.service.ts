@@ -1,8 +1,9 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, signal} from '@angular/core';
 import {SupabaseService} from '../../core/supabase.service';
-import {Transaction, TransactionsByDay, TransactionsByMonth} from './transaction.model';
+import {Transaction, TransactionsByDay, TransactionsByMonth, TransactionType} from './transaction.model';
 
 const TRANSACTIONS_TABLE = 'transactions';
+const TRANSACTION_TAGS_TABLE = 'transaction_tags';
 
 @Injectable({
     providedIn: 'root',
@@ -11,36 +12,7 @@ export class TransactionService {
     private supabaseService = inject(SupabaseService);
     private supabase = this.supabaseService.getClient();
 
-    async getTransactionsByCurrentMonth(userId: string): Promise<TransactionsByMonth> {
-        const now = new Date();
-        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-        const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-        const startDate = this.formatDate(firstDay);
-        const endDate = this.formatDate(lastDay);
-
-        const {data, error} = await this.supabase
-            .from(TRANSACTIONS_TABLE)
-            .select(`
-                *,
-                account:accounts(id, label),
-                category:categories(id, label, color),
-                currency:currencies(id, code, label),
-                tags(id, label)
-            `)
-            .eq('user_id', userId)
-            .gte('date', startDate)
-            .lte('date', endDate)
-            .order('date', {ascending: false})
-        ;
-
-        if (error) {
-            console.error('Erreur lors de la récupération des transactions:', error);
-            throw error;
-        }
-
-        return this.groupByMonth(data || []);
-    }
+    transactionRefreshTrigger = signal<boolean>(false);
 
     async getTransactionsByMonth(userId: string, monthIndex: number, year: number): Promise<TransactionsByMonth> {
         const firstDay = new Date(year, monthIndex, 1);
@@ -70,6 +42,55 @@ export class TransactionService {
         }
 
         return this.groupByMonth(data || []);
+    }
+
+    async createTransaction(userId: string, transaction: {
+        type: TransactionType;
+        amount: number;
+        amount_currency_id: string;
+        label: string;
+        date: string;
+        account_id: string;
+        category_id?: string;
+        is_subscription: boolean;
+        subscription_frequency?: string;
+    }): Promise<Transaction> {
+        const {data, error} = await this.supabase
+            .from(TRANSACTIONS_TABLE)
+            .insert([
+                {
+                    user_id: userId,
+                    type: transaction.type,
+                    amount: transaction.amount,
+                    amount_currency_id: transaction.amount_currency_id,
+                    label: transaction.label,
+                    date: transaction.date,
+                    account_id: transaction.account_id,
+                    category_id: transaction.category_id || null,
+                    is_subscription: transaction.is_subscription,
+                    // subscription_frequency: transaction.subscription_frequency || null,
+                }
+            ])
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Erreur lors de la création de la transaction:', error);
+            throw error;
+        }
+
+        return data;
+    }
+
+    async addTagsToTransaction(transactionId: string, tagIds: (string | number)[]): Promise<void> {
+        const { error } = await this.supabase
+            .from(TRANSACTION_TAGS_TABLE)
+            .insert(tagIds.map(tagId => ({
+                transaction_id: transactionId,
+                tag_id: tagId
+            })));
+
+        if (error) throw error;
     }
 
     private formatDate(date: Date): string {
@@ -116,7 +137,9 @@ export class TransactionService {
         return Array.from(grouped.entries())
             .map(([date, transactionList]) => ({
                 date,
-                transactions: transactionList,
+                transactions: transactionList.sort((a, b) => {
+                    return new Date(b.date).getTime() - new Date(a.date).getTime();
+                }),
                 total_amount: transactionList.reduce((sum, t) => {
                     return t.type === 'expense' ? sum - t.amount : sum + t.amount;
                 }, 0),
@@ -126,7 +149,6 @@ export class TransactionService {
     }
 
     private groupByMonth(transactions: Transaction[]): TransactionsByMonth {
-        console.log(transactions);
         const transactionsByDay = this.groupByDay(transactions);
 
         let transactionsByMonth = {
@@ -138,7 +160,7 @@ export class TransactionService {
         if (transactions.length > 0) {
             const firstTransaction = transactions[0];
             const date = new Date(firstTransaction.date);
-            const month = date.toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
+            const month = date.toLocaleString('fr-FR', {month: 'long', year: 'numeric'});
 
             const count = transactions.length;
 
@@ -149,6 +171,6 @@ export class TransactionService {
             };
         }
 
-         return transactionsByMonth;
+        return transactionsByMonth;
     }
 }

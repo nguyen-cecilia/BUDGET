@@ -1,0 +1,158 @@
+<form class="space-y-4" [formGroup]="transactionForm" (ngSubmit)="submitTransaction()">
+    @if (errorMessage()) {
+        <div class="text-red-600">{{ errorMessage() }}</div>
+    }
+
+    <div class="tab-switch-input">
+        <label for="expense" class="has-checked:bg-pink">
+            <input type="radio" id="expense" value="expense" name="type" formControlName="type">
+            <p>Dépense</p>
+        </label>
+        <label for="income" class="has-checked:bg-green">
+            <input type="radio" id="income" value="income" name="type" formControlName="type">
+            <p>Revenu</p>
+        </label>
+    </div>
+
+    <label for="amount">
+        <p>Montant</p>
+        <input
+            type="text"
+            id="amount"
+            formControlName="amount"
+            placeholder="0.00"
+            class="font-display text-md"
+        />
+    </label>
+
+    <div class="flex items-center gap-3 *:flex-1">
+        <label for="currency">
+            <p>Devise</p>
+            <select name="currency" id="currency" formControlName="amountCurrency" class="custom-select">
+                @for (currency of currenciesOptions(); track currency.value) {
+                    <option value="{{ currency.value }}">{{ currency.label }}</option>
+                }
+            </select>
+        </label>
+
+        <label for="account">
+            <p>Compte</p>
+            <select name="account" id="account" formControlName="account" class="custom-select">
+                @for (account of accountsOptions(); track account.value) {
+                    <option value="{{ account.value }}">{{ account.label }}</option>
+                }
+            </select>
+        </label>
+    </div>
+
+    <label for="label">
+        <p>Label</p>
+        <input
+            type="text"
+            id="label"
+            formControlName="label"
+            placeholder="Ex: Courses Carrefour"
+        />
+    </label>
+
+    <div class="flex items-center gap-3 *:flex-1">
+        <label for="category">
+            <p>Catégorie</p>
+            <select name="category" id="category" formControlName="category" class="custom-select">
+                @for (category of categoriesOptions(); track category.value) {
+                    <option value="{{ category.value }}">{{ category.label }}</option>
+                }
+            </select>
+        </label>
+
+        <label for="date">
+            <p>Date</p>
+            <input
+                type="datetime-local"
+                id="date"
+                formControlName="date"
+                placeholder="jj/mm/aaaa"
+            />
+        </label>
+    </div>
+
+    <label for="tags" class="flex flex-col gap-1">
+        <p>Tags</p>
+        <div class="order-1 flex items-center gap-3">
+            <input
+                #newTagInput
+                type="text"
+                placeholder="Ex: travaux, vacances..."
+            />
+            <button app-button variant="tertiary" (click)="addNewTag(newTagInput)">
+                <svg lucidePlus [size]="14"></svg>
+                Ajouter
+            </button>
+        </div>
+        <div class="relative flex flex-wrap items-center gap-2">
+            @for (tag of selectedTags(); track tag.value) {
+                <button app-badge variant="secondary" (click)="removeTag(tag.label)">
+                    #{{ tag.label }}
+                    <svg lucideX [size]="12"></svg>
+                </button>
+            }
+            @for (tag of newTags(); track tag) {
+                <button app-badge variant="secondary" (click)="removeTag(tag)">
+                    #{{ tag }}
+                    <svg lucideX [size]="12" class="pointer-events-none"></svg>
+                </button>
+            }
+        </div>
+        <div class="order-2 flex flex-wrap items-center gap-2">
+            @for (tag of availableTagsOptions(); track tag.value) {
+                <button app-badge variant="tertiary" (click)="addExistingTag(tag)">+ {{ tag.label }}</button>
+            }
+        </div>
+    </label>
+
+    <label for="isSubscription">
+        <input
+            type="checkbox"
+            id="isSubscription"
+            formControlName="isSubscription"
+            class="switch"
+            [checked]="isRecurring()"
+            (change)="isRecurring.set(!isRecurring())"
+        />
+        <p>Abonnement récurrent</p>
+    </label>
+
+    @if (isRecurring()) {
+        <div class="space-y-3 flex items-start gap-3 *:flex-1">
+            <label for="subscriptionFrequency">
+                <p>Fréquence</p>
+                <select name="subscriptionFrequency" id="subscriptionFrequency" formControlName="subscriptionFrequency" class="custom-select">
+                    <option value="daily">Quotidien</option>
+                    <option value="weekly">Hebdomadaire</option>
+                    <option value="monthly">Mensuel</option>
+                    <option value="yearly">Annuel</option>
+                </select>
+            </label>
+
+            <label for="subscriptionNextDate">
+                <p>Prochain renouvellement</p>
+                <input
+                    type="date"
+                    id="subscriptionNextDate"
+                    formControlName="subscriptionNextDate"
+                    placeholder="jj/mm/aaaa"
+                />
+            </label>
+        </div>
+    }
+
+    <button app-button type="submit" [disabled]="isSubmitting()" class="ml-auto">
+        @if (isSubmitting()) {
+            <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
+            Envoi...
+        } @else {
+            <svg lucideSave [size]="16"></svg>
+            Sauvegarder
+        }
+    </button>
+</form>

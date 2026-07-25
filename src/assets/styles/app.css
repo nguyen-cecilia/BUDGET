@@ -17,6 +17,7 @@
     --color-yellow: #f8e57a;
     --color-beige-lighter: #fffcf3;
     --color-beige-light: #fcf7e4;
+    --color-beige: #f0ebdc;
     --color-orange: #f8813b;
     --color-pink-lighter: #ffede9;
     --color-pink-light: #fee5df;
@@ -44,6 +45,7 @@
     --text-4xl: 72px;
 
     --radius-*: initial;
+    --radius-xs: 5px;
     --radius-sm: 20px;
     --radius: 30px;
     --radius-full: 999px;

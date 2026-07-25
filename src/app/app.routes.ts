@@ -2,7 +2,7 @@ import {Routes} from '@angular/router';
 import {LoginComponent} from './features/login/login.component';
 import {authGuard} from './features/auth/auth.guard';
 import {DashboardComponent} from './features/dashboard/dashboard.component';
-import {TransactionsComponent} from './features/transactions/transactions.component';
+import {TransactionsListingComponent} from './features/transactions/transactions-listing.component';
 
 export const routes: Routes = [
     {
@@ -19,7 +19,7 @@ export const routes: Routes = [
             },
             {
                 path: 'transactions',
-                component: TransactionsComponent,
+                component: TransactionsListingComponent,
             },
             {
                 path: 'objectifs',
@@ -37,6 +37,6 @@ export const routes: Routes = [
     },
     {
         path: '**',
-        redirectTo: 'login',
+        redirectTo: 'connexion',
     },
 ];

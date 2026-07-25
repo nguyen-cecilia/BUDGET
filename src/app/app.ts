@@ -10,7 +10,7 @@ import {
 } from '@lucide/angular';
 import {ButtonComponent} from './components/button/button.component';
 import {ModalComponent} from './components/modal/modal.component';
-import {UpdateTransactionComponent} from './features/transactions/update-transaction.component';
+import {TransactionUpdateComponent} from './features/transactions/transaction-update.component';
 import {ModalService} from './components/modal/modal.service';
 import {AuthStateService} from './features/auth/auth-state.service';
 import {SelectComponent, SelectOption} from './components/select/select.component';
@@ -18,7 +18,7 @@ import {MonthService} from './features/month/month.service';
 
 @Component({
     selector: 'app-root',
-    imports: [RouterOutlet, LucideMoon, ButtonComponent, RouterLink, LucidePlus, LucideHouse, RouterLinkActive, LucideList, LucideTarget, LucideChartColumnIncreasing, LucideSettings, ModalComponent, UpdateTransactionComponent, SelectComponent],
+    imports: [RouterOutlet, LucideMoon, ButtonComponent, RouterLink, LucidePlus, LucideHouse, RouterLinkActive, LucideList, LucideTarget, LucideChartColumnIncreasing, LucideSettings, ModalComponent, TransactionUpdateComponent, SelectComponent],
     templateUrl: './app.html',
 })
 export class App implements OnInit {

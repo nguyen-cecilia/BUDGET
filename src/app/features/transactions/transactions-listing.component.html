@@ -28,14 +28,14 @@
                 ></app-select>
 
                 <app-select
-                    [options]="accountOptions()"
+                    [options]="accountsFilters()"
                     [value]="selectedAccount()"
                     label="Compte"
                     (valueChange)="selectedAccount.set($event)"
                 ></app-select>
 
                 <app-select
-                    [options]="categoryOptions()"
+                    [options]="categoriesFilters()"
                     [value]="selectedCategory()"
                     label="Catégorie"
                     (valueChange)="selectedCategory.set($event)"
@@ -43,12 +43,12 @@
             </div>
 
             <div class="flex flex-wrap gap-3">
-                @for (tag of tags(); track tag.id) {
+                @for (tag of tagsFilters(); track tag.value) {
                     <button app-badge variant="outline">#{{ tag.label }}</button>
                 }
             </div>
 
-            <label for="subscription">
+            <label for="subscription" class="w-fit">
                 <input type="checkbox" id="subscription">
                 <p>Abonnement</p>
             </label>
@@ -82,7 +82,7 @@
                                     <p class="text-md font-bold">{{ transaction.label }}</p>
                                     <p class="text-sm text-gray">
                                         {{ transaction.account.label }} ·
-                                        {{ transaction.category.label }}
+                                        <span class="font-semibold underline decoration-2 underline-offset-3 {{ this.colorService.getDecoration(transaction.category.color) }}">{{ transaction.category.label }}</span>
                                         @if (transaction.tags && transaction.tags.length > 0) {
                                             · {{ transaction.tags.map(tag => '#' + tag.label).join(', ') }}
                                         }

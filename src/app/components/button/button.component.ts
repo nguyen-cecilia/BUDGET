@@ -14,7 +14,7 @@ import {Component, Input} from '@angular/core';
 export class ButtonComponent {
     @Input() type: 'button' | 'submit' | 'reset' = 'button';
     @Input() disabled = false;
-    @Input() variant: 'primary' | 'secondary' | 'outline' | 'sidebar' = 'primary';
+    @Input() variant: 'primary' | 'secondary' | 'tertiary' | 'outline' | 'sidebar' = 'primary';
     @Input() shape: 'pill' | 'bigPill' | 'round' = 'pill';
 
     classes(): string {
@@ -23,6 +23,7 @@ export class ButtonComponent {
         const variants = {
             primary: 'bg-black-dark text-beige-light hover:bg-black-dark/90 font-medium text-sm justify-center',
             secondary: 'bg-pink border border-black-dark shadow-sm font-bold text-md hover:bg-pink-dark hover:scale-102',
+            tertiary: 'bg-yellow hover:bg-yellow/90 font-medium text-sm justify-center',
             outline: 'bg-beige-lighter border border-gray-light shadow-sm shadow-black-dark/5 font-medium text-sm hover:scale-105',
             sidebar: 'text-gray font-bold hover:bg-blue/50'
         };

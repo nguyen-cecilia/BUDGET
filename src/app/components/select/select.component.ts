@@ -30,7 +30,7 @@ export interface SelectOption {
                 } @else {
                     <button
                         type="button"
-                        class="flex-1 flex items-center gap-4 rounded-full bg-beige-light px-4 py-2.5 text-sm font-bold w-full"
+                        class="flex-1 flex items-center gap-4 rounded-full bg-beige px-4 py-2.5 text-sm font-bold w-full"
                     >
                         @if (label) {
                             <p class="w-1/3 lg:w-auto text-left text-gray uppercase font-medium">{{ label }}</p>
@@ -49,8 +49,8 @@ export interface SelectOption {
                         <button
                             type="button"
                             (click)="selectOption(option)"
-                            class="w-full px-4 py-3 text-left text-sm hover:bg-beige-light transition-all first:rounded-t-sm last:rounded-b-sm"
-                            [class.bg-beige-light]="option.value === value"
+                            class="w-full px-4 py-3 text-left text-sm hover:bg-blue/25 transition-all first:rounded-t-sm last:rounded-b-sm"
+                            [class.bg-blue]="option.value === value"
                         >
                             {{ option.label }}
                         </button>

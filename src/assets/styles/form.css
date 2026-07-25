@@ -8,8 +8,10 @@
     }
 
     input[type="text"],
+    input[type="number"],
     input[type="password"],
     input[type="email"],
+    input[type="datetime-local"],
     input[type="date"] {
         @apply form-input w-full text-sm bg-transparent border border-gray-light shadow-sm shadow-black-dark/5 rounded px-3 py-1.5 focus:border-gray-light focus:ring-offset-0 focus:ring-2 focus:ring-pink;
     }
@@ -40,6 +42,10 @@
 
     label:has(input[type="checkbox"]) {
         @apply flex items-center gap-2 cursor-pointer;
+
+        input[type="checkbox"]:not(.switch) {
+            @apply form-checkbox m-0 size-5 rounded-xs border-gray-light shadow-black-dark/5 checked:text-green focus:border-gray-light focus:ring-offset-0 focus:ring-2 focus:ring-green;
+        }
 
         input[type="checkbox"].switch {
             @apply appearance-none bg-beige-light relative m-0 w-10 h-5.5 border border-gray-light rounded-full cursor-pointer transition-all checked:bg-blue checked:border-blue before:absolute before:top-0.5 before:left-0.5 before:transition-all before:border before:border-gray-light before:w-4 before:h-4 before:bg-white before:rounded-full checked:before:translate-x-4.5;

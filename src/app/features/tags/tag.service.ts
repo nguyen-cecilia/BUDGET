@@ -26,4 +26,17 @@ export class TagService {
 
         return data;
     }
+
+    async createTag(tag: { label: string; user_id: string }): Promise<Tag> {
+        const {data, error} = await this.supabase
+            .from(TAGS_TABLE)
+            .insert([tag])
+            .select()
+            .single()
+        ;
+
+        if (error) throw error;
+
+        return data;
+    }
 }
