@@ -48,7 +48,7 @@
         }
 
         input[type="checkbox"].switch {
-            @apply appearance-none bg-beige-light relative m-0 w-10 h-5.5 border border-gray-light rounded-full cursor-pointer transition-all checked:bg-blue checked:border-blue before:absolute before:top-0.5 before:left-0.5 before:transition-all before:border before:border-gray-light before:w-4 before:h-4 before:bg-white before:rounded-full checked:before:translate-x-4.5;
+            @apply appearance-none bg-beige-light relative m-0 w-10 h-5.5 border border-gray-light rounded-full cursor-pointer transition-all checked:bg-blue checked:border-blue before:absolute before:top-0.5 before:left-0.5 before:transition-all before:border before:border-gray-light before:w-4 before:h-4 before:bg-white before:rounded-full checked:before:translate-x-4.5 disabled:checked:bg-gray-light disabled:checked:border-gray-light disabled:checked:cursor-not-allowed;
         }
     }
 }

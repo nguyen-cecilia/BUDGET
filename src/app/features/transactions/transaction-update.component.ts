@@ -12,6 +12,7 @@ import {TagService} from '../tags/tag.service';
 import {SubscriptionService} from '../subscriptions/subscription.service';
 import positiveNumber from '../../core/validators';
 import computeNextDate from '../../core/utilities';
+import {Transaction} from './transaction.model';
 
 @Component({
     selector: 'app-update-transaction',
@@ -73,9 +74,14 @@ export class TransactionUpdateComponent implements OnInit {
         effect(() => {
             if (!this.authState.isLoading()) {
                 const userId = this.authState.getCurrentUser()?.id;
-
                 if (userId) {
                     this.initOptions(userId);
+                    const editing = this.modalService.editingTransaction();
+                    if (editing) {
+                        this.fillForm(editing);
+                    } else {
+                        this.resetForm();
+                    }
                 }
             }
         });
@@ -111,9 +117,46 @@ export class TransactionUpdateComponent implements OnInit {
         }
     }
 
+    private async fillForm(transaction: Transaction): Promise<void> {
+        this.transactionForm.patchValue({
+            type: transaction.type,
+            amount: transaction.amount,
+            amountCurrency: transaction.amount_currency_id,
+            label: transaction.label,
+            date: transaction.date.slice(0, 16),
+            account: transaction.account_id,
+            category: transaction.category_id,
+            isSubscription: transaction.is_subscription,
+            subscriptionFrequency: 'monthly',
+            subscriptionNextDate: '',
+        });
+
+        if (transaction.is_subscription && transaction.subscription_id) {
+            const subscription = await this.subscriptionService
+                .getSubscriptionById(transaction.subscription_id);
+
+            this.transactionForm.patchValue({
+                subscriptionFrequency: subscription.frequency,
+                subscriptionNextDate: subscription.next_payment_date,
+            });
+
+            this.transactionForm.get('isSubscription')?.disable();
+            this.isRecurring.set(true);
+        } else {
+            this.transactionForm.get('isSubscription')?.enable();
+        }
+
+        if (transaction.tags) {
+            this.selectedTags.set(
+                transaction.tags.map(t => ({ value: t.id, label: t.label }))
+            );
+        }
+    }
+
     private resetForm() {
         this.selectedTags.set([]);
         this.newTags.set([]);
+        this.isRecurring.set(false);
 
         const now = new Date();
         const nowLocal = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
@@ -198,7 +241,9 @@ export class TransactionUpdateComponent implements OnInit {
     }
 
     availableTagsOptions = computed(() =>
-        this.tagsOptions().filter(tag => !this.selectedTags().includes(tag))
+        this.tagsOptions().filter(
+            tag => !this.selectedTags().some(t => t.value === tag.value)
+        )
     );
 
     addNewTag(input: HTMLInputElement): void {
@@ -256,6 +301,7 @@ export class TransactionUpdateComponent implements OnInit {
                 throw new Error('Utilisateur non authentifié');
             }
 
+            const editing = this.modalService.editingTransaction();
             const fv = this.transactionForm.value;
 
             if (fv.isSubscription && !fv.subscriptionNextDate) {
@@ -275,19 +321,38 @@ export class TransactionUpdateComponent implements OnInit {
                 );
             }
 
-            const transaction = await this.transactionService.createTransaction(userId, {
-                type: fv.type,
-                amount: parseFloat(fv.amount),
-                amount_currency_id: fv.amountCurrency,
-                label: fv.label || '',
-                date: fv.date,
-                account_id: fv.account,
-                category_id: fv.category || undefined,
-                is_subscription: fv.isSubscription,
-                subscription_id: subscriptionId,
-            });
+            if (editing) {
+                // MODIFICATION
+                await this.transactionService.updateTransaction(editing.id, userId, {
+                    type: fv.type,
+                    amount: parseFloat(fv.amount),
+                    amount_currency_id: fv.amountCurrency,
+                    label: fv.label || '',
+                    date: fv.date,
+                    account_id: fv.account,
+                    category_id: fv.category || undefined,
+                    is_subscription: fv.isSubscription,
+                    subscription_id: subscriptionId,
+                });
 
-            await this.handleTags(userId, transaction.id);
+                await this.transactionService.removeTagsFromTransaction(editing.id);
+                await this.handleTags(userId, editing.id);
+            } else {
+                // CRÉATION
+                const transaction = await this.transactionService.createTransaction(userId, {
+                    type: fv.type,
+                    amount: parseFloat(fv.amount),
+                    amount_currency_id: fv.amountCurrency,
+                    label: fv.label || '',
+                    date: fv.date,
+                    account_id: fv.account,
+                    category_id: fv.category || undefined,
+                    is_subscription: fv.isSubscription,
+                    subscription_id: subscriptionId,
+                });
+
+                await this.handleTags(userId, transaction.id);
+            }
 
             this.transactionService.transactionRefreshTrigger.set(
                 !this.transactionService.transactionRefreshTrigger()

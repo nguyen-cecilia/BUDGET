@@ -76,4 +76,14 @@ export class SubscriptionService {
         if (error) throw error;
         return result;
     }
+
+    async getSubscriptionById(id: number): Promise<Subscription> {
+        const {data, error} = await this.supabase
+            .from(SUBSCRIPTIONS_TABLE)
+            .select('*')
+            .eq('id', id)
+            .single();
+        if (error) throw error;
+        return data;
+    }
 }

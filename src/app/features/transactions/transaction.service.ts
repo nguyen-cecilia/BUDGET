@@ -93,6 +93,48 @@ export class TransactionService {
         if (error) throw error;
     }
 
+    async updateTransaction(id: string, userId: string, transaction: {
+        type: TransactionType;
+        amount: number;
+        amount_currency_id: string;
+        label: string;
+        date: string;
+        account_id: string;
+        category_id?: string;
+        is_subscription: boolean;
+        subscription_id?: number | null;
+    }): Promise<Transaction> {
+        const {data, error} = await this.supabase
+            .from(TRANSACTIONS_TABLE)
+            .update({
+                type: transaction.type,
+                amount: transaction.amount,
+                amount_currency_id: transaction.amount_currency_id,
+                label: transaction.label,
+                date: transaction.date,
+                account_id: transaction.account_id,
+                category_id: transaction.category_id || null,
+                is_subscription: transaction.is_subscription,
+                subscription_id: transaction.subscription_id || null,
+            })
+            .eq('id', id)
+            .eq('user_id', userId)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
+    }
+
+    async removeTagsFromTransaction(transactionId: string): Promise<void> {
+        const {error} = await this.supabase
+            .from(TRANSACTION_TAGS_TABLE)
+            .delete()
+            .eq('transaction_id', transactionId);
+
+        if (error) throw error;
+    }
+
     private formatDate(date: Date): string {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');

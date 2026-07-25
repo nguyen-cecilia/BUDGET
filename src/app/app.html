@@ -30,7 +30,7 @@
 }
 
 <app-modal #editModal
-           title="Modifier la transaction"
+           title="{{ modalService.editingTransaction() ? 'Modifier la transaction' : 'Nouvelle transaction' }}"
            [isOpen]="modalService.editModalOpen"
 >
     <app-update-transaction/>
@@ -65,7 +65,7 @@
 
             <hr class="text-gray-light">
 
-            <button app-button variant="secondary" shape="bigPill" (click)="modalService.openEditModal()">
+            <button app-button variant="secondary" shape="bigPill" (click)="modalService.openCreateModal()">
                 <svg lucidePlus [size]="20"></svg>
                 Nouvelle transaction
             </button>

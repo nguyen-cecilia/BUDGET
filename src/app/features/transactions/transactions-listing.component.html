@@ -69,7 +69,7 @@
                     @for (transaction of dayGroup.transactions; track transaction.id) {
                         <div
                             class="flex items-center justify-between gap-6 rounded px-2 py-4 cursor-pointer transition-all hover:bg-beige-light"
-                            (click)="modalService.openEditModal()">
+                            (click)="modalService.openEditModal(transaction)">
                             <div class="flex items-center gap-6">
                                 <div class="aspect-square border rounded-full p-3 {{ this.colorService.getBackground(transaction.category.color) }}">
                                     @if (transaction.type === 'income') {
