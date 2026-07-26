@@ -14,7 +14,7 @@ export class TransactionOptionsService {
     private tagService = inject(TagService);
     private currencyService = inject(CurrencyService);
 
-    async getAccountsOptions(userId: string, includeAll: boolean = false): Promise<SelectOption[]> {
+    async getAccountsOptions(userId: string, includeAll = false): Promise<SelectOption[]> {
         const data = await this.accountService.getAllAccountsByUser(userId);
         const options: SelectOption[] = data.map(account => ({
             value: account.id,
@@ -28,7 +28,7 @@ export class TransactionOptionsService {
         return options;
     }
 
-    async getCategoriesOptions(userId: string, includeAll: boolean = false): Promise<SelectOption[]> {
+    async getCategoriesOptions(userId: string, includeAll = false): Promise<SelectOption[]> {
         const data = await this.categoryService.getAllCategoriesByUser(userId);
         const options: SelectOption[] = data.map(category => ({
             value: category.id,

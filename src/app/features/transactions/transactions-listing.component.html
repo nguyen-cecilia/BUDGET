@@ -2,7 +2,7 @@
     <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-6">
         <div>
             <h1>Transactions - {{ transactionsByMonth().month || monthService.getMonthLabel() }}</h1>
-            <p class="text-gray">{{ filteredTransactions().count }} résultat@if (filteredTransactions().count > 1) {s}</p>
+            <p class="text-gray">{{ filteredTransactions().count }} résultat{{ filteredTransactions().count > 1 ? 's' : '' }}</p>
         </div>
 
         <div class="flex flex-col gap-4">
@@ -88,9 +88,15 @@
                     @for (transaction of dayGroup.transactions; track transaction.id) {
                         <div
                             class="flex items-center justify-between gap-6 rounded px-2 py-4 cursor-pointer transition-all hover:bg-beige-light"
-                            (click)="modalService.openEditModal(transaction)">
+                            (click)="modalService.openEditModal(transaction)"
+                            (keydown.enter)="modalService.openEditModal(transaction)"
+                            (keydown.space)="modalService.openEditModal(transaction)"
+                            tabindex="0"
+                            role="button"
+                        >
                             <div class="flex items-center gap-6">
-                                <div class="aspect-square border rounded-full p-3 {{ this.colorService.getBackground(transaction.category.color) }}">
+                                <div
+                                    class="aspect-square border rounded-full p-3 {{ this.colorService.getBackground(transaction.category.color) }}">
                                     @if (transaction.type === 'income') {
                                         <svg lucideArrowDownLeft [size]="20"></svg>
                                     } @else {
@@ -106,7 +112,8 @@
                                     </div>
                                     <p class="text-sm text-gray">
                                         {{ transaction.account.label }} ·
-                                        <span class="font-semibold underline decoration-2 underline-offset-3 {{ this.colorService.getDecoration(transaction.category.color) }}">{{ transaction.category.label }}</span>
+                                        <span
+                                            class="font-semibold underline decoration-2 underline-offset-3 {{ this.colorService.getDecoration(transaction.category.color) }}">{{ transaction.category.label }}</span>
                                         @if (transaction.tags && transaction.tags.length > 0) {
                                             · {{ transaction.tags.map(tag => '#' + tag.label).join(', ') }}
                                         }

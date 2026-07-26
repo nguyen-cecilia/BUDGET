@@ -69,7 +69,7 @@ export class TransactionUpdateComponent {
         });
 
         this.transactionForm.get('subscriptionFrequency')?.valueChanges.subscribe(freq => {
-            this.transactionForm.patchValue({ subscriptionNextDate: computeNextDate(freq) });
+            this.transactionForm.patchValue({subscriptionNextDate: computeNextDate(freq)});
         });
 
         this.transactionForm.get('isSubscription')?.valueChanges.subscribe(checked => {
@@ -309,7 +309,7 @@ export class TransactionUpdateComponent {
 
         if (transaction.tags) {
             this.selectedTags.set(
-                transaction.tags.map(t => ({ value: t.id, label: t.label }))
+                transaction.tags.map(t => ({value: t.id, label: t.label}))
             );
         }
     }
@@ -349,7 +349,7 @@ export class TransactionUpdateComponent {
                     t => t.label.toLowerCase() === label.toLowerCase()
                 );
                 if (existing) return existing.id;
-                const created = await this.tagService.createTag({ label, user_id: userId });
+                const created = await this.tagService.createTag({label, user_id: userId});
                 return created.id;
             })
         );

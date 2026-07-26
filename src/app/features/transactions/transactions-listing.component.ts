@@ -109,7 +109,7 @@ export class TransactionsListingComponent implements OnInit {
             .filter(day => day.transactions.length > 0);
 
         const totalCount = filteredDays.reduce((sum, d) => sum + d.transactions.length, 0);
-        return { ...data, count: totalCount, transactionsByDay: filteredDays };
+        return {...data, count: totalCount, transactionsByDay: filteredDays};
     });
 
     toggleTag(value: string | number): void {

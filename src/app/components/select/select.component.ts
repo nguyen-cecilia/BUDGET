@@ -6,7 +6,7 @@ import {
     ContentChild,
     TemplateRef,
     HostListener,
-    ElementRef
+    ElementRef, inject
 } from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {LucideChevronDown} from '@lucide/angular';
@@ -22,7 +22,16 @@ export interface SelectOption {
     imports: [CommonModule, LucideChevronDown],
     template: `
         <div class="relative w-full">
-            <div (click)="toggleDropdown()" class="*:cursor-pointer">
+            <div
+                (click)="toggleDropdown()"
+                (keydown.enter)="toggleDropdown()"
+                (keydown.space)="toggleDropdown()"
+                tabindex="0"
+                role="combobox"
+                aria-controls="select-dropdown"
+                [attr.aria-expanded]="isOpen"
+                class="*:cursor-pointer"
+            >
                 @if (triggerTemplate) {
                     <ng-container
                         *ngTemplateOutlet="triggerTemplate; context: { $implicit: selectedLabel }"
@@ -44,7 +53,10 @@ export interface SelectOption {
             <!-- Dropdown menu -->
             @if (isOpen) {
                 <div
-                    class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-light rounded-sm shadow-md z-50 *:cursor-pointer">
+                    id="select-dropdown"
+                    class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-light rounded-sm shadow-md z-50 *:cursor-pointer"
+                    role="listbox"
+                >
                     @for (option of options; track option.value) {
                         <button
                             type="button"
@@ -66,16 +78,15 @@ export interface SelectOption {
     `]
 })
 export class SelectComponent {
-    @Input() options: SelectOption[] = [];
-    @Input() value: string | number = '';
-    @Input() label: string = '';
-    @Output() valueChange = new EventEmitter<string | number>();
-
-    @ContentChild('trigger') triggerTemplate?: TemplateRef<any>;
-
+    private elementRef = inject(ElementRef);
     isOpen = false;
 
-    constructor(private elementRef: ElementRef) {}
+    @Input() options: SelectOption[] = [];
+    @Input() value: string | number = '';
+    @Input() label = '';
+    @Output() valueChange = new EventEmitter<string | number>();
+
+    @ContentChild('trigger') triggerTemplate?: TemplateRef<{$implicit: string}>;
 
     get selectedLabel(): string {
         return this.options.find(opt => opt.value === this.value)?.label || this.label || 'Sélectionner';

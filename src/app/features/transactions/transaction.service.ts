@@ -83,7 +83,7 @@ export class TransactionService {
     }
 
     async addTagsToTransaction(transactionId: string, tagIds: (string | number)[]): Promise<void> {
-        const { error } = await this.supabase
+        const {error} = await this.supabase
             .from(TRANSACTION_TAGS_TABLE)
             .insert(tagIds.map(tagId => ({
                 transaction_id: transactionId,
