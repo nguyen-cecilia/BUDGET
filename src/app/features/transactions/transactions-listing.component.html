@@ -2,7 +2,7 @@
     <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-6">
         <div>
             <h1>Transactions - {{ transactionsByMonth().month || monthService.getMonthLabel() }}</h1>
-            <p class="text-gray">{{ transactionsByMonth().count }} résultat@if (transactionsByMonth().count > 1) {s}</p>
+            <p class="text-gray">{{ filteredTransactions().count }} résultat@if (filteredTransactions().count > 1) {s}</p>
         </div>
 
         <div class="flex flex-col gap-4">
@@ -12,6 +12,7 @@
                         type="text"
                         placeholder="Rechercher"
                         class="pl-9"
+                        (input)="searchQuery.set($any($event.target).value)"
                     >
                     <svg lucideSearch [size]="16" class="absolute bottom-0 top-3 left-3"></svg>
                 </label>
@@ -42,14 +43,32 @@
                 ></app-select>
             </div>
 
-            <div class="flex flex-wrap gap-3">
+            <div class="flex flex-wrap items-center gap-3">
                 @for (tag of tagsFilters(); track tag.value) {
-                    <button app-badge variant="outline">#{{ tag.label }}</button>
+                    <button app-badge
+                            [variant]="isSelected(tag.value) ? 'secondary' : 'outline'"
+                            (click)="toggleTag(tag.value)"
+                    >
+                        #{{ tag.label }}
+                    </button>
+                }
+                @if (selectedTags().size > 0) {
+                    <button app-button
+                            shape="roundSmall"
+                            (click)="clearSelectedTags()"
+                    >
+                        <svg lucideX [size]="16"></svg>
+                    </button>
                 }
             </div>
 
             <label for="subscription" class="w-fit">
-                <input type="checkbox" id="subscription">
+                <input
+                    type="checkbox"
+                    id="subscription"
+                    [checked]="selectedSubscription()"
+                    (change)="selectedSubscription.set(!selectedSubscription())"
+                >
                 <p>Abonnement</p>
             </label>
         </div>
@@ -57,8 +76,8 @@
 
     @if (isLoading()) {
         <p>Chargement en cours...</p>
-    } @else if (transactionsByMonth().transactionsByDay.length > 0) {
-        @for (dayGroup of transactionsByMonth().transactionsByDay; track dayGroup.date) {
+    } @else if (filteredTransactions().transactionsByDay.length > 0) {
+        @for (dayGroup of filteredTransactions().transactionsByDay; track dayGroup.date) {
             <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-3">
                 <div class="flex items-center justify-between gap-6">
                     <h2>{{ dayGroup.date|date:'longDate' }}</h2>
@@ -101,5 +120,10 @@
                 </div>
             </div>
         }
+    } @else {
+        <div class="flex flex-col items-center justify-center gap-3 px-6 py-10 text-gray">
+            <svg lucideFrown [size]="40"></svg>
+            <p>Aucun résultat trouvé.</p>
+        </div>
     }
 </section>
