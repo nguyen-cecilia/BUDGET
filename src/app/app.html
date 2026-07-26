@@ -32,6 +32,7 @@
 <app-modal #editModal
            title="{{ modalService.editingTransaction() ? 'Modifier la transaction' : 'Nouvelle transaction' }}"
            [isOpen]="modalService.editModalOpen"
+           [onClose]="() => modalService.closeEditModal()"
 >
     <app-update-transaction/>
 </app-modal>
@@ -121,7 +122,7 @@
                 @if (i === 2) {
                     <button
                         class="-translate-y-6 cursor-pointer transition-all hover:bg-pink-dark bg-pink text-black-dark border border-black-dark rounded-full p-3"
-                        (click)="editModal.open()"
+                        (click)="modalService.openCreateModal()"
                     >
                         <svg lucidePlus [size]="34"></svg>
                     </button>

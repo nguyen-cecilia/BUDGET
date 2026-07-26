@@ -1,6 +1,6 @@
 <form class="space-y-4" [formGroup]="transactionForm" (ngSubmit)="submitTransaction()">
     @if (errorMessage()) {
-        <div class="text-red-600">{{ errorMessage() }}</div>
+        <div class="text-red">{{ errorMessage() }}</div>
     }
 
     <div class="tab-switch-input">
@@ -130,8 +130,6 @@
             id="isSubscription"
             formControlName="isSubscription"
             class="switch"
-            [checked]="isRecurring()"
-            (change)="isRecurring.set(!isRecurring())"
         />
         <p>Abonnement récurrent</p>
     </label>
@@ -160,13 +158,22 @@
         </div>
     }
 
-    <button app-button type="submit" [disabled]="isSubmitting()" class="ml-auto">
-        @if (isSubmitting()) {
-            <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
-            Envoi...
-        } @else {
-            <svg lucideSave [size]="16"></svg>
-            Sauvegarder
+    <div class="flex items-center justify-between">
+        @if (modalService.editingTransaction()) {
+            <button app-button variant="invalid" (click)="deleteTransaction()">
+                <svg lucideTrash2 [size]="16"></svg>
+                Supprimer
+            </button>
         }
-    </button>
+
+        <button app-button type="submit" [disabled]="isSubmitting()" class="ml-auto">
+            @if (isSubmitting()) {
+                <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
+                Envoi...
+            } @else {
+                <svg lucideSave [size]="16"></svg>
+                Sauvegarder
+            }
+        </button>
+    </div>
 </form>

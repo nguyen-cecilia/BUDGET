@@ -12,12 +12,17 @@ import {LucideX} from '@lucide/angular';
 export class ModalComponent {
     @Input() isOpen = signal(false);
     @Input() title = '';
+    @Input() onClose?: () => void;
 
     open(): void {
         this.isOpen.set(true);
     }
 
     close(): void {
-        this.isOpen.set(false);
+        if (this.onClose) {
+            this.onClose();
+        } else {
+            this.isOpen.set(false);
+        }
     }
 }

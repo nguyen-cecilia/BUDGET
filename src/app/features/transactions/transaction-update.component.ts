@@ -1,7 +1,7 @@
-import {Component, computed, effect, EventEmitter, inject, OnInit, Output, signal} from '@angular/core';
+import {Component, computed, effect, inject, signal} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {BadgeComponent} from '../../components/badge/badge.component';
-import {LucideLoaderCircle, LucidePlus, LucideSave, LucideX} from '@lucide/angular';
+import {LucideLoaderCircle, LucidePlus, LucideSave, LucideTrash2, LucideX} from '@lucide/angular';
 import {ButtonComponent} from '../../components/button/button.component';
 import {SelectOption} from '../../components/select/select.component';
 import {AuthStateService} from '../auth/auth-state.service';
@@ -24,17 +24,18 @@ import {Transaction} from './transaction.model';
         ButtonComponent,
         LucideLoaderCircle,
         LucidePlus,
+        LucideTrash2,
     ],
     templateUrl: './transaction-update.component.html',
 })
-export class TransactionUpdateComponent implements OnInit {
+export class TransactionUpdateComponent {
     private authState = inject(AuthStateService);
     private fb = inject(FormBuilder);
     private optionsService = inject(TransactionOptionsService);
     private transactionService = inject(TransactionService);
     private tagService = inject(TagService);
     private subscriptionService = inject(SubscriptionService);
-    private modalService = inject(ModalService);
+    protected modalService = inject(ModalService);
 
     transactionForm: FormGroup;
 
@@ -71,23 +72,182 @@ export class TransactionUpdateComponent implements OnInit {
             this.transactionForm.patchValue({ subscriptionNextDate: computeNextDate(freq) });
         });
 
+        this.transactionForm.get('isSubscription')?.valueChanges.subscribe(checked => {
+            this.isRecurring.set(checked);
+        });
+
         effect(() => {
             if (!this.authState.isLoading()) {
                 const userId = this.authState.getCurrentUser()?.id;
                 if (userId) {
                     this.initOptions(userId);
-                    const editing = this.modalService.editingTransaction();
-                    if (editing) {
-                        this.fillForm(editing);
-                    } else {
-                        this.resetForm();
-                    }
                 }
+            }
+        });
+
+        effect(() => {
+            const editing = this.modalService.editingTransaction();
+            if (editing) {
+                this.fillForm(editing);
+            } else {
+                this.resetForm();
             }
         });
     }
 
-    ngOnInit() {}
+    availableTagsOptions = computed(() =>
+        this.tagsOptions().filter(
+            tag => !this.selectedTags().some(t => t.value === tag.value)
+        )
+    );
+
+    addNewTag(input: HTMLInputElement): void {
+        const rawValue = input.value.trim();
+        if (!rawValue) return;
+
+        const value = rawValue.charAt(0).toUpperCase() + rawValue.slice(1);
+
+        const existsInOptions = this.tagsOptions().some(
+            t => t.label.toLowerCase() === value.toLowerCase()
+        );
+        const existsInSelected = this.selectedTags().some(
+            t => t.label.toLowerCase() === value.toLowerCase()
+        );
+        const existsInNew = this.newTags().some(
+            t => t.toLowerCase() === value.toLowerCase()
+        );
+
+        if (existsInOptions || existsInSelected || existsInNew) return;
+
+        this.newTags.update(tags => [...tags, value]);
+        input.value = '';
+    }
+
+    addExistingTag(tag: SelectOption): void {
+        const isTagAlreadySelected = this.selectedTags().some(t => t.label === tag.label);
+
+        if (!isTagAlreadySelected) {
+            this.selectedTags.set([...this.selectedTags(), tag]);
+        }
+    }
+
+    removeTag(tagLabel: string | number): void {
+        this.selectedTags.set(
+            this.selectedTags().filter(tag => tag.label !== tagLabel)
+        );
+
+        this.newTags.set(
+            this.newTags().filter(tag => tag !== tagLabel)
+        );
+    }
+
+    async submitTransaction() {
+        if (this.transactionForm.invalid) {
+            this.errorMessage.set('Veuillez remplir tous les champs obligatoires');
+            return;
+        }
+
+        this.isSubmitting.set(true);
+        this.errorMessage.set(null);
+
+        try {
+            const userId = this.authState.getCurrentUser()?.id;
+            if (!userId) {
+                throw new Error('Utilisateur non authentifié');
+            }
+
+            const editing = this.modalService.editingTransaction();
+            const fv = this.transactionForm.value;
+
+            if (fv.isSubscription && !fv.subscriptionNextDate) {
+                this.errorMessage.set('Veuillez renseigner la date du prochain renouvellement');
+                return;
+            }
+
+            let subscriptionId: number | null = null;
+            if (fv.isSubscription) {
+                subscriptionId = await this.handleSubscription(
+                    userId,
+                    fv.label,
+                    fv.account,
+                    fv.category || undefined,
+                    fv.subscriptionFrequency,
+                    fv.subscriptionNextDate
+                );
+            }
+
+            if (editing) {
+                // Modification de la transaction
+                await this.transactionService.updateTransaction(editing.id, userId, {
+                    type: fv.type,
+                    amount: parseFloat(fv.amount),
+                    amount_currency_id: fv.amountCurrency,
+                    label: fv.label || '',
+                    date: fv.date,
+                    account_id: fv.account,
+                    category_id: fv.category || undefined,
+                    is_subscription: fv.isSubscription,
+                    subscription_id: subscriptionId,
+                });
+
+                await this.transactionService.removeTagsFromTransaction(editing.id);
+                await this.handleTags(userId, editing.id);
+            } else {
+                // Création de la transaction
+                const transaction = await this.transactionService.createTransaction(userId, {
+                    type: fv.type,
+                    amount: parseFloat(fv.amount),
+                    amount_currency_id: fv.amountCurrency,
+                    label: fv.label || '',
+                    date: fv.date,
+                    account_id: fv.account,
+                    category_id: fv.category || undefined,
+                    is_subscription: fv.isSubscription,
+                    subscription_id: subscriptionId,
+                });
+
+                await this.handleTags(userId, transaction.id);
+            }
+
+            this.transactionService.transactionRefreshTrigger.set(
+                !this.transactionService.transactionRefreshTrigger()
+            );
+
+            this.resetForm();
+
+            this.modalService.closeEditModal();
+        } catch (error) {
+            console.error('Erreur lors de la création de la transaction:', error);
+            this.errorMessage.set('Erreur lors de la création de la transaction');
+        } finally {
+            this.isSubmitting.set(false);
+        }
+    }
+
+    async deleteTransaction(): Promise<void> {
+        const editing = this.modalService.editingTransaction();
+        if (!editing) return;
+
+        const confirmed = confirm('Supprimer cette transaction ?');
+        if (!confirmed) return;
+
+        this.isSubmitting.set(true);
+
+        try {
+            await this.transactionService.deleteTransaction(editing.id, editing.user_id);
+
+            this.transactionService.transactionRefreshTrigger.set(
+                !this.transactionService.transactionRefreshTrigger()
+            );
+
+            this.modalService.closeEditModal();
+        } catch (error) {
+            console.error('Erreur lors de la suppression:', error);
+            this.errorMessage.set('Erreur lors de la suppression');
+        } finally {
+            this.isSubmitting.set(false);
+        }
+    }
 
     private async initOptions(userId: string) {
         try {
@@ -118,6 +278,8 @@ export class TransactionUpdateComponent implements OnInit {
     }
 
     private async fillForm(transaction: Transaction): Promise<void> {
+        this.isRecurring.set(transaction.is_subscription);
+
         this.transactionForm.patchValue({
             type: transaction.type,
             amount: transaction.amount,
@@ -141,7 +303,6 @@ export class TransactionUpdateComponent implements OnInit {
             });
 
             this.transactionForm.get('isSubscription')?.disable();
-            this.isRecurring.set(true);
         } else {
             this.transactionForm.get('isSubscription')?.enable();
         }
@@ -238,134 +399,5 @@ export class TransactionUpdateComponent implements OnInit {
         });
 
         return created.id;
-    }
-
-    availableTagsOptions = computed(() =>
-        this.tagsOptions().filter(
-            tag => !this.selectedTags().some(t => t.value === tag.value)
-        )
-    );
-
-    addNewTag(input: HTMLInputElement): void {
-        const rawValue = input.value.trim();
-        if (!rawValue) return;
-
-        const value = rawValue.charAt(0).toUpperCase() + rawValue.slice(1);
-
-        const existsInOptions = this.tagsOptions().some(
-            t => t.label.toLowerCase() === value.toLowerCase()
-        );
-        const existsInSelected = this.selectedTags().some(
-            t => t.label.toLowerCase() === value.toLowerCase()
-        );
-        const existsInNew = this.newTags().some(
-            t => t.toLowerCase() === value.toLowerCase()
-        );
-
-        if (existsInOptions || existsInSelected || existsInNew) return;
-
-        this.newTags.update(tags => [...tags, value]);
-        input.value = '';
-    }
-
-    addExistingTag(tag: SelectOption): void {
-        const isTagAlreadySelected = this.selectedTags().some(t => t.label === tag.label);
-
-        if (!isTagAlreadySelected) {
-            this.selectedTags.set([...this.selectedTags(), tag]);
-        }
-    }
-
-    removeTag(tagLabel: string | number): void {
-        this.selectedTags.set(
-            this.selectedTags().filter(tag => tag.label !== tagLabel)
-        );
-
-        this.newTags.set(
-            this.newTags().filter(tag => tag !== tagLabel)
-        );
-    }
-
-    async submitTransaction() {
-        if (this.transactionForm.invalid) {
-            this.errorMessage.set('Veuillez remplir tous les champs obligatoires');
-            return;
-        }
-
-        this.isSubmitting.set(true);
-        this.errorMessage.set(null);
-
-        try {
-            const userId = this.authState.getCurrentUser()?.id;
-            if (!userId) {
-                throw new Error('Utilisateur non authentifié');
-            }
-
-            const editing = this.modalService.editingTransaction();
-            const fv = this.transactionForm.value;
-
-            if (fv.isSubscription && !fv.subscriptionNextDate) {
-                this.errorMessage.set('Veuillez renseigner la date du prochain renouvellement');
-                return;
-            }
-
-            let subscriptionId: number | null = null;
-            if (fv.isSubscription) {
-                subscriptionId = await this.handleSubscription(
-                    userId,
-                    fv.label,
-                    fv.account,
-                    fv.category || undefined,
-                    fv.subscriptionFrequency,
-                    fv.subscriptionNextDate
-                );
-            }
-
-            if (editing) {
-                // MODIFICATION
-                await this.transactionService.updateTransaction(editing.id, userId, {
-                    type: fv.type,
-                    amount: parseFloat(fv.amount),
-                    amount_currency_id: fv.amountCurrency,
-                    label: fv.label || '',
-                    date: fv.date,
-                    account_id: fv.account,
-                    category_id: fv.category || undefined,
-                    is_subscription: fv.isSubscription,
-                    subscription_id: subscriptionId,
-                });
-
-                await this.transactionService.removeTagsFromTransaction(editing.id);
-                await this.handleTags(userId, editing.id);
-            } else {
-                // CRÉATION
-                const transaction = await this.transactionService.createTransaction(userId, {
-                    type: fv.type,
-                    amount: parseFloat(fv.amount),
-                    amount_currency_id: fv.amountCurrency,
-                    label: fv.label || '',
-                    date: fv.date,
-                    account_id: fv.account,
-                    category_id: fv.category || undefined,
-                    is_subscription: fv.isSubscription,
-                    subscription_id: subscriptionId,
-                });
-
-                await this.handleTags(userId, transaction.id);
-            }
-
-            this.transactionService.transactionRefreshTrigger.set(
-                !this.transactionService.transactionRefreshTrigger()
-            );
-
-            this.resetForm();
-
-            this.modalService.closeEditModal();
-        } catch (error) {
-            console.error('Erreur lors de la création de la transaction:', error);
-            this.errorMessage.set('Erreur lors de la création de la transaction');
-        } finally {
-            this.isSubmitting.set(false);
-        }
     }
 }

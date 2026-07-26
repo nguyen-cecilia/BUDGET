@@ -135,6 +135,18 @@ export class TransactionService {
         if (error) throw error;
     }
 
+    async deleteTransaction(id: string, userId: string): Promise<void> {
+        await this.removeTagsFromTransaction(id);
+
+        const {error} = await this.supabase
+            .from(TRANSACTIONS_TABLE)
+            .delete()
+            .eq('id', id)
+            .eq('user_id', userId);
+
+        if (error) throw error;
+    }
+
     private formatDate(date: Date): string {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
