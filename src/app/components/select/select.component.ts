@@ -86,7 +86,7 @@ export class SelectComponent {
     @Input() label = '';
     @Output() valueChange = new EventEmitter<string | number>();
 
-    @ContentChild('trigger') triggerTemplate?: TemplateRef<{$implicit: string}>;
+    @ContentChild('trigger') triggerTemplate?: TemplateRef<{ $implicit: string }>;
 
     get selectedLabel(): string {
         return this.options.find(opt => opt.value === this.value)?.label || this.label || 'Sélectionner';
