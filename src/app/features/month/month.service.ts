@@ -5,7 +5,7 @@ import {Injectable, signal} from '@angular/core';
 })
 export class MonthService {
     selectedMonth = signal<number>(new Date().getMonth());
-    currentYear = signal<number>(new Date().getFullYear());
+    selectedYear = signal<number>(new Date().getFullYear());
 
     setMonth(monthIndex: number): void {
         this.selectedMonth.set(monthIndex);
@@ -15,8 +15,12 @@ export class MonthService {
         return this.selectedMonth();
     }
 
+    getCurrentMonth(): number {
+        return new Date().getMonth();
+    }
+
     getMonthLabel(): string {
-        const date = new Date(this.currentYear(), this.selectedMonth(), 1);
+        const date = new Date(this.selectedYear(), this.selectedMonth(), 1);
         const monthLabel = new Intl.DateTimeFormat('fr-FR', {
             month: 'long',
             year: 'numeric',
@@ -26,6 +30,10 @@ export class MonthService {
     }
 
     getYear(): number {
-        return this.currentYear();
+        return this.selectedYear();
+    }
+
+    getCurrentYear(): number {
+        return new Date().getFullYear();
     }
 }

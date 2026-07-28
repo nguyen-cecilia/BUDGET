@@ -46,7 +46,8 @@
     --text-4xl: 72px;
 
     --radius-*: initial;
-    --radius-xs: 5px;
+    --radius-xxs: 5px;
+    --radius-xs: 10px;
     --radius-sm: 20px;
     --radius: 30px;
     --radius-full: 999px;

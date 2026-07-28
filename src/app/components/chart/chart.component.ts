@@ -1,4 +1,4 @@
-import {Component, Input, ElementRef, AfterViewInit, inject} from '@angular/core';
+import {Component, Input, ElementRef, AfterViewInit, inject, SimpleChanges, OnChanges} from '@angular/core';
 import {Chart, registerables} from 'chart.js';
 
 Chart.register(...registerables);
@@ -6,18 +6,30 @@ Chart.register(...registerables);
 @Component({
     selector: 'app-pie-chart',
     template: '<canvas #canvas></canvas>',
-    host: {
-        'class': 'block',
-    }
+    host: {'class': 'block'}
 })
-export class PieChartComponent implements AfterViewInit {
+export class PieChartComponent implements AfterViewInit, OnChanges {
     @Input() labels: string[] = [];
     @Input() data: number[] = [];
     @Input() colors: string[] = [];
     private el = inject(ElementRef);
+    private chart?: Chart;
 
     ngAfterViewInit() {
-        new Chart(this.el.nativeElement.querySelector('canvas'), {
+        this.createChart();
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (this.chart && (changes['data'] || changes['labels'] || changes['colors'])) {
+            this.chart.data.labels = this.labels;
+            this.chart.data.datasets[0].data = this.data;
+            this.chart.data.datasets[0].backgroundColor = this.colors;
+            this.chart.update('none');
+        }
+    }
+
+    private createChart() {
+        this.chart = new Chart(this.el.nativeElement.querySelector('canvas'), {
             type: 'doughnut',
             data: {
                 labels: this.labels,

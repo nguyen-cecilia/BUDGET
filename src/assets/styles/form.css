@@ -44,7 +44,7 @@
         @apply flex items-center gap-2 cursor-pointer;
 
         input[type="checkbox"]:not(.switch) {
-            @apply form-checkbox m-0 size-5 rounded-xs border-gray-light shadow-black-dark/5 checked:text-blue focus:border-gray-light focus:ring-offset-0 focus:ring-2 focus:ring-blue;
+            @apply form-checkbox m-0 size-5 rounded-xxs border-gray-light shadow-black-dark/5 checked:text-blue focus:border-gray-light focus:ring-offset-0 focus:ring-2 focus:ring-blue;
         }
 
         input[type="checkbox"].switch {

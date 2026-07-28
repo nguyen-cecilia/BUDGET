@@ -114,7 +114,10 @@
                                     <p class="text-sm text-gray">
                                         {{ transaction.account.label }} ·
                                         <span
-                                            class="font-semibold underline decoration-2 underline-offset-3 {{ this.colorService.getDecoration(transaction.category.color) }}">{{ transaction.category.label }}</span>
+                                            class="font-semibold underline decoration-2 underline-offset-3 {{ this.colorService.getDecoration(transaction.category.color) }}"
+                                        >
+                                            {{ transaction.category.label }}
+                                        </span>
                                         @if (transaction.tags && transaction.tags.length > 0) {
                                             · {{ transaction.tags.map(tag => '#' + tag.label).join(', ') }}
                                         }

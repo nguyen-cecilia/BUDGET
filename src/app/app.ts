@@ -43,16 +43,15 @@ export class App implements OnInit {
     }
 
     private initializeMonthOptions(): void {
-        const today = new Date();
-        const currentYear = today.getFullYear();
-        const currentMonth = today.getMonth();
+        const currentYear = this.monthService.getCurrentYear();
+        const currentMonth = this.monthService.getCurrentMonth();
 
         const months = [
             'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
         ];
 
         const options: SelectOption[] = months
-            .slice(0, currentMonth + 1)
+            .slice(0, currentMonth + 3)
             .map((month, index) => ({
                 value: index,
                 label: `${month} ${currentYear}`

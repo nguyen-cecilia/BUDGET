@@ -12,18 +12,21 @@
         </div>
 
         <div class="relative z-1">
-            <p class="uppercase text-gray font-semibold">Juillet 2026</p>
+            <p class="uppercase text-gray font-semibold">{{ monthService.getMonthLabel() }}</p>
             <p class="font-display text-2xl leading-12">Il reste</p>
-            <p class="font-display text-4xl leading-20 font-medium">1224,91 €</p>
+            <p class="font-display text-4xl leading-20 font-medium">{{ balance()|currency:'EUR' }}</p>
         </div>
 
         <div class="space-y-1">
             <div class="w-full h-3 border bg-beige border-black-dark/80 rounded-sm">
-                <div class="w-40/100 h-full bg-pink rounded-sm"></div>
+                <div
+                    class="w-40/100 h-full bg-pink rounded-sm"
+                    [style.width.%]="expensesRatio()"
+                ></div>
             </div>
             <div class="flex items-center justify-between gap-6 text-gray text-sm">
-                <p>Dépenses : <strong class="text-black-dark">567,87 €</strong></p>
-                <p>Revenus : <strong class="text-black-dark">2010,60 €</strong></p>
+                <p>Dépenses : <strong class="text-black-dark">{{ totalExpenses()|currency:'EUR' }}</strong></p>
+                <p>Revenus : <strong class="text-black-dark">{{ totalIncomes()|currency:'EUR' }}</strong></p>
             </div>
         </div>
 
@@ -34,7 +37,7 @@
                     <svg lucideAstroid [size]="24"></svg>
                 </div>
                 <div>
-                    <p class="font-display text-lg leading-5 font-semibold">10</p>
+                    <p class="font-display text-lg leading-5 font-semibold">{{ transactionCount() }}</p>
                     <p class="font-medium">transactions</p>
                 </div>
             </div>
@@ -45,7 +48,7 @@
                     <svg lucideZap [size]="24"></svg>
                 </div>
                 <div>
-                    <p class="font-display text-lg leading-5 font-semibold">67,45 €</p>
+                    <p class="font-display text-lg leading-5 font-semibold">{{ subscriptionTotal()|currency:'EUR' }}</p>
                     <p class="font-medium">d'abonnement</p>
                 </div>
             </div>
@@ -58,7 +61,7 @@
         <div class="flex justify-between items-center gap-2">
             <h2 class="flex items-center gap-2">
                 <svg lucideWallet [size]="20" class="text-pink"></svg>
-                Par catégorie
+                Dernières transactions
             </h2>
 
             <button app-button routerLink="/transactions">
@@ -68,47 +71,45 @@
         </div>
 
         <div>
-            <div
-                class="flex items-center justify-between gap-6 rounded px-2 py-4 cursor-pointer transition-all hover:bg-beige-light"
-                tabindex="0"
-                role="button"
-            >
-                <div class="flex items-center gap-6">
-                    <div
-                        class="aspect-square border rounded-full p-3 bg-pink">
-                        <svg lucideArrowUpRight [size]="20"></svg>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-1.5">
-                            <h3>Leroy Merlin</h3>
-                            <!--                            {{ transaction.label }}-->
-                            <!--                            @if (transaction.is_subscription) {-->
-                            <!--                                <svg lucideSparkles [size]="20"></svg>-->
-                            <!--                            }-->
+            @for (transaction of recentTransactions(); track transaction.id) {
+                <div
+                    class="flex items-center justify-between gap-6 rounded px-2 py-4 cursor-pointer transition-all hover:bg-beige-light"
+                    (click)="modalService.openEditModal(transaction)"
+                    (keydown.enter)="modalService.openEditModal(transaction)"
+                    (keydown.space)="modalService.openEditModal(transaction)"
+                    tabindex="0"
+                    role="button"
+                >
+                    <div class="flex items-center gap-6">
+                        <div class="aspect-square border rounded-full p-3 {{ colorService.getBackground(transaction.category.color) }}">
+                            @if (transaction.type === 'income') {
+                                <svg lucideArrowDownLeft [size]="20"></svg>
+                            } @else {
+                                <svg lucideArrowUpRight [size]="20"></svg>
+                            }
                         </div>
-                        <!--                        <p class="text-sm text-gray">-->
-                        <!--                            {{ transaction.account.label }} ·-->
-                        <!--                            <span-->
-                        <!--                                class="font-semibold underline decoration-2 underline-offset-3 {{ this.colorService.getDecoration(transaction.category.color) }}">{{ transaction.category.label }}</span>-->
-                        <!--                            @if (transaction.tags && transaction.tags.length > 0) {-->
-                        <!--                                · {{ transaction.tags.map(tag => '#' + tag.label).join(', ') }}-->
-                        <!--                            }-->
-                        <!--                        </p>-->
-                        <p class="text-sm text-gray">
-                            Caisse d'Epargne ·
-                            <span
-                                class="font-semibold underline decoration-2 underline-offset-3 decoration-pink"
-                            >
-                                Maison
-                            </span>
-                            · 25/07/2026 · #Travaux
-                        </p>
+                        <div>
+                            <div class="flex items-center gap-1.5">
+                                <h3>{{ transaction.label }}</h3>
+                                @if (transaction.is_subscription) {
+                                    <svg lucideSparkles [size]="16"></svg>
+                                }
+                            </div>
+                            <p class="text-sm text-gray">
+                                {{ transaction.account.label }} ·
+                                <span class="font-semibold underline decoration-2 underline-offset-3 {{ colorService.getDecoration(transaction.category.color) }}">
+                                    {{ transaction.category.label }}
+                                </span>
+                                · {{ transaction.date|date:'dd/MM/yyyy' }}
+                                @if (transaction.tags && transaction.tags.length > 0) {
+                                    · {{ transaction.tags.map(tag => '#' + tag.label).join(', ') }}
+                                }
+                            </p>
+                        </div>
                     </div>
+                    <p class="font-display text-md">{{ transaction.type === 'expense' ? '-' : '+' }}{{ transaction.amount|currency:transaction.currency.code }}</p>
                 </div>
-
-                <!--                <p class="font-display text-md">{{ transaction.type === 'expense' ? '-' : '+' }}{{ transaction.amount|currency:transaction.currency.code }}</p>-->
-                <p class="font-display text-md">-32,99 €</p>
-            </div>
+            }
         </div>
     </div>
 
@@ -119,27 +120,31 @@
         </h2>
 
         <div class="flex flex-col gap-3">
-            <div class="flex items-center gap-3 bg-beige-lighter border border-black-dark p-3 rounded">
-                <label>
-                    <input type="checkbox" class="switch pink" disabled checked>
-                </label>
-                <div class="flex-1">
-                    <p class="font-semibold">Netflix</p>
-                    <p class="text-xs text-gray">03/07/2026</p>
+            @for (sub of subscriptionStatus(); track sub.id) {
+                <div class="flex items-center gap-3 bg-beige-lighter border border-black-dark p-3 rounded">
+                    <label>
+                        <input type="checkbox" class="switch pink" disabled [checked]="sub.checked">
+                    </label>
+                    <div class="flex-1">
+                        <p class="font-semibold">{{ sub.label }}</p>
+                        @if (sub.lastTransactionDate) {
+                            <p class="text-xs text-gray">
+                                Payé le : {{ sub.lastTransactionDate|date:'dd/MM/yyyy' }}
+                            </p>
+                        }
+                        <div class="flex items-center gap-0.75 text-xs text-gray font-medium">
+                            <svg lucideArrowRight [size]="12"></svg>
+                            Prochain paiement : {{ sub.next_payment_date|date:'dd/MM/yyyy' }}
+                        </div>
+                    </div>
+                    <div class="font-display font-semibold text-md">
+                        {{ sub.amount|currency:sub.currency }}
+                    </div>
                 </div>
-                <div class="font-display font-semibold text-md">12,99 €</div>
-            </div>
-
-            <div class="flex items-center gap-3 bg-beige-lighter border border-black-dark p-3 rounded">
-                <label>
-                    <input type="checkbox" class="switch pink" disabled>
-                </label>
-                <div class="flex-1">
-                    <p class="font-semibold">Spotify</p>
-                    <p class="text-xs text-gray">12/07/2026</p>
-                </div>
-                <div class="font-display font-semibold text-md">10,000 W</div>
-            </div>
+            }
+            @empty {
+                <p class="text-gray text-sm">Aucun abonnement.</p>
+            }
         </div>
     </div>
 </section>
@@ -154,42 +159,34 @@
 
         <div class="w-full lg:max-w-1/2 mx-auto">
             <app-pie-chart
-                [labels]="['Maison', 'Travail']"
-                [data]="[820, 120]"
-                [colors]="['#ffa6d6', '#79D482']"
+                [labels]="categoriesData().pieLabels"
+                [data]="categoriesData().pieData"
+                [colors]="categoriesData().pieColors"
             ></app-pie-chart>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            <div class="bg-beige-light rounded p-4 space-y-3 border">
-                <div class="flex items-center gap-2">
-                    <div class="bg-pink size-3 rounded-full"></div>
-                    <h3 class="flex-1">Maison</h3>
-                    <div class="font-display">820 €</div>
-                </div>
-
-                <div class="space-y-1">
-                    <div class="w-full h-2 bg-beige rounded-full">
-                        <div class="w-40/100 h-full bg-pink rounded-full"></div>
+            @for (cat of categoriesData().categories; track cat.label) {
+                <div class="bg-beige-light rounded p-4 space-y-3 border">
+                    <div class="flex items-center gap-2">
+                        <div class="size-3 rounded-full {{ colorService.getBackground(cat.color) }}"></div>
+                        <h3 class="flex-1">{{ cat.label }}</h3>
+                        <div class="font-display">{{ cat.total|currency:'EUR' }}</div>
                     </div>
-                    <p class="text-xs text-gray">40% du total</p>
-                </div>
-            </div>
-
-            <div class="bg-beige-light rounded p-4 space-y-3 border">
-                <div class="flex items-center gap-2">
-                    <div class="bg-green size-3 rounded-full"></div>
-                    <h3 class="flex-1">Travail</h3>
-                    <div class="font-display">120 €</div>
-                </div>
-
-                <div class="space-y-1">
-                    <div class="w-full h-2 bg-beige rounded-full">
-                        <div class="w-40/100 h-full bg-green rounded-full"></div>
+                    <div class="space-y-1">
+                        <div class="w-full h-2 bg-beige rounded-full">
+                            <div
+                                class="h-full rounded-full {{ colorService.getBackground(cat.color) }}"
+                                [style.width.%]="(cat.total / categoriesData().grandTotal) * 100"
+                            ></div>
+                        </div>
+                        <p class="text-xs text-gray">{{ (cat.total / categoriesData().grandTotal * 100|number:'1.0-0') }}% du total</p>
                     </div>
-                    <p class="text-xs text-gray">10% du total</p>
                 </div>
-            </div>
+            }
+            @empty {
+                <p class="text-gray text-sm">Aucune dépense ce mois-ci.</p>
+            }
         </div>
     </div>
 
@@ -199,6 +196,7 @@
             <svg lucideTag [size]="20"></svg>
             Par tag
         </h2>
+        <p class="text-gray text-sm">Pourcentage par rapport aux dépenses totales.</p>
 
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"
              class="size-40 z-0 absolute -left-10 -bottom-25 lg:-bottom-10 text-green">
@@ -207,18 +205,21 @@
                 fill="currentColor" stroke-width="2" class="stroke-black-dark"></path>
         </svg>
 
-        <div class="relative z-1 grid grid-cols-[1fr_4fr_1fr] lg:grid-cols-[1fr_5fr_1fr] items-center gap-3">
-            <div class="text-gray">#Smiski</div>
-            <div class="flex-1 w-full h-3 bg-beige-light rounded-full border">
-                <div class="w-50/100 h-full bg-yellow rounded-full"></div>
-            </div>
-            <div class="font-display font-medium text-md">186 €</div>
-
-            <div class="text-gray">#Cannes</div>
-            <div class="flex-1 w-full h-3 bg-beige-light rounded-full border">
-                <div class="w-30/100 h-full bg-yellow rounded-full"></div>
-            </div>
-            <div class="font-display font-medium text-md">43 €</div>
+        <div class="relative z-1 grid grid-cols-[1fr_3fr_1fr] lg:grid-cols-[1fr_4fr_1fr] items-center gap-3">
+            @for (tag of tagsData().tags; track tag.label) {
+                <div class="text-gray text-sm">#{{ tag.label }}</div>
+                <div class="w-full h-3 bg-beige-light rounded-full border">
+                    <div
+                        class="h-full bg-yellow rounded-full transition-all"
+                        [style.width.%]="(tag.total / totalExpenses()) * 100"
+                    >
+                    </div>
+                </div>
+                <div class="font-display font-medium text-md text-right">{{ tag.total|currency:'EUR' }}</div>
+            }
+            @empty {
+                <p class="text-gray text-sm">Aucun tag ce mois-ci.</p>
+            }
         </div>
     </div>
 </section>
