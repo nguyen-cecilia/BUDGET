@@ -1,38 +1,32 @@
 import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
 import {
-    LucideArrowDownLeft,
-    LucideArrowUpRight,
     LucideFrown,
     LucideSearch,
-    LucideSparkles,
     LucideX
 } from '@lucide/angular';
 import {BadgeComponent} from '../../components/badge/badge.component';
-import {ModalService} from '../../components/modal/modal.service';
 import {TransactionsByMonth} from './transaction.model';
 import {TransactionService} from './transaction.service';
 import {CurrencyPipe, DatePipe} from '@angular/common';
 import {SelectComponent, SelectOption} from '../../components/select/select.component';
-import {ColorService} from '../../core/color.service';
 import {AuthStateService} from '../auth/auth-state.service';
 import {MonthService} from '../month/month.service';
 import {TransactionOptionsService} from './transaction-options.service';
 import {ButtonComponent} from '../../components/button/button.component';
+import {TransactionItemComponent} from './transaction-item.component';
 
 @Component({
     selector: 'app-transactions',
     imports: [
         LucideSearch,
         BadgeComponent,
-        LucideArrowUpRight,
-        LucideArrowDownLeft,
-        LucideSparkles,
         DatePipe,
         CurrencyPipe,
         SelectComponent,
         LucideFrown,
         LucideX,
-        ButtonComponent
+        ButtonComponent,
+        TransactionItemComponent
     ],
     templateUrl: './transactions-listing.component.html',
 })
@@ -40,8 +34,6 @@ export class TransactionsListingComponent implements OnInit {
     private authState = inject(AuthStateService);
     private transactionService = inject(TransactionService);
     private optionsService = inject(TransactionOptionsService);
-    protected modalService = inject(ModalService);
-    protected colorService = inject(ColorService);
     protected monthService = inject(MonthService);
 
     isLoading = signal(false);

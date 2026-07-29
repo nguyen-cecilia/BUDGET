@@ -1,10 +1,11 @@
 import {Component, computed, effect, inject, signal} from '@angular/core';
 import {
-    LucideArrowDownLeft,
     LucideArrowRight,
-    LucideArrowUpRight,
     LucideAstroid,
-    LucideCalendar, LucideLayers, LucideSparkles, LucideTag, LucideWallet,
+    LucideCalendar,
+    LucideLayers,
+    LucideTag,
+    LucideWallet,
     LucideZap
 } from '@lucide/angular';
 import {ButtonComponent} from '../../components/button/button.component';
@@ -19,6 +20,7 @@ import {Subscription} from '../subscriptions/subscription.model';
 import {CurrencyPipe, DatePipe, DecimalPipe} from '@angular/common';
 import {ColorService} from '../../core/color.service';
 import {ModalService} from '../../components/modal/modal.service';
+import {TransactionItemComponent} from '../transactions/transaction-item.component';
 
 @Component({
     selector: 'app-dashboard',
@@ -29,16 +31,14 @@ import {ModalService} from '../../components/modal/modal.service';
         ButtonComponent,
         LucideCalendar,
         RouterLink,
-        LucideArrowUpRight,
         LucideLayers,
         LucideTag,
         LucideWallet,
         PieChartComponent,
         CurrencyPipe,
-        LucideArrowDownLeft,
         DatePipe,
-        LucideSparkles,
         DecimalPipe,
+        TransactionItemComponent,
     ],
     templateUrl: './dashboard.component.html',
 })

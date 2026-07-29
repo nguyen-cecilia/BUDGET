@@ -38,34 +38,34 @@ Layout:
 
 Auth:
 
-- [ ] Simple lock with a password
+- [x] Simple lock with a password
 
 Dashboard:
 
-- [ ] Last 10 transactions of the current month
-- [ ] Balance left
+- [x] Last 10 transactions of the current month
+- [x] Balance left
 - [ ] Stats: number of transactions, total amount spent, total amount earned, subscriptions (number and amount)
 - [ ] View of the 7 next days
-- [ ] Transactions by category: cards, pie chart
+- [x] Transactions by category: cards, pie chart
 - [ ] Savings goals
 - [ ] Based on month earnings, do the 50/30/20 rule
 
 Transactions:
 
-- [ ] Search bar with filters by category and tag
-- [ ] List of transactions grouped by day, one page per month
-- [ ] CRUD modal: add, edit, delete
+- [x] Search bar with filters by category and tag
+- [x] List of transactions grouped by day, one page per month
+- [x] CRUD modal: add, edit, delete
 
 Transaction CRUD modal:
 
-- [ ] Expense / income selector
-- [ ] Amount input
-- [ ] Description input
-- [ ] Which account
-- [ ] Category selector
-- [ ] Date picker
-- [ ] Tag selector
-- [ ] Subscription?
+- [x] Expense / income selector
+- [x] Amount input
+- [x] Description input
+- [x] Which account
+- [x] Category selector
+- [x] Date picker
+- [x] Tag selector
+- [x] Subscription?
 
 Savings goals:
 

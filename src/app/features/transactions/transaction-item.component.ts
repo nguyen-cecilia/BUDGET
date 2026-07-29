@@ -1,0 +1,68 @@
+import {Component, inject, Input} from '@angular/core';
+import {CurrencyPipe, DatePipe} from '@angular/common';
+import {LucideArrowDownLeft, LucideArrowUpRight, LucideSparkles} from '@lucide/angular';
+import {Transaction} from './transaction.model';
+import {ColorService} from '../../core/color.service';
+import {ModalService} from '../../components/modal/modal.service';
+
+@Component({
+    selector: 'app-transaction-item',
+    imports: [
+        CurrencyPipe,
+        DatePipe,
+        LucideArrowDownLeft,
+        LucideArrowUpRight,
+        LucideSparkles
+    ],
+    template: `
+        <div
+            class="flex items-center justify-between gap-6 rounded px-2 py-4 cursor-pointer transition-all hover:bg-beige-light"
+            (click)="modalService.openEditModal(transaction)"
+            (keydown.enter)="modalService.openEditModal(transaction)"
+            (keydown.space)="modalService.openEditModal(transaction)"
+            tabindex="0"
+            role="button"
+        >
+            <div class="flex items-center gap-6">
+                <div
+                    class="aspect-square border rounded-full p-3 {{ colorService.getBackground(transaction.category.color) }}">
+                    @if (transaction.type === 'income') {
+                        <svg lucideArrowDownLeft [size]="20"></svg>
+                    } @else {
+                        <svg lucideArrowUpRight [size]="20"></svg>
+                    }
+                </div>
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <h3>{{ transaction.label }}</h3>
+                        @if (transaction.is_subscription) {
+                            <svg lucideSparkles [size]="20"></svg>
+                        }
+                    </div>
+                    <p class="text-sm text-gray">
+                        {{ transaction.account.label }} ·
+                        <span
+                            class="font-semibold underline decoration-2 underline-offset-3 {{ colorService.getDecoration(transaction.category.color) }}"
+                        >
+                            {{ transaction.category.label }}
+                        </span>
+                        @if (hasDate) {
+                            · {{ transaction.date|date:'dd/MM/yyyy' }}
+                        }
+                        @if (transaction.tags && transaction.tags.length > 0) {
+                            · {{ transaction.tags.map(tag => '#' + tag.label).join(', ') }}
+                        }
+                    </p>
+                </div>
+            </div>
+            <p class="font-display text-md">{{ transaction.type === 'expense' ? '-' : '+' }}{{ transaction.amount|currency:transaction.currency.code }}</p>
+        </div>
+    `,
+})
+export class TransactionItemComponent {
+    @Input({required: true}) transaction!: Transaction;
+    @Input() hasDate = false;
+
+    protected colorService = inject(ColorService);
+    protected modalService = inject(ModalService);
+}
