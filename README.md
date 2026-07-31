@@ -44,7 +44,7 @@ Dashboard:
 
 - [x] Last 10 transactions of the current month
 - [x] Balance left
-- [ ] Stats: number of transactions, total amount spent, total amount earned, subscriptions (number and amount)
+- [x] Stats: number of transactions, total amount spent, total amount earned, subscriptions (number and amount)
 - [ ] View of the 7 next days
 - [x] Transactions by category: cards, pie chart
 - [ ] Savings goals

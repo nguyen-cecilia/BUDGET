@@ -79,8 +79,8 @@
 
     <div class="w-full lg:w-1/3 bg-blue/50 border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
         <h2 class="flex items-center gap-2">
-            <svg lucideCalendar [size]="20"></svg>
-            Abonnements
+            <svg lucideSparkles [size]="20"></svg>
+            Abonnements @if (subscriptionStatus().length > 0) {({{ subscriptionStatus().length }})}
         </h2>
 
         <div class="flex flex-col gap-3">

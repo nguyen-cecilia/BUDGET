@@ -2,10 +2,10 @@ import {Component, computed, effect, inject, signal} from '@angular/core';
 import {
     LucideArrowRight,
     LucideAstroid,
-    LucideCalendar,
     LucideLayers,
     LucideTag,
     LucideWallet,
+    LucideSparkles,
     LucideZap
 } from '@lucide/angular';
 import {ButtonComponent} from '../../components/button/button.component';
@@ -19,7 +19,6 @@ import {TransactionsByMonth} from '../transactions/transaction.model';
 import {Subscription} from '../subscriptions/subscription.model';
 import {CurrencyPipe, DatePipe, DecimalPipe} from '@angular/common';
 import {ColorService} from '../../core/color.service';
-import {ModalService} from '../../components/modal/modal.service';
 import {TransactionItemComponent} from '../transactions/transaction-item.component';
 
 @Component({
@@ -29,7 +28,6 @@ import {TransactionItemComponent} from '../transactions/transaction-item.compone
         LucideZap,
         LucideArrowRight,
         ButtonComponent,
-        LucideCalendar,
         RouterLink,
         LucideLayers,
         LucideTag,
@@ -39,6 +37,7 @@ import {TransactionItemComponent} from '../transactions/transaction-item.compone
         DatePipe,
         DecimalPipe,
         TransactionItemComponent,
+        LucideSparkles,
     ],
     templateUrl: './dashboard.component.html',
 })
@@ -49,7 +48,6 @@ export class DashboardComponent {
     private subscriptionService = inject(SubscriptionService);
     protected monthService = inject(MonthService);
     protected colorService = inject(ColorService);
-    protected modalService = inject(ModalService);
 
     isLoading = signal(false);
     transactionsByMonth = signal<TransactionsByMonth | null>(null);
