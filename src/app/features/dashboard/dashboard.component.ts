@@ -2,10 +2,12 @@ import {Component, computed, effect, inject, signal} from '@angular/core';
 import {
     LucideArrowRight,
     LucideAstroid,
+    LucideCheck,
     LucideLayers,
+    LucideSparkles,
     LucideTag,
     LucideWallet,
-    LucideSparkles,
+    LucideX,
     LucideZap
 } from '@lucide/angular';
 import {ButtonComponent} from '../../components/button/button.component';
@@ -38,6 +40,8 @@ import {TransactionItemComponent} from '../transactions/transaction-item.compone
         DecimalPipe,
         TransactionItemComponent,
         LucideSparkles,
+        LucideCheck,
+        LucideX,
     ],
     templateUrl: './dashboard.component.html',
 })

@@ -61,12 +61,13 @@
             <app-select
                 [options]="monthOptions()"
                 [value]="selectedMonth()"
-                (valueChange)="onMonthChange($event)"
+                (valueChange)="monthService.setMonth($event)"
             ></app-select>
 
             <hr class="text-gray-light">
 
-            <button app-button variant="secondary" shape="bigPill" (click)="modalService.openCreateModal()">
+            <button app-button variant="secondary" class="text-md! font-bold" shape="bigPill"
+                    (click)="modalService.openCreateModal()">
                 <svg lucidePlus [size]="20"></svg>
                 Nouvelle transaction
             </button>
@@ -81,7 +82,7 @@
                                 routerLinkActive="bg-blue/50 text-black-dark! [&>svg]:bg-yellow"
                                 [routerLinkActiveOptions]="{exact: true}"
                                 variant="sidebar"
-                                class="[&>svg]:rounded-full [&>svg]:p-1.5 [&>svg]:border [&>svg]:border-black-dark [&>svg]:text-black-dark"
+                                class="font-bold text-md! [&>svg]:rounded-full [&>svg]:p-1.5 [&>svg]:border [&>svg]:border-black-dark [&>svg]:text-black-dark"
                             >
                                 @switch (link.icon) {
                                     @case ('lucideHome') {
@@ -121,7 +122,10 @@
             @if (!isLast) {
                 @if (i === 2) {
                     <button
-                        class="-translate-y-6 cursor-pointer transition-all hover:bg-pink-dark bg-pink text-black-dark border border-black-dark rounded-full p-3"
+                        app-button
+                        variant="secondary"
+                        shape="round"
+                        class="-translate-y-6 text-black-dark p-3"
                         (click)="modalService.openCreateModal()"
                     >
                         <svg lucidePlus [size]="34"></svg>

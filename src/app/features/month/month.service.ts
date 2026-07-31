@@ -1,4 +1,10 @@
 import {Injectable, signal} from '@angular/core';
+import {SelectOption} from '../../components/select/select.component';
+
+const MONTHS = [
+    'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+];
 
 @Injectable({
     providedIn: 'root'
@@ -6,9 +12,14 @@ import {Injectable, signal} from '@angular/core';
 export class MonthService {
     selectedMonth = signal<number>(new Date().getMonth());
     selectedYear = signal<number>(new Date().getFullYear());
+    monthOptions = signal<SelectOption[]>([]);
 
-    setMonth(monthIndex: number): void {
-        this.selectedMonth.set(monthIndex);
+    constructor() {
+        this.initializeMonthOptions();
+    }
+
+    setMonth(monthIndex: string | number): void {
+        this.selectedMonth.set(Number(monthIndex));
     }
 
     getMonth(): number {
@@ -35,5 +46,19 @@ export class MonthService {
 
     getCurrentYear(): number {
         return new Date().getFullYear();
+    }
+
+    initializeMonthOptions(): void {
+        const currentYear = this.getCurrentYear();
+        const currentMonth = this.getCurrentMonth();
+
+        const options: SelectOption[] = MONTHS
+            .slice(0, currentMonth + 3)
+            .map((month, index) => ({
+                value: index,
+                label: `${month} ${currentYear}`
+            }));
+
+        this.monthOptions.set(options);
     }
 }

@@ -80,15 +80,22 @@
     <div class="w-full lg:w-1/3 bg-blue/50 border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
         <h2 class="flex items-center gap-2">
             <svg lucideSparkles [size]="20"></svg>
-            Abonnements @if (subscriptionStatus().length > 0) {({{ subscriptionStatus().length }})}
+            Abonnements @if (subscriptionStatus().length > 0) {
+            ({{ subscriptionStatus().length }})
+        }
         </h2>
 
         <div class="flex flex-col gap-3">
             @for (sub of subscriptionStatus(); track sub.id) {
                 <div class="flex items-center gap-3 bg-beige-lighter border border-black-dark p-3 rounded">
-                    <label>
-                        <input type="checkbox" class="switch pink" disabled [checked]="sub.checked">
-                    </label>
+                    <div
+                        class="size-10 border rounded-full flex justify-center items-center font-display text-md {{ sub.checked ? 'bg-green' : 'bg-pink' }}">
+                        @if (sub.checked) {
+                            <svg lucideCheck [size]="16"></svg>
+                        } @else {
+                            <svg lucideX [size]="16"></svg>
+                        }
+                    </div>
                     <div class="flex-1">
                         <p class="font-semibold">{{ sub.label }}</p>
                         @if (sub.lastTransactionDate) {
@@ -105,8 +112,7 @@
                         {{ sub.amount|currency:sub.currency }}
                     </div>
                 </div>
-            }
-            @empty {
+            } @empty {
                 <p class="text-gray text-sm">Aucun abonnement.</p>
             }
         </div>
@@ -144,11 +150,11 @@
                                 [style.width.%]="(cat.total / categoriesData().grandTotal) * 100"
                             ></div>
                         </div>
-                        <p class="text-xs text-gray">{{ (cat.total / categoriesData().grandTotal * 100|number:'1.0-0') }}% du total</p>
+                        <p class="text-xs text-gray">{{ (cat.total / categoriesData().grandTotal * 100|number:'1.0-0') }}
+                            % du total</p>
                     </div>
                 </div>
-            }
-            @empty {
+            } @empty {
                 <p class="text-gray text-sm">Aucune dépense ce mois-ci.</p>
             }
         </div>
@@ -180,8 +186,7 @@
                     </div>
                 </div>
                 <div class="font-display font-medium text-md text-right">{{ tag.total|currency:'EUR' }}</div>
-            }
-            @empty {
+            } @empty {
                 <p class="text-gray text-sm">Aucun tag ce mois-ci.</p>
             }
         </div>

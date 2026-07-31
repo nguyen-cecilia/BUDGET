@@ -119,7 +119,7 @@
         </div>
         <div class="order-2 flex flex-wrap items-center gap-2">
             @for (tag of availableTagsOptions(); track tag.value) {
-                <button app-badge variant="tertiary" (click)="addExistingTag(tag)">+ {{ tag.label }}</button>
+                <button app-badge (click)="addExistingTag(tag)">+ {{ tag.label }}</button>
             }
         </div>
     </label>

@@ -84,3 +84,5 @@ Parameters:
 - [ ] Manage categories
 - [ ] Manage tags
 - [ ] Manage currencies
+- [ ] Manage subscriptions
+- [ ] Manage imports / exports

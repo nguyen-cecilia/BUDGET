@@ -1,0 +1,230 @@
+<section>
+    <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-3 lg:space-y-0">
+        <div>
+            <h1>Paramètres</h1>
+            <p class="text-gray">Gestion de l'application : catégories, tags, devises, abonnements...</p>
+        </div>
+
+        <div class="lg:hidden">
+            <app-select
+                [options]="monthOptions()"
+                [value]="selectedMonth()"
+                (valueChange)="monthService.setMonth($event)"
+            ></app-select>
+        </div>
+    </div>
+</section>
+
+<section class="flex flex-col lg:flex-row gap-8 *:flex-1">
+    <div class="space-y-8">
+        <div class="bg-yellow/50 border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
+            <div class="flex items-center justify-between gap-3">
+                <h2 class="flex items-center gap-2">
+                    <svg lucideCoins [size]="20"></svg>
+                    Devises disponibles
+                </h2>
+
+                <button app-button>
+                    <svg lucidePlus [size]="16"></svg>
+                    Ajouter
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-2">
+                <div
+                    class="p-3 border rounded flex items-center gap-2 cursor-pointer bg-beige-lighter transition-all hover:bg-beige-light">
+                    <div
+                        class="size-10 rounded-full border p-1 text-md font-medium font-display bg-purple flex justify-center items-center gap-3">
+                        €
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <h3>Euros</h3>
+                            <div class="text-xs text-semibold py-0.5 px-1.5 border rounded-xs bg-green">principale</div>
+                        </div>
+                        <p class="text-sm text-gray">EUR</p>
+                    </div>
+                </div>
+
+                <div
+                    class="p-3 border rounded flex items-center gap-2 cursor-pointer bg-beige-lighter transition-all hover:bg-beige-light">
+                    <div
+                        class="size-10 rounded-full border p-1 text-md font-medium font-display bg-purple flex justify-center items-center gap-3">
+                        Y
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <h3>Yens</h3>
+                        </div>
+                        <p class="text-sm text-gray">JPY</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
+            <h2 class="flex items-center gap-2">
+                <svg lucideTag [size]="20"></svg>
+                Tags
+            </h2>
+
+            <div class="flex items-center gap-3">
+                <input type="text" placeholder="Nouveau tag">
+                <button app-button>
+                    <svg lucidePlus [size]="16"></svg>
+                    Ajouter
+                </button>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+                <div app-badge variant="secondary">
+                    #Test
+                    <svg lucideTrash2 [size]="12" class="text-red"></svg>
+                </div>
+
+                <div app-badge variant="secondary">
+                    #Smiski
+                    <svg lucideTrash2 [size]="12" class="text-red"></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
+        <div class="flex items-center justify-between gap-3">
+            <h2 class="flex items-center gap-2">
+                <svg lucideSparkles [size]="20"></svg>
+                Abonnements
+            </h2>
+
+            <button app-button>
+                <svg lucidePlus [size]="16"></svg>
+                Ajouter
+            </button>
+        </div>
+
+        <div>
+            <div
+                class="flex items-center justify-between gap-6 rounded px-2 py-4 cursor-pointer transition-all hover:bg-beige-light"
+            >
+                <label>
+                    <input type="checkbox" class="switch" disabled checked>
+                </label>
+                <div class="flex-1">
+                    <h3>Netflix</h3>
+                    <p class="text-sm text-gray">
+                        <span
+                            class="font-semibold underline decoration-2 underline-offset-3 decoration-pink"
+                        >
+                            Maison
+                        </span>
+                        · Mensuel
+                    </p>
+                </div>
+                <div class="font-display text-md">10,000 W</div>
+            </div>
+            <div
+                class="flex items-center justify-between gap-6 rounded px-2 py-4 cursor-pointer transition-all hover:bg-beige-light"
+            >
+                <label>
+                    <input type="checkbox" class="switch" disabled checked>
+                </label>
+                <div class="flex-1">
+                    <h3>Disney+</h3>
+                    <p class="text-sm text-gray">
+                        <span
+                            class="font-semibold underline decoration-2 underline-offset-3 decoration-pink"
+                        >
+                            Maison
+                        </span>
+                        · Mensuel · Renouvelle le 00/00/0000
+                    </p>
+                </div>
+                <div class="font-display text-md">10,000 W</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8">
+    <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
+        <h2 class="flex items-center gap-2">
+            <svg lucideWallet [size]="20"></svg>
+            Catégories
+        </h2>
+
+        <div class="flex items-center gap-3">
+            <input type="text" placeholder="Nouvelle catégorie">
+            <button app-button>
+                <svg lucidePlus [size]="16"></svg>
+                Ajouter
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2">
+            <div class="flex items-center gap-3 bg-beige-light border p-3 rounded">
+                <div class="size-10 border bg-pink rounded-full"></div>
+                <h3 class="flex-1">Maison</h3>
+                <button app-button shape="round" variant="outline">
+                    <svg lucidePencil [size]="16"></svg>
+                </button>
+            </div>
+
+            <div class="flex items-center gap-3 bg-beige-light border p-3 rounded">
+                <div class="size-10 border bg-green rounded-full"></div>
+                <h3 class="flex-1">Travail</h3>
+                <button app-button shape="round" variant="outline">
+                    <svg lucidePencil [size]="16"></svg>
+                </button>
+            </div>
+
+            <div class="flex items-center gap-3 bg-beige-light border p-3 rounded">
+                <div class="size-10 border bg-blue rounded-full"></div>
+                <h3 class="flex-1">Courses</h3>
+                <button app-button shape="round" variant="outline">
+                    <svg lucidePencil [size]="16"></svg>
+                </button>
+            </div>
+
+            <div class="flex items-center gap-3 bg-beige-light border p-3 rounded">
+                <div class="size-10 border bg-yellow rounded-full"></div>
+                <h3 class="flex-1">Cadeaux</h3>
+                <button app-button shape="round" variant="outline">
+                    <svg lucidePencil [size]="16"></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-green/50 border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
+        <div class="flex items-center justify-between gap-3">
+            <h2 class="flex items-center gap-2">
+                <svg lucideLandmark [size]="20"></svg>
+                Comptes
+            </h2>
+
+            <button app-button>
+                <svg lucidePlus [size]="16"></svg>
+                Ajouter
+            </button>
+        </div>
+
+        <div class="space-y-2">
+            <div
+                class="flex items-center gap-3 bg-beige-lighter p-3 rounded border cursor-pointer transition-all hover:bg-beige-light">
+                <label>
+                    <input type="checkbox" class="switch pink" disabled checked>
+                </label>
+                <h3>Caisse d'Epargne</h3>
+            </div>
+
+            <div
+                class="flex items-center gap-3 bg-beige-lighter p-3 rounded border cursor-pointer transition-all hover:bg-beige-light">
+                <label>
+                    <input type="checkbox" class="switch pink" disabled>
+                </label>
+                <h3>Wise</h3>
+            </div>
+        </div>
+    </div>
+</section>
