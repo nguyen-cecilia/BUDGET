@@ -1,0 +1,32 @@
+<form class="space-y-4" [formGroup]="tagForm" (ngSubmit)="submitTag()">
+    @if (errorMessage()) {
+        <div class="text-red">{{ errorMessage() }}</div>
+    }
+
+    <div class="flex items-end gap-3">
+        <label for="label" class="flex-1">
+            @if (editingTag()) { <p>Label</p> }
+            <input id="label" type="text" placeholder="Nouveau tag" formControlName="label">
+        </label>
+
+        <button app-button (click)="submitTag()" [disabled]="isSubmitting()">
+            @if (isSubmitting()) {
+                <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
+                Envoi...
+            } @else if (editingTag()) {
+                <svg lucideSave [size]="16"></svg>
+                Sauvegarder
+            } @else {
+                <svg lucidePlus [size]="16"></svg>
+                Ajouter
+            }
+        </button>
+    </div>
+
+    @if (editingTag()) {
+        <button app-button variant="invalid" (click)="deleteTag()">
+            <svg lucideTrash2 [size]="16"></svg>
+            Supprimer
+        </button>
+    }
+</form>

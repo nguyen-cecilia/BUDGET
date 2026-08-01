@@ -352,7 +352,7 @@ export class TransactionUpdateComponent {
                     t => t.label.toLowerCase() === label.toLowerCase()
                 );
                 if (existing) return existing.id;
-                const created = await this.tagService.createTag({label, user_id: userId});
+                const created = await this.tagService.createTag(userId, {label});
                 return created.id;
             })
         );

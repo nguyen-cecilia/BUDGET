@@ -3,7 +3,15 @@
     [isOpen]="modalService.account.isOpen"
     [onClose]="() => modalService.account.close()"
 >
-    <app-account-update />
+    <app-account-update/>
+</app-modal>
+
+<app-modal
+    title="Modifier le tag"
+    [isOpen]="modalService.tag.isOpen"
+    [onClose]="() => modalService.tag.close()"
+>
+    <app-tag-update/>
 </app-modal>
 
 <section>
@@ -79,24 +87,22 @@
                     Tags
                 </h2>
 
-                <div class="flex items-center gap-3">
-                    <input type="text" placeholder="Nouveau tag">
-                    <button app-button>
-                        <svg lucidePlus [size]="16"></svg>
-                        Ajouter
-                    </button>
-                </div>
+                <app-tag-update [createOnly]="true"/>
 
                 <div class="flex flex-wrap items-center gap-2">
-                    <div app-badge variant="secondary">
-                        #Test
-                        <svg lucideTrash2 [size]="12" class="text-red"></svg>
-                    </div>
-
-                    <div app-badge variant="secondary">
-                        #Smiski
-                        <svg lucideTrash2 [size]="12" class="text-red"></svg>
-                    </div>
+                    @for (tag of tags(); track tag.id) {
+                        <div
+                            app-badge
+                            variant="secondary"
+                            (click)="modalService.tag.openEdit(tag)"
+                            (keydown.enter)="modalService.tag.openEdit(tag)"
+                            (keydown.space)="modalService.tag.openEdit(tag)"
+                            tabindex="0"
+                            role="button"
+                        >
+                            #{{ tag.label }}
+                        </div>
+                    }
                 </div>
             </div>
         </div>

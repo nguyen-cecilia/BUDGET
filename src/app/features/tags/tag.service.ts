@@ -1,6 +1,8 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, signal} from '@angular/core';
 import {SupabaseService} from '../../core/supabase.service';
 import {Tag} from './tag.model';
+import {Account} from '../accounts/account.model';
+import {TransactionService} from '../transactions/transaction.service';
 
 const TAGS_TABLE = 'tags';
 
@@ -9,7 +11,10 @@ const TAGS_TABLE = 'tags';
 })
 export class TagService {
     private supabaseService = inject(SupabaseService);
+    private transactionService = inject(TransactionService);
     private supabase = this.supabaseService.getClient();
+
+    tagRefreshTrigger = signal<boolean>(false);
 
     async getAllTagsByUser(userId: string): Promise<Tag[]> {
         const {data, error} = await this.supabase
@@ -27,10 +32,13 @@ export class TagService {
         return data;
     }
 
-    async createTag(tag: { label: string; user_id: string }): Promise<Tag> {
+    async createTag(userId: string, tag: { label: string; }): Promise<Tag> {
         const {data, error} = await this.supabase
             .from(TAGS_TABLE)
-            .insert([tag])
+            .insert([{
+                user_id: userId,
+                label: tag.label,
+            }])
             .select()
             .single()
         ;
@@ -38,5 +46,35 @@ export class TagService {
         if (error) throw error;
 
         return data;
+    }
+
+    async updateTag(id: string, userId: string, tag: {
+        label: string;
+    }): Promise<Account> {
+        const {data, error} = await this.supabase
+            .from(TAGS_TABLE)
+            .update({
+                label: tag.label,
+            })
+            .eq('id', id)
+            .eq('user_id', userId)
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        return data;
+    }
+
+    async deleteTag(id: string, userId: string): Promise<void> {
+        await this.transactionService.removeTagFromAllTransactions(id);
+
+        const {error} = await this.supabase
+            .from(TAGS_TABLE)
+            .delete()
+            .eq('id', id)
+            .eq('user_id', userId);
+
+        if (error) throw error;
     }
 }

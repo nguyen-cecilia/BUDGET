@@ -135,6 +135,15 @@ export class TransactionService {
         if (error) throw error;
     }
 
+    async removeTagFromAllTransactions(tagId: string): Promise<void> {
+        const {error} = await this.supabase
+            .from(TRANSACTION_TAGS_TABLE)
+            .delete()
+            .eq('tag_id', tagId);
+
+        if (error) throw error;
+    }
+
     async deleteTransaction(id: string, userId: string): Promise<void> {
         await this.removeTagsFromTransaction(id);
 

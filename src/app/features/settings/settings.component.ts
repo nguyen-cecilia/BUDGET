@@ -6,7 +6,6 @@ import {
     LucidePlus,
     LucideSparkles,
     LucideTag,
-    LucideTrash2,
     LucideWallet,
 } from '@lucide/angular';
 import {ButtonComponent} from '../../components/button/button.component';
@@ -19,6 +18,9 @@ import {ModalService} from '../../components/modal/modal.service';
 import {AccountService} from '../accounts/account.service';
 import {Account} from '../accounts/account.model';
 import {AuthStateService} from '../auth/auth-state.service';
+import {TagService} from '../tags/tag.service';
+import {Tag} from '../tags/tag.model';
+import {TagUpdateComponent} from '../tags/tag-update.component';
 
 @Component({
     selector: 'app-settings',
@@ -31,17 +33,18 @@ import {AuthStateService} from '../auth/auth-state.service';
         LucideWallet,
         LucideTag,
         BadgeComponent,
-        LucideTrash2,
         LucideLandmark,
         SelectComponent,
         ModalComponent,
-        AccountUpdateComponent
+        AccountUpdateComponent,
+        TagUpdateComponent
     ],
     templateUrl: './settings.component.html',
 })
 export class SettingsComponent implements OnInit {
     private authState = inject(AuthStateService);
     private accountService = inject(AccountService);
+    private tagService = inject(TagService);
     protected modalService = inject(ModalService);
     protected monthService = inject(MonthService);
 
@@ -50,13 +53,16 @@ export class SettingsComponent implements OnInit {
 
     isLoading = signal(false);
     accounts = signal<Account[]>([]);
+    tags = signal<Tag[]>([]);
 
     constructor() {
         effect(() => {
             this.accountService.accountRefreshTrigger();
+            this.tagService.tagRefreshTrigger();
             const userId = this.authState.getCurrentUser()?.id;
             if (userId) {
                 this.getAccounts(userId);
+                this.getTags(userId);
             }
         });
     }
@@ -78,6 +84,17 @@ export class SettingsComponent implements OnInit {
         this.accountService.getAllAccountsByUser(userId, true).then(
             (data) => {
                 this.accounts.set(data);
+            },
+            (error) => {
+                console.error('Erreur lors du chargement:', error);
+            }
+        );
+    }
+
+    private getTags(userId: string) {
+        this.tagService.getAllTagsByUser(userId).then(
+            (data) => {
+                this.tags.set(data);
             },
             (error) => {
                 console.error('Erreur lors du chargement:', error);
