@@ -25,7 +25,7 @@ import {ModalService} from '../../components/modal/modal.service';
         >
             <div class="flex items-center gap-6">
                 <div
-                    class="aspect-square border rounded-full p-3 {{ colorService.getBackground(transaction.category.color) }}">
+                    class="aspect-square border rounded-full p-3 {{ colorService.getBackground(transaction.category?.color ?? 'gray') }}">
                     @if (transaction.type === 'income') {
                         <svg lucideArrowDownLeft [size]="20"></svg>
                     } @else {
@@ -42,9 +42,9 @@ import {ModalService} from '../../components/modal/modal.service';
                     <p class="text-sm text-gray">
                         {{ transaction.account.label }} ·
                         <span
-                            class="font-semibold underline decoration-2 underline-offset-3 {{ colorService.getDecoration(transaction.category.color) }}"
+                            class="font-semibold underline decoration-2 underline-offset-3 {{ colorService.getDecoration(transaction.category?.color ?? 'gray') }}"
                         >
-                            {{ transaction.category.label }}
+                            {{ transaction.category?.label ?? 'Sans catégorie' }}
                         </span>
                         @if (hasDate) {
                             · {{ transaction.date|date:'dd/MM/yyyy' }}

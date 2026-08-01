@@ -14,6 +14,7 @@ import positiveNumber from '../../core/validators';
 import computeNextDate from '../../core/utilities';
 import {Transaction} from './transaction.model';
 import {AccountService} from '../accounts/account.service';
+import {CategoryService} from '../categories/category.service';
 
 @Component({
     selector: 'app-update-transaction',
@@ -35,6 +36,7 @@ export class TransactionUpdateComponent {
     private optionsService = inject(TransactionOptionsService);
     private transactionService = inject(TransactionService);
     private accountService = inject(AccountService);
+    private categoryService = inject(CategoryService);
     private tagService = inject(TagService);
     private subscriptionService = inject(SubscriptionService);
     protected modalService = inject(ModalService);
@@ -64,7 +66,7 @@ export class TransactionUpdateComponent {
             label: ['', [Validators.required]],
             date: [nowLocal, [Validators.required]],
             account: ['', [Validators.required]],
-            category: ['', [Validators.required]],
+            category: [''],
             isSubscription: [false],
             subscriptionFrequency: ['monthly'],
             subscriptionNextDate: [computeNextDate('monthly')],
@@ -83,6 +85,8 @@ export class TransactionUpdateComponent {
                 const userId = this.authState.getCurrentUser()?.id;
                 if (userId) {
                     this.accountService.accountRefreshTrigger();
+                    this.tagService.tagRefreshTrigger();
+                    this.categoryService.categoryRefreshTrigger();
                     this.initOptions(userId);
                 }
             }
@@ -167,7 +171,7 @@ export class TransactionUpdateComponent {
                 return;
             }
 
-            let subscriptionId: number | null = null;
+            let subscriptionId: string | null = null;
             if (fv.isSubscription) {
                 subscriptionId = await this.handleSubscription(
                     userId,
@@ -257,7 +261,7 @@ export class TransactionUpdateComponent {
             const [currencies, accounts, categories, tags] = await Promise.all([
                 this.optionsService.getCurrenciesOptions(),
                 this.optionsService.getAccountsOptions(userId, false),
-                this.optionsService.getCategoriesOptions(userId, false),
+                this.optionsService.getCategoriesOptions(userId, false, true),
                 this.optionsService.getTagsOptions(userId),
             ]);
 
@@ -290,7 +294,7 @@ export class TransactionUpdateComponent {
             label: transaction.label,
             date: transaction.date.slice(0, 16),
             account: transaction.account_id,
-            category: transaction.category_id,
+            category: transaction.category_id ?? '',
             isSubscription: transaction.is_subscription,
             subscriptionFrequency: 'monthly',
             subscriptionNextDate: '',
@@ -374,7 +378,7 @@ export class TransactionUpdateComponent {
         categoryId: string | undefined,
         frequency: string,
         nextDate: string,
-    ): Promise<number | null> {
+    ): Promise<string | null> {
         const existing = await this.subscriptionService.getAllSubscriptionsByUser(userId);
 
         const match = existing.find(
@@ -397,7 +401,7 @@ export class TransactionUpdateComponent {
             next_payment_date: nextDate,
             is_active: true,
             account_id: accountId,
-            category_id: categoryId || '',
+            category_id: categoryId || null,
             frequency,
         });
 

@@ -124,4 +124,8 @@ export class ColorService {
     getConfig(color: string): ColorConfig {
         return this.colorMap[color];
     }
+
+    getAvailableColors(): string[] {
+        return Object.keys(this.colorMap);
+    }
 }

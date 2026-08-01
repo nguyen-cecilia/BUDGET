@@ -14,6 +14,14 @@
     <app-tag-update/>
 </app-modal>
 
+<app-modal
+    title="Modifier la catégorie"
+    [isOpen]="modalService.category.isOpen"
+    [onClose]="() => modalService.category.close()"
+>
+    <app-category-update/>
+</app-modal>
+
 <section>
     <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-3 lg:space-y-0">
         <div>
@@ -170,46 +178,27 @@
                 Catégories
             </h2>
 
-            <div class="flex items-center gap-3">
-                <input type="text" placeholder="Nouvelle catégorie">
-                <button app-button>
-                    <svg lucidePlus [size]="16"></svg>
-                    Ajouter
-                </button>
-            </div>
+            <app-category-update [createOnly]="true"/>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2">
-                <div class="flex items-center gap-3 bg-beige-light border p-3 rounded">
-                    <div class="size-10 border bg-pink rounded-full"></div>
-                    <h3 class="flex-1">Maison</h3>
-                    <button app-button shape="round" variant="outline">
-                        <svg lucidePencil [size]="16"></svg>
-                    </button>
-                </div>
-
-                <div class="flex items-center gap-3 bg-beige-light border p-3 rounded">
-                    <div class="size-10 border bg-green rounded-full"></div>
-                    <h3 class="flex-1">Travail</h3>
-                    <button app-button shape="round" variant="outline">
-                        <svg lucidePencil [size]="16"></svg>
-                    </button>
-                </div>
-
-                <div class="flex items-center gap-3 bg-beige-light border p-3 rounded">
-                    <div class="size-10 border bg-blue rounded-full"></div>
-                    <h3 class="flex-1">Courses</h3>
-                    <button app-button shape="round" variant="outline">
-                        <svg lucidePencil [size]="16"></svg>
-                    </button>
-                </div>
-
-                <div class="flex items-center gap-3 bg-beige-light border p-3 rounded">
-                    <div class="size-10 border bg-yellow rounded-full"></div>
-                    <h3 class="flex-1">Cadeaux</h3>
-                    <button app-button shape="round" variant="outline">
-                        <svg lucidePencil [size]="16"></svg>
-                    </button>
-                </div>
+                @for (category of categories(); track category.id) {
+                    <div class="flex items-center gap-3 bg-beige-light border p-3 rounded">
+                        <div class="size-10 border rounded-full {{ colorService.getBackground(category.color) }}"></div>
+                        <h3 class="flex-1">{{ category.label }}</h3>
+                        <button
+                            app-button
+                            shape="round"
+                            variant="outline"
+                            (click)="modalService.category.openEdit(category)"
+                            (keydown.enter)="modalService.category.openEdit(category)"
+                            (keydown.space)="modalService.category.openEdit(category)"
+                            tabindex="0"
+                            role="button"
+                        >
+                            <svg lucidePencil [size]="16"></svg>
+                        </button>
+                    </div>
+                }
             </div>
         </div>
 

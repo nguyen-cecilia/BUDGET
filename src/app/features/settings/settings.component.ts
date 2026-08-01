@@ -21,6 +21,10 @@ import {AuthStateService} from '../auth/auth-state.service';
 import {TagService} from '../tags/tag.service';
 import {Tag} from '../tags/tag.model';
 import {TagUpdateComponent} from '../tags/tag-update.component';
+import {CategoryUpdateComponent} from '../categories/category-update.component';
+import {CategoryService} from '../categories/category.service';
+import {Category} from '../categories/category.model';
+import {ColorService} from '../../core/color.service';
 
 @Component({
     selector: 'app-settings',
@@ -37,7 +41,8 @@ import {TagUpdateComponent} from '../tags/tag-update.component';
         SelectComponent,
         ModalComponent,
         AccountUpdateComponent,
-        TagUpdateComponent
+        TagUpdateComponent,
+        CategoryUpdateComponent
     ],
     templateUrl: './settings.component.html',
 })
@@ -45,8 +50,10 @@ export class SettingsComponent implements OnInit {
     private authState = inject(AuthStateService);
     private accountService = inject(AccountService);
     private tagService = inject(TagService);
+    private categoryService = inject(CategoryService);
     protected modalService = inject(ModalService);
     protected monthService = inject(MonthService);
+    protected colorService = inject(ColorService);
 
     selectedMonth = this.monthService.selectedMonth;
     monthOptions = this.monthService.monthOptions;
@@ -54,15 +61,18 @@ export class SettingsComponent implements OnInit {
     isLoading = signal(false);
     accounts = signal<Account[]>([]);
     tags = signal<Tag[]>([]);
+    categories = signal<Category[]>([]);
 
     constructor() {
         effect(() => {
             this.accountService.accountRefreshTrigger();
             this.tagService.tagRefreshTrigger();
+            this.categoryService.categoryRefreshTrigger();
             const userId = this.authState.getCurrentUser()?.id;
             if (userId) {
-                this.getAccounts(userId);
+                this.getCategories(userId);
                 this.getTags(userId);
+                this.getAccounts(userId);
             }
         });
     }
@@ -80,10 +90,10 @@ export class SettingsComponent implements OnInit {
         this.isLoading.set(false);
     }
 
-    private getAccounts(userId: string) {
-        this.accountService.getAllAccountsByUser(userId, true).then(
+    private getCategories(userId: string) {
+        this.categoryService.getAllCategoriesByUser(userId).then(
             (data) => {
-                this.accounts.set(data);
+                this.categories.set(data);
             },
             (error) => {
                 console.error('Erreur lors du chargement:', error);
@@ -95,6 +105,17 @@ export class SettingsComponent implements OnInit {
         this.tagService.getAllTagsByUser(userId).then(
             (data) => {
                 this.tags.set(data);
+            },
+            (error) => {
+                console.error('Erreur lors du chargement:', error);
+            }
+        );
+    }
+
+    private getAccounts(userId: string) {
+        this.accountService.getAllAccountsByUser(userId, true).then(
+            (data) => {
+                this.accounts.set(data);
             },
             (error) => {
                 console.error('Erreur lors du chargement:', error);

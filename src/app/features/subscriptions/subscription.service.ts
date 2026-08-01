@@ -32,7 +32,7 @@ export class SubscriptionService {
         next_payment_date: string;
         is_active: boolean;
         account_id: string;
-        category_id: string;
+        category_id: string | null;
         frequency: string;
     }): Promise<Subscription> {
         const {data, error} = await this.supabase
@@ -60,11 +60,11 @@ export class SubscriptionService {
         return data;
     }
 
-    async updateSubscription(id: number, data: {
+    async updateSubscription(id: string, data: {
         next_payment_date?: string;
         is_active?: boolean;
         account_id?: string;
-        category_id?: string;
+        category_id?: string | null;
         frequency?: string;
     }): Promise<Subscription> {
         const {data: result, error} = await this.supabase
@@ -77,7 +77,7 @@ export class SubscriptionService {
         return result;
     }
 
-    async getSubscriptionById(id: number): Promise<Subscription> {
+    async getSubscriptionById(id: string): Promise<Subscription> {
         const {data, error} = await this.supabase
             .from(SUBSCRIPTIONS_TABLE)
             .select('*')

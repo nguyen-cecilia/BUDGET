@@ -1,0 +1,29 @@
+<div class="relative">
+    <button type="button"
+            (click)="toggle()"
+            class="flex items-center gap-2 rounded-full border p-1 cursor-pointer"
+            [attr.aria-expanded]="isOpen"
+            aria-haspopup="listbox"
+    >
+        <span class="size-7 rounded-full border {{ colorService.getBackground(color) }}"></span>
+        <svg lucideChevronDown [size]="16"></svg>
+    </button>
+
+    @if (isOpen) {
+        <div
+            class="absolute top-full left-0 mt-1 z-50 bg-white border border-gray-light rounded-sm shadow-md p-2 grid grid-cols-5 gap-2 w-max"
+            role="listbox"
+        >
+            @for (c of availableColors; track c) {
+                <button type="button"
+                        (click)="select(c)"
+                        class="cursor-pointer size-8 rounded-full border transition-all {{ colorService.getBackground(c) }}"
+                        [class.ring-2]="c === color"
+                        role="option"
+                        [attr.aria-label]="c"
+                        [attr.aria-selected]="c === color">
+                </button>
+            }
+        </div>
+    }
+</div>

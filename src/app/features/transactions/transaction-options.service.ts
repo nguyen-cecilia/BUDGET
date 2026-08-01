@@ -28,12 +28,16 @@ export class TransactionOptionsService {
         return options;
     }
 
-    async getCategoriesOptions(userId: string, includeAll = false): Promise<SelectOption[]> {
+    async getCategoriesOptions(userId: string, includeAll = false, includeNone = false): Promise<SelectOption[]> {
         const data = await this.categoryService.getAllCategoriesByUser(userId);
         const options: SelectOption[] = data.map(category => ({
             value: category.id,
             label: category.label
         }));
+
+        if (includeNone) {
+            options.unshift({value: '', label: 'Sans catégorie'});
+        }
 
         if (includeAll) {
             options.unshift({value: 'all', label: 'Tout'});

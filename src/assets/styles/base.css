@@ -12,6 +12,6 @@
     }
 
     h3 {
-        @apply font-semibold text-md tracking-tight;
+        @apply font-semibold text-md tracking-tight leading-5;
     }
 }

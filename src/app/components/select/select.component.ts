@@ -61,7 +61,7 @@ export interface SelectOption {
                         <button
                             type="button"
                             (click)="selectOption(option)"
-                            class="w-full px-4 py-3 text-left text-sm hover:bg-blue/25 transition-all first:rounded-t-sm last:rounded-b-sm"
+                            class="w-full px-4 py-2 text-left text-sm hover:bg-blue/25 transition-all first:rounded-t-sm last:rounded-b-sm"
                             [class.bg-blue]="option.value === value"
                         >
                             {{ option.label }}

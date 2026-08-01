@@ -49,6 +49,7 @@ Dashboard:
 - [x] Transactions by category: cards, pie chart
 - [ ] Savings goals
 - [ ] Based on month earnings, do the 50/30/20 rule
+- [ ] View per month
 
 Transactions:
 

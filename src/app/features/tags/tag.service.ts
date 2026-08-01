@@ -1,7 +1,6 @@
 import {inject, Injectable, signal} from '@angular/core';
 import {SupabaseService} from '../../core/supabase.service';
 import {Tag} from './tag.model';
-import {Account} from '../accounts/account.model';
 import {TransactionService} from '../transactions/transaction.service';
 
 const TAGS_TABLE = 'tags';
@@ -50,7 +49,7 @@ export class TagService {
 
     async updateTag(id: string, userId: string, tag: {
         label: string;
-    }): Promise<Account> {
+    }): Promise<Tag> {
         const {data, error} = await this.supabase
             .from(TAGS_TABLE)
             .update({

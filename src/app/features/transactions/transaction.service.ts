@@ -53,7 +53,7 @@ export class TransactionService {
         account_id: string;
         category_id?: string;
         is_subscription: boolean;
-        subscription_id?: number | null;
+        subscription_id?: string | null;
     }): Promise<Transaction> {
         const {data, error} = await this.supabase
             .from(TRANSACTIONS_TABLE)
@@ -102,7 +102,7 @@ export class TransactionService {
         account_id: string;
         category_id?: string;
         is_subscription: boolean;
-        subscription_id?: number | null;
+        subscription_id?: string | null;
     }): Promise<Transaction> {
         const {data, error} = await this.supabase
             .from(TRANSACTIONS_TABLE)

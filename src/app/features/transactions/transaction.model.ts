@@ -9,9 +9,9 @@ export interface Transaction {
     label: string;
     date: string;
     account_id: string;
-    category_id: string;
+    category_id: string | null;
     is_subscription: boolean;
-    subscription_id?: number | null;
+    subscription_id?: string | null;
     tags?: {
         id: string;
         label: string;
@@ -25,7 +25,7 @@ export interface Transaction {
         id: string;
         label: string;
         color: string;
-    };
+    } | null;
     currency: {
         id: string;
         code: string;

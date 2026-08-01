@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, signal} from '@angular/core';
 import {SupabaseService} from '../../core/supabase.service';
 import {Category} from './category.model';
 
@@ -10,6 +10,8 @@ const CATEGORIES_TABLE = 'categories';
 export class CategoryService {
     private supabaseService = inject(SupabaseService);
     private supabase = this.supabaseService.getClient();
+
+    categoryRefreshTrigger = signal<boolean>(false);
 
     async getAllCategoriesByUser(userId: string): Promise<Category[]> {
         const {data, error} = await this.supabase
@@ -25,5 +27,62 @@ export class CategoryService {
         }
 
         return data;
+    }
+
+    async createCategory(userId: string, category: { label: string; color: string; }): Promise<Category> {
+        const {data, error} = await this.supabase
+            .from(CATEGORIES_TABLE)
+            .insert([{
+                user_id: userId,
+                label: category.label,
+                color: category.color,
+            }])
+            .select()
+            .single()
+        ;
+
+        if (error) throw error;
+
+        return data;
+    }
+
+    async updateCategory(id: string, userId: string, category: {
+        label: string;
+        color: string;
+    }): Promise<Category> {
+        const {data, error} = await this.supabase
+            .from(CATEGORIES_TABLE)
+            .update({
+                label: category.label,
+                color: category.color,
+            })
+            .eq('id', id)
+            .eq('user_id', userId)
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        return data;
+    }
+
+    async deleteCategory(userId: string, id: string, reassignTo: string | null): Promise<void> {
+        await this.supabase
+            .from('transactions')
+            .update({category_id: reassignTo})
+            .eq('category_id', id)
+            .eq('user_id', userId);
+
+        await this.supabase
+            .from('subscriptions')
+            .update({category_id: reassignTo})
+            .eq('category_id', id)
+            .eq('user_id', userId);
+
+        await this.supabase
+            .from('categories')
+            .delete()
+            .eq('id', id)
+            .eq('user_id', userId);
     }
 }

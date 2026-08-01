@@ -126,7 +126,7 @@ export class TransactionsListingComponent implements OnInit {
         try {
             const [accounts, categories, tags] = await Promise.all([
                 this.optionsService.getAccountsOptions(userId, true),
-                this.optionsService.getCategoriesOptions(userId, true),
+                this.optionsService.getCategoriesOptions(userId, true, true),
                 this.optionsService.getTagsOptions(userId),
             ]);
 

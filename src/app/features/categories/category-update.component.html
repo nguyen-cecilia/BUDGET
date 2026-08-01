@@ -1,0 +1,89 @@
+<form class="space-y-10" [formGroup]="categoryForm" (ngSubmit)="submitCategory()">
+    @if (errorMessage()) {
+        <div class="text-red">{{ errorMessage() }}</div>
+    }
+
+    <div class="flex items-end gap-3">
+        <app-color-picker [color]="selectedColor()" (colorChange)="selectColor($event)"/>
+
+        <label for="label" class="flex-1">
+            @if (editingCategory()) {
+                <p>Label</p>
+            }
+            <input id="label" type="text" placeholder="Nouvelle catégorie" formControlName="label">
+        </label>
+
+        @if (!editingCategory()) {
+            <button app-button (click)="submitCategory()" [disabled]="isSubmitting()">
+                @if (isSubmitting()) {
+                    <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
+                    Envoi...
+                } @else {
+                    <svg lucidePlus [size]="16"></svg>
+                    Ajouter
+                }
+            </button>
+        }
+    </div>
+
+    @if (editingCategory()) {
+        <div class="flex items-center justify-between gap-3">
+            <button app-button variant="invalid" (click)="startDelete()">
+                <svg lucideTrash2 [size]="16"></svg>
+                Supprimer
+            </button>
+
+            <button app-button (click)="submitCategory()" [disabled]="isSubmitting() || showDelete()">
+                @if (isSubmitting()) {
+                    <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
+                    Envoi...
+                } @else {
+                    <svg lucideSave [size]="16"></svg>
+                    Sauvegarder
+                }
+            </button>
+        </div>
+
+        @if (showDelete()) {
+            <div class="space-y-3 rounded border border-red/40 bg-red/6 p-5">
+                <p class="font-semibold text-red">
+                    Supprimer « {{ editingCategory()?.label }} » ?
+                </p>
+                <p class="text-sm text-gray">
+                    Les transactions et abonnements liés seront réaffectés ou passeront
+                    « Sans catégorie ».
+                </p>
+
+                <div class="space-y-2">
+                    <p>Réaffecter à :</p>
+                    <app-select
+                        [options]="reassignOptions()"
+                        [value]="reassignTo()"
+                        (valueChange)="reassignTo.set($event)"
+                    ></app-select>
+                </div>
+
+                <div class="flex items-center justify-between gap-3">
+                    <button app-button variant="outline" type="button" (click)="cancelDelete()">
+                        Annuler
+                    </button>
+                    <button
+                        app-button
+                        variant="invalid"
+                        type="button"
+                        (click)="confirmDelete()"
+                        [disabled]="isDeleting()"
+                    >
+                        @if (isDeleting()) {
+                            <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
+                            Suppression...
+                        } @else {
+                            <svg lucideTrash2 [size]="16"></svg>
+                            Confirmer
+                        }
+                    </button>
+                </div>
+            </div>
+        }
+    }
+</form>

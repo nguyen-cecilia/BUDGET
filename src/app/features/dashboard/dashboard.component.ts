@@ -104,13 +104,13 @@ export class DashboardComponent {
         return subs.map(sub => {
             const linked = transactions.filter(t => t.subscription_id === sub.id);
             const paidThisMonth = linked.length > 0;
-            const lastTx = linked[0];
-            const isPast = new Date(lastTx.date) < new Date();
+            const lastTx = paidThisMonth ? linked[0] : undefined;
+            const isPast = lastTx ? new Date(lastTx.date) < new Date() : false;
 
             return {
                 ...sub,
                 amount: lastTx?.amount ?? 0,
-                lastTransactionDate: lastTx?.date ?? 'Indéfini',
+                lastTransactionDate: lastTx?.date,
                 currency: lastTx?.currency?.code ?? 'EUR',
                 checked: isPast && paidThisMonth,
             };
@@ -124,9 +124,13 @@ export class DashboardComponent {
         const map = new Map<string, { label: string; color: string; total: number }>();
 
         for (const t of transactions.filter(t => t.type === 'expense')) {
-            const existing = map.get(t.category_id);
+            const label = t.category?.label ?? 'Sans catégorie';
+            const color = t.category?.color ?? 'gray';
+            const key = t.category_id ?? 'none';
+
+            const existing = map.get(key);
             if (existing) existing.total += t.amount;
-            else map.set(t.category_id, {label: t.category.label, color: t.category.color, total: t.amount});
+            else map.set(key, {label, color, total: t.amount});
         }
 
         const categories = Array.from(map.values()).sort((a, b) => b.total - a.total);

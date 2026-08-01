@@ -18,7 +18,7 @@ export class ButtonComponent {
     @Input() shape: 'pill' | 'bigPill' | 'round' | 'roundSmall' = 'pill';
 
     classes(): string {
-        const base = 'flex items-center gap-2 leading-4 text-sm transition-all cursor-pointer hover:scale-103';
+        const base = 'flex items-center gap-2 leading-4 text-sm transition-all cursor-pointer hover:scale-103 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100';
 
         const variants = {
             primary: 'bg-black-dark text-beige-light hover:bg-black-dark/80 font-medium justify-center',
