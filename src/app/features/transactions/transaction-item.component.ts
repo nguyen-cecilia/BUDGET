@@ -17,9 +17,9 @@ import {ModalService} from '../../components/modal/modal.service';
     template: `
         <div
             class="flex items-center justify-between gap-6 rounded px-2 py-4 cursor-pointer transition-all hover:bg-beige-light"
-            (click)="modalService.openEditModal(transaction)"
-            (keydown.enter)="modalService.openEditModal(transaction)"
-            (keydown.space)="modalService.openEditModal(transaction)"
+            (click)="modalService.transaction.openEdit(transaction)"
+            (keydown.enter)="modalService.transaction.openEdit(transaction)"
+            (keydown.space)="modalService.transaction.openEdit(transaction)"
             tabindex="0"
             role="button"
         >

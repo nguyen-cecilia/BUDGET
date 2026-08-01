@@ -29,10 +29,10 @@
     </header>
 }
 
-<app-modal #editModal
-           title="{{ modalService.editingTransaction() ? 'Modifier la transaction' : 'Nouvelle transaction' }}"
-           [isOpen]="modalService.editModalOpen"
-           [onClose]="() => modalService.closeEditModal()"
+<app-modal
+    title="{{ modalService.transaction.editing() ? 'Modifier la transaction' : 'Nouvelle transaction' }}"
+    [isOpen]="modalService.transaction.isOpen"
+    [onClose]="() => modalService.transaction.close()"
 >
     <app-update-transaction/>
 </app-modal>
@@ -67,7 +67,7 @@
             <hr class="text-gray-light">
 
             <button app-button variant="secondary" class="text-md! font-bold" shape="bigPill"
-                    (click)="modalService.openCreateModal()">
+                    (click)="modalService.transaction.openCreate()">
                 <svg lucidePlus [size]="20"></svg>
                 Nouvelle transaction
             </button>
@@ -126,7 +126,7 @@
                         variant="secondary"
                         shape="round"
                         class="-translate-y-6 text-black-dark p-3"
-                        (click)="modalService.openCreateModal()"
+                        (click)="modalService.transaction.openCreate()"
                     >
                         <svg lucidePlus [size]="34"></svg>
                     </button>

@@ -1,0 +1,36 @@
+<form class="space-y-4" [formGroup]="accountForm" (ngSubmit)="submitAccount()">
+    @if (errorMessage()) {
+        <div class="text-red">{{ errorMessage() }}</div>
+    }
+
+    @if (!modalService.account.editing()) {
+        <p class="text-gray text-sm">Une fois créé, le compte ne pourra plus être supprimé.</p>
+    }
+
+    <label for="label">
+        <p>Label</p>
+        <input id="label" type="text" placeholder="Ex : Caisse d'Epargne" formControlName="label">
+    </label>
+
+    <label for="isDefault">
+        <input id="isDefault" type="checkbox" formControlName="isDefault">
+        <p>Par défaut</p>
+    </label>
+
+    <label for="isActive">
+        <input id="isActive" type="checkbox" formControlName="isActive">
+        <p>Actif</p>
+    </label>
+
+    <div class="flex items-center justify-end">
+        <button app-button type="submit" [disabled]="isSubmitting()" class="ml-auto">
+            @if (isSubmitting()) {
+                <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
+                Envoi...
+            } @else {
+                <svg lucideSave [size]="16"></svg>
+                Sauvegarder
+            }
+        </button>
+    </div>
+</form>

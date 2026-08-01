@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, effect, inject, OnInit, signal} from '@angular/core';
 import {
     LucideCoins,
     LucideLandmark,
@@ -13,6 +13,12 @@ import {ButtonComponent} from '../../components/button/button.component';
 import {BadgeComponent} from '../../components/badge/badge.component';
 import {SelectComponent} from '../../components/select/select.component';
 import {MonthService} from '../month/month.service';
+import {ModalComponent} from '../../components/modal/modal.component';
+import {AccountUpdateComponent} from '../accounts/account-update.component';
+import {ModalService} from '../../components/modal/modal.service';
+import {AccountService} from '../accounts/account.service';
+import {Account} from '../accounts/account.model';
+import {AuthStateService} from '../auth/auth-state.service';
 
 @Component({
     selector: 'app-settings',
@@ -27,13 +33,55 @@ import {MonthService} from '../month/month.service';
         BadgeComponent,
         LucideTrash2,
         LucideLandmark,
-        SelectComponent
+        SelectComponent,
+        ModalComponent,
+        AccountUpdateComponent
     ],
     templateUrl: './settings.component.html',
 })
-export class SettingsComponent {
+export class SettingsComponent implements OnInit {
+    private authState = inject(AuthStateService);
+    private accountService = inject(AccountService);
+    protected modalService = inject(ModalService);
     protected monthService = inject(MonthService);
 
     selectedMonth = this.monthService.selectedMonth;
     monthOptions = this.monthService.monthOptions;
+
+    isLoading = signal(false);
+    accounts = signal<Account[]>([]);
+
+    constructor() {
+        effect(() => {
+            this.accountService.accountRefreshTrigger();
+            const userId = this.authState.getCurrentUser()?.id;
+            if (userId) {
+                this.getAccounts(userId);
+            }
+        });
+    }
+
+    ngOnInit() {
+        this.isLoading.set(true);
+        const userId = this.authState.getCurrentUser()?.id;
+
+        if (!userId) {
+            console.error('Utilisateur non authentifié');
+            return;
+        }
+
+        this.getAccounts(userId);
+        this.isLoading.set(false);
+    }
+
+    private getAccounts(userId: string) {
+        this.accountService.getAllAccountsByUser(userId, true).then(
+            (data) => {
+                this.accounts.set(data);
+            },
+            (error) => {
+                console.error('Erreur lors du chargement:', error);
+            }
+        );
+    }
 }

@@ -160,7 +160,7 @@
     }
 
     <div class="flex items-center justify-between">
-        @if (modalService.editingTransaction()) {
+        @if (modalService.transaction.editing()) {
             <button app-button variant="invalid" (click)="deleteTransaction()">
                 <svg lucideTrash2 [size]="16"></svg>
                 Supprimer

@@ -13,6 +13,7 @@ import {SubscriptionService} from '../subscriptions/subscription.service';
 import positiveNumber from '../../core/validators';
 import computeNextDate from '../../core/utilities';
 import {Transaction} from './transaction.model';
+import {AccountService} from '../accounts/account.service';
 
 @Component({
     selector: 'app-update-transaction',
@@ -33,6 +34,7 @@ export class TransactionUpdateComponent {
     private fb = inject(FormBuilder);
     private optionsService = inject(TransactionOptionsService);
     private transactionService = inject(TransactionService);
+    private accountService = inject(AccountService);
     private tagService = inject(TagService);
     private subscriptionService = inject(SubscriptionService);
     protected modalService = inject(ModalService);
@@ -80,13 +82,14 @@ export class TransactionUpdateComponent {
             if (!this.authState.isLoading()) {
                 const userId = this.authState.getCurrentUser()?.id;
                 if (userId) {
+                    this.accountService.accountRefreshTrigger();
                     this.initOptions(userId);
                 }
             }
         });
 
         effect(() => {
-            const editing = this.modalService.editingTransaction();
+            const editing = this.modalService.transaction.editing();
             if (editing) {
                 this.fillForm(editing);
             } else {
@@ -156,7 +159,7 @@ export class TransactionUpdateComponent {
                 throw new Error('Utilisateur non authentifié');
             }
 
-            const editing = this.modalService.editingTransaction();
+            const editing = this.modalService.transaction.editing();
             const fv = this.transactionForm.value;
 
             if (fv.isSubscription && !fv.subscriptionNextDate) {
@@ -215,7 +218,7 @@ export class TransactionUpdateComponent {
 
             this.resetForm();
 
-            this.modalService.closeEditModal();
+            this.modalService.transaction.close();
         } catch (error) {
             console.error('Erreur lors de la création de la transaction:', error);
             this.errorMessage.set('Erreur lors de la création de la transaction');
@@ -225,7 +228,7 @@ export class TransactionUpdateComponent {
     }
 
     async deleteTransaction(): Promise<void> {
-        const editing = this.modalService.editingTransaction();
+        const editing = this.modalService.transaction.editing();
         if (!editing) return;
 
         const confirmed = confirm('Supprimer cette transaction ?');
@@ -240,7 +243,7 @@ export class TransactionUpdateComponent {
                 !this.transactionService.transactionRefreshTrigger()
             );
 
-            this.modalService.closeEditModal();
+            this.modalService.transaction.close();
         } catch (error) {
             console.error('Erreur lors de la suppression:', error);
             this.errorMessage.set('Erreur lors de la suppression');
