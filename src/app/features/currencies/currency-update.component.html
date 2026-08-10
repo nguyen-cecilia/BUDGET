@@ -1,0 +1,39 @@
+<form class="space-y-6" [formGroup]="currencyForm" (ngSubmit)="submitCurrency()">
+    @if (errorMessage()) {
+        <div class="text-red">{{ errorMessage() }}</div>
+    }
+
+    <div class="space-y-2">
+        <p>Devise</p>
+        <app-select
+            [options]="availableCurrencies()"
+            [value]="selectedCurrency()"
+            [disabled]="modalService.currency.editing() !== null"
+            (valueChange)="selectedCurrency.set($event)"
+        ></app-select>
+    </div>
+
+    <label for="isDefault">
+        <input id="isDefault" type="checkbox" formControlName="isDefault">
+        <p>Par défaut</p>
+    </label>
+
+    <div class="flex items-center justify-between gap-3">
+        @if (modalService.currency.editing()) {
+            <button app-button variant="invalid" type="button" (click)="removeCurrency()" [disabled]="isSubmitting()">
+                <svg lucideTrash2 [size]="16"></svg>
+                Retirer
+            </button>
+        }
+
+        <button app-button type="submit" [disabled]="isSubmitting()" class="ml-auto">
+            @if (isSubmitting()) {
+                <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
+                Envoi...
+            } @else {
+                <svg lucideSave [size]="16"></svg>
+                Sauvegarder
+            }
+        </button>
+    </div>
+</form>

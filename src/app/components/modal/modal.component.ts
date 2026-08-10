@@ -18,6 +18,12 @@ export class ModalComponent {
         this.isOpen.set(true);
     }
 
+    onBackdropClick(event: MouseEvent): void {
+        if (event.target === event.currentTarget) {
+            this.close();
+        }
+    }
+
     close(): void {
         if (this.onClose) {
             this.onClose();

@@ -1,9 +1,5 @@
 import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
-import {
-    LucideFrown,
-    LucideSearch,
-    LucideX
-} from '@lucide/angular';
+import {LucideFrown, LucideSearch, LucideX} from '@lucide/angular';
 import {BadgeComponent} from '../../components/badge/badge.component';
 import {TransactionsByMonth} from './transaction.model';
 import {TransactionService} from './transaction.service';

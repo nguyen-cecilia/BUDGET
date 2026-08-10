@@ -5,7 +5,9 @@
 
     <div class="flex items-end gap-3">
         <label for="label" class="flex-1">
-            @if (editingTag()) { <p>Label</p> }
+            @if (editingTag()) {
+                <p>Label</p>
+            }
             <input id="label" type="text" placeholder="Nouveau tag" formControlName="label">
         </label>
 

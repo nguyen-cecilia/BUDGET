@@ -22,6 +22,14 @@
     <app-category-update/>
 </app-modal>
 
+<app-modal
+    title="{{ modalService.currency.editing() ? 'Modifier la devise' : 'Ajouter une devise' }}"
+    [isOpen]="modalService.currency.isOpen"
+    [onClose]="() => modalService.currency.close()"
+>
+    <app-currency-update/>
+</app-modal>
+
 <section>
     <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-3 lg:space-y-0">
         <div>
@@ -51,41 +59,39 @@
                         Devises disponibles
                     </h2>
 
-                    <button app-button>
+                    <button app-button (click)="modalService.currency.openCreate()">
                         <svg lucidePlus [size]="16"></svg>
                         Ajouter
                     </button>
                 </div>
 
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-2">
-                    <div
-                        class="p-3 border rounded flex items-center gap-2 cursor-pointer bg-beige-lighter transition-all hover:bg-beige-light">
+                    @for (currency of currencies(); track currency.currency_id) {
                         <div
-                            class="size-10 rounded-full border p-1 text-md font-medium font-display bg-purple flex justify-center items-center gap-3">
-                            €
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2">
-                                <h3>Euros</h3>
-                                <div class="text-xs text-semibold py-0.5 px-1.5 border rounded-xs bg-green">principale</div>
+                            class="p-3 border rounded flex items-center gap-2 cursor-pointer bg-beige-lighter transition-all hover:bg-beige-light"
+                            (click)="modalService.currency.openEdit(currency)"
+                            (keydown.enter)="modalService.currency.openEdit(currency)"
+                            (keydown.space)="modalService.currency.openEdit(currency)"
+                            tabindex="0"
+                            role="button"
+                        >
+                            <div
+                                class="size-10 rounded-full border p-1 text-md font-medium font-display bg-purple flex justify-center items-center gap-3">
+                                {{ currency.symbol }}
                             </div>
-                            <p class="text-sm text-gray">EUR</p>
-                        </div>
-                    </div>
-
-                    <div
-                        class="p-3 border rounded flex items-center gap-2 cursor-pointer bg-beige-lighter transition-all hover:bg-beige-light">
-                        <div
-                            class="size-10 rounded-full border p-1 text-md font-medium font-display bg-purple flex justify-center items-center gap-3">
-                            Y
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2">
-                                <h3>Yens</h3>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2">
+                                    <h3>{{ currency.label }}</h3>
+                                    @if (currency.is_default) {
+                                        <div class="text-xs text-semibold py-0.5 px-1.5 border rounded-xs bg-green">
+                                            principale
+                                        </div>
+                                    }
+                                </div>
+                                <p class="text-sm text-gray">{{ currency.code }}</p>
                             </div>
-                            <p class="text-sm text-gray">JPY</p>
                         </div>
-                    </div>
+                    }
                 </div>
             </div>
 
@@ -231,7 +237,9 @@
                         <div class="flex items-center gap-2">
                             <h3>{{ account.label }}</h3>
                             @if (account.is_default) {
-                                <div class="text-xs text-semibold py-0.5 px-1.5 border rounded-xs bg-purple">par défaut</div>
+                                <div class="text-xs text-semibold py-0.5 px-1.5 border rounded-xs bg-purple">par
+                                    défaut
+                                </div>
                             }
                         </div>
                     </div>

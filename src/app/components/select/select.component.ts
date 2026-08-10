@@ -30,7 +30,9 @@ export interface SelectOption {
                 role="combobox"
                 aria-controls="select-dropdown"
                 [attr.aria-expanded]="isOpen"
-                class="*:cursor-pointer"
+                class="{{ disabled ? 'opacity-50 *:cursor-not-allowed' : '*:cursor-pointer '}}"
+                [attr.tabindex]="disabled ? null : 0"
+                [attr.aria-disabled]="disabled"
             >
                 @if (triggerTemplate) {
                     <ng-container
@@ -84,6 +86,8 @@ export class SelectComponent {
     @Input() options: SelectOption[] = [];
     @Input() value: string | number = '';
     @Input() label = '';
+    @Input() disabled = false;
+
     @Output() valueChange = new EventEmitter<string | number>();
 
     @ContentChild('trigger') triggerTemplate?: TemplateRef<{ $implicit: string }>;
@@ -93,6 +97,7 @@ export class SelectComponent {
     }
 
     toggleDropdown() {
+        if (this.disabled) return;
         this.isOpen = !this.isOpen;
     }
 

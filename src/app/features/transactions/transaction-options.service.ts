@@ -1,4 +1,4 @@
-import {Injectable, inject} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {SelectOption} from '../../components/select/select.component';
 import {AccountService} from '../accounts/account.service';
 import {CategoryService} from '../categories/category.service';
@@ -54,10 +54,10 @@ export class TransactionOptionsService {
         }));
     }
 
-    async getCurrenciesOptions(): Promise<SelectOption[]> {
-        const data = await this.currencyService.getAllCurrencies();
+    async getCurrenciesOptions(userId: string): Promise<SelectOption[]> {
+        const data = await this.currencyService.getUserCurrencies(userId);
         return data.map(currency => ({
-            value: currency.id,
+            value: currency.currency_id,
             label: `${currency.label} (${currency.symbol})`,
         }));
     }

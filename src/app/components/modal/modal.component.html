@@ -1,37 +1,32 @@
 @if (isOpen()) {
     <div
-        class="w-full h-full overflow-y-hidden overflow-x-hidden fixed top-0 right-0 left-0 inset-0 z-40 bg-linear-to-br from-black-dark/70 to-black-dark/50 backdrop-blur-xs"
+        class="w-full h-full overflow-y-hidden overflow-x-hidden fixed top-0 right-0 left-0 inset-0 z-40 bg-linear-to-br from-black-dark/70 to-black-dark/50 backdrop-blur-xs flex items-center justify-center"
         role="presentation"
-        (click)="close()"
+        (click)="onBackdropClick($event)"
         (keydown.escape)="close()"
     >
+        <div
+            class="relative bg-beige-lighter border border-gray-light rounded shadow-xl m-3 w-full max-h-95/100 flex flex-col lg:max-w-120"
+            role="dialog"
+            aria-modal="true"
+            [aria-labelledby]="this.title"
+            (keydown.escape)="close()"
+        >
+            <div class="flex justify-between items-center p-6">
+                <h2>{{ this.title }}</h2>
+                <button
+                    type="button"
+                    (click)="close()"
+                    aria-label="Fermer la modale"
+                    class="cursor-pointer p-2 rounded-full bg-beige-light border border-beige-light hover:bg-blue hover:border hover:border-black-dark hover:shadow-md focus:outline-none"
+                >
+                    <svg lucideX [size]="20"/>
+                </button>
+            </div>
 
-        <div class="relative flex items-center justify-center w-full h-full">
-            <div
-                class="relative bg-beige-lighter border border-gray-light rounded shadow-xl m-3 w-full max-h-95/100 flex flex-col lg:max-w-120"
-                (click)="$event.stopPropagation()"
-                role="dialog"
-                aria-modal="true"
-                [aria-labelledby]="this.title"
-                (keydown.escape)="close()"
-            >
-                <div class="flex justify-between items-center p-6">
-                    <h2>{{ this.title }}</h2>
-                    <button
-                        type="button"
-                        (click)="close()"
-                        aria-label="Fermer la modale"
-                        class="cursor-pointer p-2 rounded-full bg-beige-light border border-beige-light hover:bg-blue hover:border hover:border-black-dark hover:shadow-md focus:outline-none"
-                    >
-                        <svg lucideX [size]="20"/>
-                    </button>
-                </div>
-
-                <div class="flex-1 space-y-4 h-full overflow-y-auto px-6 pb-6">
-                    <ng-content/>
-                </div>
+            <div class="flex-1 space-y-4 h-full overflow-y-auto px-6 pb-6">
+                <ng-content/>
             </div>
         </div>
-
     </div>
 }

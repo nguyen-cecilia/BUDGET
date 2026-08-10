@@ -15,6 +15,7 @@ import computeNextDate from '../../core/utilities';
 import {Transaction} from './transaction.model';
 import {AccountService} from '../accounts/account.service';
 import {CategoryService} from '../categories/category.service';
+import {CurrencyService} from '../currencies/currency.service';
 
 @Component({
     selector: 'app-update-transaction',
@@ -37,6 +38,7 @@ export class TransactionUpdateComponent {
     private transactionService = inject(TransactionService);
     private accountService = inject(AccountService);
     private categoryService = inject(CategoryService);
+    private currencyService = inject(CurrencyService);
     private tagService = inject(TagService);
     private subscriptionService = inject(SubscriptionService);
     protected modalService = inject(ModalService);
@@ -87,6 +89,7 @@ export class TransactionUpdateComponent {
                     this.accountService.accountRefreshTrigger();
                     this.tagService.tagRefreshTrigger();
                     this.categoryService.categoryRefreshTrigger();
+                    this.currencyService.currencyRefreshTrigger();
                     this.initOptions(userId);
                 }
             }
@@ -259,7 +262,7 @@ export class TransactionUpdateComponent {
     private async initOptions(userId: string) {
         try {
             const [currencies, accounts, categories, tags] = await Promise.all([
-                this.optionsService.getCurrenciesOptions(),
+                this.optionsService.getCurrenciesOptions(userId),
                 this.optionsService.getAccountsOptions(userId, false),
                 this.optionsService.getCategoriesOptions(userId, false, true),
                 this.optionsService.getTagsOptions(userId),

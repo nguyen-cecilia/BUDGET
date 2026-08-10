@@ -25,6 +25,9 @@ import {CategoryUpdateComponent} from '../categories/category-update.component';
 import {CategoryService} from '../categories/category.service';
 import {Category} from '../categories/category.model';
 import {ColorService} from '../../core/color.service';
+import {CurrencyService} from '../currencies/currency.service';
+import {UserCurrencies} from '../currencies/currency.model';
+import {CurrencyUpdateComponent} from '../currencies/currency-update.component';
 
 @Component({
     selector: 'app-settings',
@@ -42,12 +45,14 @@ import {ColorService} from '../../core/color.service';
         ModalComponent,
         AccountUpdateComponent,
         TagUpdateComponent,
-        CategoryUpdateComponent
+        CategoryUpdateComponent,
+        CurrencyUpdateComponent
     ],
     templateUrl: './settings.component.html',
 })
 export class SettingsComponent implements OnInit {
     private authState = inject(AuthStateService);
+    private currencyService = inject(CurrencyService);
     private accountService = inject(AccountService);
     private tagService = inject(TagService);
     private categoryService = inject(CategoryService);
@@ -59,17 +64,20 @@ export class SettingsComponent implements OnInit {
     monthOptions = this.monthService.monthOptions;
 
     isLoading = signal(false);
+    currencies = signal<UserCurrencies[]>([]);
     accounts = signal<Account[]>([]);
     tags = signal<Tag[]>([]);
     categories = signal<Category[]>([]);
 
     constructor() {
         effect(() => {
+            this.currencyService.currencyRefreshTrigger();
             this.accountService.accountRefreshTrigger();
             this.tagService.tagRefreshTrigger();
             this.categoryService.categoryRefreshTrigger();
             const userId = this.authState.getCurrentUser()?.id;
             if (userId) {
+                this.getCurrencies(userId);
                 this.getCategories(userId);
                 this.getTags(userId);
                 this.getAccounts(userId);
@@ -86,8 +94,22 @@ export class SettingsComponent implements OnInit {
             return;
         }
 
+        this.getCurrencies(userId);
+        this.getCategories(userId);
+        this.getTags(userId);
         this.getAccounts(userId);
         this.isLoading.set(false);
+    }
+
+    private getCurrencies(userId: string) {
+        this.currencyService.getUserCurrencies(userId).then(
+            (data) => {
+                this.currencies.set(data);
+            },
+            (error) => {
+                console.error('Erreur lors du chargement:', error);
+            }
+        );
     }
 
     private getCategories(userId: string) {
