@@ -14,7 +14,7 @@
         <div class="relative z-1">
             <p class="uppercase text-gray font-semibold">{{ monthService.getMonthLabel() }}</p>
             <p class="font-display text-2xl leading-12">Il reste</p>
-            <p class="font-display text-4xl leading-20 font-medium">{{ balance()|currency:'EUR' }}</p>
+            <p class="font-display text-3xl leading-20 font-medium">{{ balance()|currency:defaultCurrency() }}</p>
         </div>
 
         <div class="space-y-1">
@@ -25,8 +25,8 @@
                 ></div>
             </div>
             <div class="flex items-center justify-between gap-6 text-gray text-sm">
-                <p>Dépenses : <strong class="text-black-dark">{{ totalExpenses()|currency:'EUR' }}</strong></p>
-                <p>Revenus : <strong class="text-black-dark">{{ totalIncomes()|currency:'EUR' }}</strong></p>
+                <p>Dépenses : <strong class="text-black-dark">{{ totalExpenses()|currency:defaultCurrency() }}</strong></p>
+                <p>Revenus : <strong class="text-black-dark">{{ totalIncomes()|currency:defaultCurrency() }}</strong></p>
             </div>
         </div>
 
@@ -48,7 +48,7 @@
                     <svg lucideZap [size]="24"></svg>
                 </div>
                 <div>
-                    <p class="font-display text-lg leading-5 font-semibold">{{ subscriptionTotal()|currency:'EUR' }}</p>
+                    <p class="font-display text-lg leading-5 font-semibold">{{ subscriptionTotal()|currency:defaultCurrency() }}</p>
                     <p class="font-medium">d'abonnement</p>
                 </div>
             </div>
@@ -130,7 +130,7 @@
         </h2>
 
         @if (categoriesData().grandTotal > 0) {
-            <div class="w-full lg:max-w-1/2 mx-auto">
+            <div class="w-9/10 lg:max-w-1/2 mx-auto">
                 <app-pie-chart
                     [labels]="categoriesData().pieLabels"
                     [data]="categoriesData().pieData"
@@ -145,7 +145,7 @@
                     <div class="flex items-center gap-2">
                         <div class="size-3 rounded-full {{ colorService.getBackground(cat.color) }}"></div>
                         <h3 class="flex-1">{{ cat.label }}</h3>
-                        <div class="font-display">{{ cat.total|currency:'EUR' }}</div>
+                        <div class="font-display">{{ cat.total|currency:defaultCurrency() }}</div>
                     </div>
                     <div class="space-y-1">
                         <div class="w-full h-2 bg-beige rounded-full">
@@ -189,7 +189,7 @@
                     >
                     </div>
                 </div>
-                <div class="font-display font-medium text-md text-right">{{ tag.total|currency:'EUR' }}</div>
+                <div class="font-display font-medium text-md text-right">{{ tag.total|currency:defaultCurrency() }}</div>
             } @empty {
                 <p class="col-span-5 text-gray text-sm">Aucun tag ce mois-ci.</p>
             }

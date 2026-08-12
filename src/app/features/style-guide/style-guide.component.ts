@@ -12,7 +12,7 @@ export class StyleGuideComponent {
     colors = [
         'bg-purple', 'bg-blue', 'bg-blue-dark', 'bg-green', 'bg-green-yellow',
         'bg-yellow', 'bg-beige', 'bg-orange', 'bg-pink', 'bg-pink-dark',
-        'bg-pink-darker', 'bg-red', 'bg-brown', 'bg-gray', 'bg-black-dark',
+        'bg-pink-darker', 'bg-red', 'bg-brown', 'bg-gray-light', 'bg-gray-mid', 'bg-gray', 'bg-black-dark',
     ];
 
     textSizes = ['text-xxs', 'text-xs', 'text-sm', 'text-base', 'text-md', 'text-lg', 'text-xl', 'text-2xl', 'text-3xl', 'text-4xl'];

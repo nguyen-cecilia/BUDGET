@@ -13,6 +13,12 @@ interface ColorConfig {
 })
 export class ColorService {
     private readonly colorMap: Record<string, ColorConfig> = {
+        grayMid: {
+            background: 'bg-gray-mid',
+            backgroundLighter: 'bg-gray-mid/70',
+            decoration: 'decoration-gray-mid',
+            color: 'text-gray-mid',
+        },
         gray: {
             background: 'bg-gray',
             backgroundLighter: 'bg-gray/30',
@@ -112,13 +118,13 @@ export class ColorService {
     }
 
     getHex(color: string | null): string {
-        if (!color) return '#dcd7c9';
+        if (!color) return '#95a2b6';
 
         const value = getComputedStyle(document.documentElement)
             .getPropertyValue(ColorService.toCssVar(color))
             .trim();
 
-        return value || '#dcd7c9';
+        return value || '#95a2b6';
     }
 
     getConfig(color: string): ColorConfig {
@@ -126,6 +132,6 @@ export class ColorService {
     }
 
     getAvailableColors(): string[] {
-        return Object.keys(this.colorMap);
+        return Object.keys(this.colorMap).filter(color => color !== 'grayMid');
     }
 }

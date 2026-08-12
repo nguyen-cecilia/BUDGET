@@ -22,6 +22,7 @@ import {Subscription} from '../subscriptions/subscription.model';
 import {CurrencyPipe, DatePipe, DecimalPipe} from '@angular/common';
 import {ColorService} from '../../core/color.service';
 import {TransactionItemComponent} from '../transactions/transaction-item.component';
+import {CurrencyService} from '../currencies/currency.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -46,29 +47,30 @@ import {TransactionItemComponent} from '../transactions/transaction-item.compone
     templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent {
-    // TODO : Gérer les différentes devises
     private authState = inject(AuthStateService);
     private transactionService = inject(TransactionService);
     private subscriptionService = inject(SubscriptionService);
+    private currencyService = inject(CurrencyService);
     protected monthService = inject(MonthService);
     protected colorService = inject(ColorService);
 
     isLoading = signal(false);
     transactionsByMonth = signal<TransactionsByMonth | null>(null);
     subscriptions = signal<Subscription[]>([]);
+    protected defaultCurrency = this.currencyService.defaultCurrency;
 
     totalExpenses = computed(() =>
         this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions)
             .filter(t => t.type === 'expense')
-            .reduce((sum, t) => sum + t.amount, 0) ?? 0
+            .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0) ?? 0
     );
 
     totalIncomes = computed(() =>
         this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions)
             .filter(t => t.type === 'income')
-            .reduce((sum, t) => sum + t.amount, 0) ?? 0
+            .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0) ?? 0
     );
 
     balance = computed(() => this.totalIncomes() - this.totalExpenses());
@@ -81,7 +83,7 @@ export class DashboardComponent {
         this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions)
             .filter(t => t.is_subscription)
-            .reduce((sum, t) => sum + t.amount, 0) ?? 0
+            .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0) ?? 0
     );
 
     expensesRatio = computed(() =>
@@ -111,7 +113,7 @@ export class DashboardComponent {
                 ...sub,
                 amount: lastTx?.amount ?? 0,
                 lastTransactionDate: lastTx?.date,
-                currency: lastTx?.currency?.code ?? 'EUR',
+                currency: lastTx?.currency?.code ?? this.currencyService.defaultCurrency(),
                 checked: isPast && paidThisMonth,
             };
         });
@@ -125,12 +127,13 @@ export class DashboardComponent {
 
         for (const t of transactions.filter(t => t.type === 'expense')) {
             const label = t.category?.label ?? 'Sans catégorie';
-            const color = t.category?.color ?? 'gray';
+            const color = t.category?.color ?? 'grayMid';
             const key = t.category_id ?? 'none';
+            const convertedAmount = this.currencyService.convertToDefault(t.amount, t.currency.code);
 
             const existing = map.get(key);
-            if (existing) existing.total += t.amount;
-            else map.set(key, {label, color, total: t.amount});
+            if (existing) existing.total += convertedAmount;
+            else map.set(key, {label, color, total: convertedAmount});
         }
 
         const categories = Array.from(map.values()).sort((a, b) => b.total - a.total);
@@ -153,7 +156,7 @@ export class DashboardComponent {
 
         for (const t of transactions.filter(t => t.type === 'expense')) {
             for (const tag of t.tags ?? []) {
-                map.set(tag.label, (map.get(tag.label) ?? 0) + t.amount);
+                map.set(tag.label, (map.get(tag.label) ?? 0) + this.currencyService.convertToDefault(t.amount, t.currency.code));
             }
         }
 
@@ -167,6 +170,7 @@ export class DashboardComponent {
     constructor() {
         effect(() => {
             this.transactionService.transactionRefreshTrigger();
+            this.currencyService.currencyRefreshTrigger();
             const userId = this.authState.getCurrentUser()?.id;
             if (userId) this.loadData(userId);
         });
@@ -177,12 +181,15 @@ export class DashboardComponent {
 
         const monthIndex = this.monthService.getCurrentMonth();
         const year = this.monthService.getCurrentYear();
+
         const [transactions, subs] = await Promise.all([
             this.transactionService.getTransactionsByMonth(userId, monthIndex, year),
             this.subscriptionService.getAllSubscriptionsByUser(userId),
         ]);
+
         this.transactionsByMonth.set(transactions);
         this.subscriptions.set(subs);
+        await this.currencyService.loadDefaultCurrency(userId);
 
         this.isLoading.set(false);
     }

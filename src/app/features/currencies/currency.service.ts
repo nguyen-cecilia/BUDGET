@@ -14,6 +14,10 @@ export class CurrencyService {
 
     currencyRefreshTrigger = signal(false);
 
+    defaultCurrency = signal<string>('EUR');
+    private baseCode = signal<string>('');
+    private rates = signal<Record<string, number> | null>(null);
+
     async getAllCurrencies(): Promise<Currency[]> {
         const {data, error} = await this.supabase
             .from(CURRENCIES_TABLE)
@@ -115,5 +119,48 @@ export class CurrencyService {
             .eq('currency_id', currencyId)
             .eq('user_id', userId);
         if (error) throw error;
+    }
+
+    async refreshRates(baseCode: string): Promise<void> {
+        this.defaultCurrency.set(baseCode);
+
+        if (this.baseCode() === baseCode && this.rates()) return;
+
+        const cacheKey = `budget.rates.${baseCode}`;
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+            const {fetchedAt, rates} = JSON.parse(cached);
+            if (Date.now() - fetchedAt < 24 * 60 * 60 * 1000) {
+                this.baseCode.set(baseCode);
+                this.rates.set(rates);
+                return;
+            }
+        }
+
+        try {
+            const res = await fetch(`https://api.frankfurter.dev/v2/rates?base=${baseCode}`);
+            const data = await res.json();
+            const rates = Array.isArray(data)
+                ? Object.fromEntries(data.map(r => [r.quote, Number(r.rate)]))
+                : data.rates;
+            localStorage.setItem(cacheKey, JSON.stringify({fetchedAt: Date.now(), rates}));
+            this.baseCode.set(baseCode);
+            this.rates.set(rates);
+        } catch (error) {
+            console.error('Erreur de récupération des taux:', error);
+        }
+    }
+
+    convertToDefault(amount: number, fromCode: string): number {
+        const rates = this.rates();
+        if (!rates || fromCode === this.baseCode()) return amount;
+        const rate = rates[fromCode];
+        return rate ? amount / rate : amount;
+    }
+
+    async loadDefaultCurrency(userId: string): Promise<void> {
+        const currencies = await this.getUserCurrencies(userId);
+        const def = currencies.find(c => c.is_default) ?? currencies[0];
+        await this.refreshRates(def?.code ?? 'EUR');
     }
 }

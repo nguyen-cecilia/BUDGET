@@ -5,8 +5,8 @@ Chart.register(...registerables);
 
 @Component({
     selector: 'app-pie-chart',
-    template: '<canvas #canvas></canvas>',
-    host: {'class': 'block'}
+    template: '<canvas #canvas class="block"></canvas>',
+    host: {'class': 'block relative w-full'}
 })
 export class PieChartComponent implements AfterViewInit, OnChanges {
     @Input() labels: string[] = [];

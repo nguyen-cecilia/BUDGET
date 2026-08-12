@@ -10,6 +10,7 @@ import {MonthService} from '../month/month.service';
 import {TransactionOptionsService} from './transaction-options.service';
 import {ButtonComponent} from '../../components/button/button.component';
 import {TransactionItemComponent} from './transaction-item.component';
+import {CurrencyService} from '../currencies/currency.service';
 
 @Component({
     selector: 'app-transactions',
@@ -29,6 +30,7 @@ import {TransactionItemComponent} from './transaction-item.component';
 export class TransactionsListingComponent implements OnInit {
     private authState = inject(AuthStateService);
     private transactionService = inject(TransactionService);
+    private currencyService = inject(CurrencyService);
     private optionsService = inject(TransactionOptionsService);
     protected monthService = inject(MonthService);
 
@@ -47,10 +49,12 @@ export class TransactionsListingComponent implements OnInit {
     constructor() {
         effect(() => {
             this.transactionService.transactionRefreshTrigger();
+            this.currencyService.currencyRefreshTrigger();
             const userId = this.authState.getCurrentUser()?.id;
             if (userId) {
                 this.getTransactions(userId);
                 this.getFilters(userId);
+                this.currencyService.loadDefaultCurrency(userId);
             }
         });
     }

@@ -4,6 +4,7 @@ import {LucideArrowDownLeft, LucideArrowUpRight, LucideSparkles} from '@lucide/a
 import {Transaction} from './transaction.model';
 import {ColorService} from '../../core/color.service';
 import {ModalService} from '../../components/modal/modal.service';
+import {CurrencyService} from '../currencies/currency.service';
 
 @Component({
     selector: 'app-transaction-item',
@@ -16,7 +17,7 @@ import {ModalService} from '../../components/modal/modal.service';
     ],
     template: `
         <div
-            class="flex items-center justify-between gap-6 rounded px-2 py-4 cursor-pointer transition-all hover:bg-beige-light"
+            class="flex items-center justify-between gap-4 rounded px-2 py-4 cursor-pointer transition-all hover:bg-beige-light"
             (click)="modalService.transaction.openEdit(transaction)"
             (keydown.enter)="modalService.transaction.openEdit(transaction)"
             (keydown.space)="modalService.transaction.openEdit(transaction)"
@@ -25,7 +26,7 @@ import {ModalService} from '../../components/modal/modal.service';
         >
             <div class="flex items-center gap-6">
                 <div
-                    class="aspect-square border rounded-full p-3 {{ colorService.getBackground(transaction.category?.color ?? 'gray') }}">
+                    class="aspect-square border rounded-full p-3 {{ colorService.getBackground(transaction.category?.color ?? 'grayMid') }}">
                     @if (transaction.type === 'income') {
                         <svg lucideArrowDownLeft [size]="20"></svg>
                     } @else {
@@ -55,7 +56,12 @@ import {ModalService} from '../../components/modal/modal.service';
                     </p>
                 </div>
             </div>
-            <p class="font-display text-md">{{ transaction.type === 'expense' ? '-' : '+' }}{{ transaction.amount|currency:transaction.currency.code }}</p>
+            <div class="text-right">
+                <p class="font-display text-md">{{ transaction.type === 'expense' ? '-' : '+' }}{{ transaction.amount|currency:transaction.currency.code }}</p>
+                @if (transaction.currency.code !== currencyService.defaultCurrency()) {
+                    <p class="text-sm text-gray">≈ {{ transaction.type === 'expense' ? '-' : '+' }}{{ currencyService.convertToDefault(transaction.amount, transaction.currency.code)|currency:currencyService.defaultCurrency() }}</p>
+                }
+            </div>
         </div>
     `,
 })
@@ -65,4 +71,5 @@ export class TransactionItemComponent {
 
     protected colorService = inject(ColorService);
     protected modalService = inject(ModalService);
+    protected currencyService = inject(CurrencyService);
 }
