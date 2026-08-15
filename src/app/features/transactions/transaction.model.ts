@@ -36,8 +36,6 @@ export interface Transaction {
 export interface TransactionsByDay {
     date: string;
     transactions: Transaction[];
-    total_amount: number;
-    total_amount_currency: string;
 }
 
 export interface TransactionsByMonth {

@@ -31,10 +31,10 @@ npm run lint
 
 Layout:
 
-- [ ] Responsive
-- [ ] Desktop: sidebar with menu / Mobile: floating menu bar bottom
+- [x] Responsive
+- [x] Desktop: sidebar with menu / Mobile: floating menu bar bottom
 - [ ] Dark mode
-- [ ] Logo
+- [x] Logo
 
 Auth:
 
@@ -49,7 +49,7 @@ Dashboard:
 - [x] Transactions by category: cards, pie chart
 - [ ] Savings goals
 - [ ] Based on month earnings, do the 50/30/20 rule
-- [ ] View per month
+- [ ] View per month: be able to choose the month (independent of the current month)
 
 Transactions:
 
@@ -66,7 +66,7 @@ Transaction CRUD modal:
 - [x] Category selector
 - [x] Date picker
 - [x] Tag selector
-- [x] Subscription?
+- [x] Subscription
 
 Savings goals:
 
@@ -81,9 +81,10 @@ Yearly view:
 
 Parameters:
 
-- [ ] Manage bank accounts
-- [ ] Manage categories
-- [ ] Manage tags
-- [ ] Manage currencies
-- [ ] Manage subscriptions
+- [x] Manage bank accounts
+- [x] Manage categories
+- [x] Manage tags
+- [x] Manage currencies
+- [x] Manage subscriptions
 - [ ] Manage imports / exports
+- [ ] Add types of categories: needs or wants

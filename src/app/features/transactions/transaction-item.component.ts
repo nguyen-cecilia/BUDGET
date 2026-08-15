@@ -58,7 +58,7 @@ import {CurrencyService} from '../currencies/currency.service';
             </div>
             <div class="text-right">
                 <p class="font-display text-md">{{ transaction.type === 'expense' ? '-' : '+' }}{{ transaction.amount|currency:transaction.currency.code }}</p>
-                @if (transaction.currency.code !== currencyService.defaultCurrency()) {
+                @if (transaction.currency.code !== currencyService.defaultCurrency() && currencyService.canConvert(transaction.currency.code)) {
                     <p class="text-sm text-gray">≈ {{ transaction.type === 'expense' ? '-' : '+' }}{{ currencyService.convertToDefault(transaction.amount, transaction.currency.code)|currency:currencyService.defaultCurrency() }}</p>
                 }
             </div>

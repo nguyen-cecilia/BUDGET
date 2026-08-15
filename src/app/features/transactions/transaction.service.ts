@@ -163,29 +163,6 @@ export class TransactionService {
         return `${year}-${month}-${day}`;
     }
 
-    private getMostUsedCurrency(transactions: Transaction[]): string {
-        if (transactions.length === 0) return '';
-
-        const currencyCount = new Map<string, number>();
-
-        transactions.forEach(transaction => {
-            const currency = transaction.currency.code;
-            currencyCount.set(currency, (currencyCount.get(currency) || 0) + 1);
-        });
-
-        let mostUsedCurrency = '';
-        let maxCount = 0;
-
-        currencyCount.forEach((count, currency) => {
-            if (count > maxCount) {
-                maxCount = count;
-                mostUsedCurrency = currency;
-            }
-        });
-
-        return mostUsedCurrency;
-    }
-
     private groupByDay(transactions: Transaction[]): TransactionsByDay[] {
         const grouped = new Map<string, Transaction[]>();
 
@@ -203,10 +180,6 @@ export class TransactionService {
                 transactions: transactionList.sort((a, b) => {
                     return new Date(b.date).getTime() - new Date(a.date).getTime();
                 }),
-                total_amount: transactionList.reduce((sum, t) => {
-                    return t.type === 'expense' ? sum - t.amount : sum + t.amount;
-                }, 0),
-                total_amount_currency: this.getMostUsedCurrency(transactionList)
             }))
             .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     }

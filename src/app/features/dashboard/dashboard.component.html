@@ -100,9 +100,9 @@
                     </div>
                     <div class="flex-1">
                         <p class="font-semibold">{{ sub.label }}</p>
-                        @if (sub.lastTransactionDate) {
+                        @if (sub.last_payment_date) {
                             <p class="text-xs text-gray">
-                                Payé le : {{ sub.lastTransactionDate|date:'dd/MM/yyyy' }}
+                                Payé le : {{ sub.last_payment_date|date:'dd/MM/yyyy' }}
                             </p>
                         }
                         <div class="flex items-center gap-0.75 text-xs text-gray font-medium">
@@ -110,8 +110,11 @@
                             Prochain paiement : {{ sub.next_payment_date|date:'dd/MM/yyyy' }}
                         </div>
                     </div>
-                    <div class="font-display font-semibold text-md">
-                        {{ sub.amount|currency:sub.currency }}
+                    <div class="text-right">
+                        <p class="font-display font-semibold text-md">{{ sub.amount|currency:sub.currency.code }}</p>
+                        @if (sub.currency.code !== currencyService.defaultCurrency() && currencyService.canConvert(sub.currency.code)) {
+                            <p class="text-sm text-gray">≈ {{ currencyService.convertToDefault(sub.amount, sub.currency.code)|currency:currencyService.defaultCurrency() }}</p>
+                        }
                     </div>
                 </div>
             } @empty {

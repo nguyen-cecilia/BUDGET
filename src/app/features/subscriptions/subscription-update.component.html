@@ -1,0 +1,108 @@
+<form class="space-y-4" [formGroup]="subscriptionForm" (ngSubmit)="submitSubscription()">
+    @if (errorMessage()) {
+        <div class="text-red">{{ errorMessage() }}</div>
+    }
+
+    <label for="amount">
+        <p>Montant</p>
+        <input type="number" id="amount" formControlName="amount" placeholder="0.00" min="0"
+               class="font-display text-md" />
+        @if (subscriptionForm.get('amount')?.invalid && (subscriptionForm.get('amount')?.dirty || subscriptionForm.get('amount')?.touched)) {
+            @if (subscriptionForm.get('amount')?.errors?.['required']) {
+                <span class="text-red text-xs">Le montant est requis.</span>
+            }
+            @if (subscriptionForm.get('amount')?.errors?.['positiveNumber']) {
+                <span class="text-red text-xs">Le montant doit être un nombre positif.</span>
+            }
+        }
+    </label>
+
+    <div class="flex items-center gap-3 *:flex-1">
+        <label for="currencyId">
+            <p>Devise</p>
+            <select name="currencyId" id="currencyId" formControlName="currencyId" class="custom-select">
+                @for (currency of currenciesOptions(); track currency.value) {
+                    <option value="{{ currency.value }}">{{ currency.label }}</option>
+                }
+            </select>
+            @if (subscriptionForm.get('currencyId')?.invalid && (subscriptionForm.get('currencyId')?.dirty || subscriptionForm.get('currencyId')?.touched)) {
+                <span class="text-red text-xs">La devise est requise.</span>
+            }
+        </label>
+
+        <label for="accountId">
+            <p>Compte</p>
+            <select name="accountId" id="accountId" formControlName="accountId" class="custom-select">
+                @for (account of accountsOptions(); track account.value) {
+                    <option value="{{ account.value }}">{{ account.label }}</option>
+                }
+            </select>
+            @if (subscriptionForm.get('accountId')?.invalid && (subscriptionForm.get('accountId')?.dirty || subscriptionForm.get('accountId')?.touched)) {
+                <span class="text-red text-xs">Le compte est requis.</span>
+            }
+        </label>
+    </div>
+
+    <label for="label">
+        <p>Label</p>
+        <input type="text" id="label" formControlName="label" placeholder="Ex : Netflix" />
+        @if (subscriptionForm.get('label')?.invalid && (subscriptionForm.get('label')?.dirty || subscriptionForm.get('label')?.touched)) {
+            @if (subscriptionForm.get('label')?.errors?.['required']) {
+                <span class="text-red text-xs">Le label est requis.</span>
+            }
+        }
+    </label>
+
+    <div class="flex items-center gap-3 *:flex-1">
+        <label for="categoryId">
+            <p>Catégorie</p>
+            <select name="categoryId" id="categoryId" formControlName="categoryId" class="custom-select">
+                @for (category of categoriesOptions(); track category.value) {
+                    <option value="{{ category.value }}">{{ category.label }}</option>
+                }
+            </select>
+        </label>
+
+        <label for="nextPaymentDate">
+            <p>Prochain renouvellement</p>
+            <input type="date" id="nextPaymentDate" formControlName="nextPaymentDate" placeholder="jj/mm/aaaa" />
+            @if (subscriptionForm.get('nextPaymentDate')?.invalid && (subscriptionForm.get('nextPaymentDate')?.dirty || subscriptionForm.get('nextPaymentDate')?.touched)) {
+                <span class="text-red text-xs">La date est requise.</span>
+            }
+        </label>
+    </div>
+
+    <label for="frequency">
+        <p>Fréquence</p>
+        <select name="frequency" id="frequency" formControlName="frequency" class="custom-select">
+            <option value="daily">Quotidien</option>
+            <option value="weekly">Hebdomadaire</option>
+            <option value="monthly">Mensuel</option>
+            <option value="yearly">Annuel</option>
+        </select>
+    </label>
+
+    <label for="isActive">
+        <input type="checkbox" id="isActive" formControlName="isActive" class="switch" />
+        <p>Actif</p>
+    </label>
+
+    <div class="flex items-center justify-between">
+        @if (modalService.subscription.editing()) {
+            <button app-button variant="invalid" (click)="deleteSubscription()">
+                <svg lucideTrash2 [size]="16"></svg>
+                Supprimer
+            </button>
+        }
+
+        <button app-button type="submit" [disabled]="isSubmitting()" class="ml-auto">
+            @if (isSubmitting()) {
+                <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
+                Envoi...
+            } @else {
+                <svg lucideSave [size]="16"></svg>
+                Sauvegarder
+            }
+        </button>
+    </div>
+</form>

@@ -33,6 +33,7 @@ export class TransactionsListingComponent implements OnInit {
     private currencyService = inject(CurrencyService);
     private optionsService = inject(TransactionOptionsService);
     protected monthService = inject(MonthService);
+    protected defaultCurrency = this.currencyService.defaultCurrency;
 
     isLoading = signal(false);
     transactionsByMonth = signal<TransactionsByMonth>({month: '', count: 0, transactionsByDay: []});
@@ -103,6 +104,24 @@ export class TransactionsListingComponent implements OnInit {
         const totalCount = filteredDays.reduce((sum, d) => sum + d.transactions.length, 0);
         return {...data, count: totalCount, transactionsByDay: filteredDays};
     });
+
+    convertedDayTotals = computed(() => {
+        const totals = new Map<string, number>();
+        for (const day of this.transactionsByMonth().transactionsByDay) {
+            totals.set(day.date, day.transactions.reduce((acc, t) => {
+                if (!this.currencyService.canConvert(t.currency.code)) return acc;
+                return acc + this.currencyService.convertToDefault(
+                    t.type === 'expense' ? -t.amount : t.amount,
+                    t.currency.code
+                );
+            }, 0));
+        }
+        return totals;
+    });
+
+    dayTotal(date: string): number {
+        return this.convertedDayTotals().get(date) ?? 0;
+    }
 
     toggleTag(value: string | number): void {
         this.selectedTags.update(set => {

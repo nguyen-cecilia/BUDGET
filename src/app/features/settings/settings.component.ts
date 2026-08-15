@@ -28,6 +28,10 @@ import {ColorService} from '../../core/color.service';
 import {CurrencyService} from '../currencies/currency.service';
 import {UserCurrencies} from '../currencies/currency.model';
 import {CurrencyUpdateComponent} from '../currencies/currency-update.component';
+import {SubscriptionService} from '../subscriptions/subscription.service';
+import {Subscription} from '../subscriptions/subscription.model';
+import {CurrencyPipe, DatePipe} from '@angular/common';
+import {SubscriptionUpdate} from '../subscriptions/subscription-update.component';
 
 @Component({
     selector: 'app-settings',
@@ -46,16 +50,20 @@ import {CurrencyUpdateComponent} from '../currencies/currency-update.component';
         AccountUpdateComponent,
         TagUpdateComponent,
         CategoryUpdateComponent,
-        CurrencyUpdateComponent
+        CurrencyUpdateComponent,
+        CurrencyPipe,
+        DatePipe,
+        SubscriptionUpdate
     ],
     templateUrl: './settings.component.html',
 })
 export class SettingsComponent implements OnInit {
     private authState = inject(AuthStateService);
-    private currencyService = inject(CurrencyService);
     private accountService = inject(AccountService);
     private tagService = inject(TagService);
     private categoryService = inject(CategoryService);
+    protected subscriptionService = inject(SubscriptionService);
+    protected currencyService = inject(CurrencyService);
     protected modalService = inject(ModalService);
     protected monthService = inject(MonthService);
     protected colorService = inject(ColorService);
@@ -65,6 +73,7 @@ export class SettingsComponent implements OnInit {
 
     isLoading = signal(false);
     currencies = signal<UserCurrencies[]>([]);
+    subscriptions = signal<Subscription[]>([]);
     accounts = signal<Account[]>([]);
     tags = signal<Tag[]>([]);
     categories = signal<Category[]>([]);
@@ -72,12 +81,14 @@ export class SettingsComponent implements OnInit {
     constructor() {
         effect(() => {
             this.currencyService.currencyRefreshTrigger();
+            this.subscriptionService.subscriptionRefreshTrigger();
             this.accountService.accountRefreshTrigger();
             this.tagService.tagRefreshTrigger();
             this.categoryService.categoryRefreshTrigger();
             const userId = this.authState.getCurrentUser()?.id;
             if (userId) {
                 this.getCurrencies(userId);
+                this.getSubscriptions(userId);
                 this.getCategories(userId);
                 this.getTags(userId);
                 this.getAccounts(userId);
@@ -95,6 +106,7 @@ export class SettingsComponent implements OnInit {
         }
 
         this.getCurrencies(userId);
+        this.getSubscriptions(userId);
         this.getCategories(userId);
         this.getTags(userId);
         this.getAccounts(userId);
@@ -105,6 +117,17 @@ export class SettingsComponent implements OnInit {
         this.currencyService.getUserCurrencies(userId).then(
             (data) => {
                 this.currencies.set(data);
+            },
+            (error) => {
+                console.error('Erreur lors du chargement:', error);
+            }
+        );
+    }
+
+    private getSubscriptions(userId: string) {
+        this.subscriptionService.getAllSubscriptionsByUser(userId, true).then(
+            (data) => {
+                this.subscriptions.set(data);
             },
             (error) => {
                 console.error('Erreur lors du chargement:', error);

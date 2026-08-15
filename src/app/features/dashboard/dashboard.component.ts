@@ -50,7 +50,7 @@ export class DashboardComponent {
     private authState = inject(AuthStateService);
     private transactionService = inject(TransactionService);
     private subscriptionService = inject(SubscriptionService);
-    private currencyService = inject(CurrencyService);
+    protected currencyService = inject(CurrencyService);
     protected monthService = inject(MonthService);
     protected colorService = inject(ColorService);
 
@@ -63,6 +63,7 @@ export class DashboardComponent {
         this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions)
             .filter(t => t.type === 'expense')
+            .filter(t => this.currencyService.canConvert(t.currency.code))
             .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0) ?? 0
     );
 
@@ -70,6 +71,7 @@ export class DashboardComponent {
         this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions)
             .filter(t => t.type === 'income')
+            .filter(t => this.currencyService.canConvert(t.currency.code))
             .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0) ?? 0
     );
 
@@ -83,6 +85,7 @@ export class DashboardComponent {
         this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions)
             .filter(t => t.is_subscription)
+            .filter(t => this.currencyService.canConvert(t.currency.code))
             .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0) ?? 0
     );
 
@@ -103,20 +106,20 @@ export class DashboardComponent {
         const transactions = this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions) ?? [];
 
-        return subs.map(sub => {
-            const linked = transactions.filter(t => t.subscription_id === sub.id);
-            const paidThisMonth = linked.length > 0;
-            const lastTx = paidThisMonth ? linked[0] : undefined;
-            const isPast = lastTx ? new Date(lastTx.date) < new Date() : false;
+        return subs
+            .map(sub => {
+                const linked = transactions.filter(t => t.subscription_id === sub.id);
+                const paidThisMonth = linked.length > 0;
+                const lastTx = paidThisMonth ? linked[0] : undefined;
+                const isPast = lastTx ? new Date(lastTx.date) < new Date() : false;
 
-            return {
-                ...sub,
-                amount: lastTx?.amount ?? 0,
-                lastTransactionDate: lastTx?.date,
-                currency: lastTx?.currency?.code ?? this.currencyService.defaultCurrency(),
-                checked: isPast && paidThisMonth,
-            };
-        });
+                return {
+                    ...sub,
+                    last_payment_date: lastTx?.date,
+                    checked: isPast && paidThisMonth,
+                };
+            })
+            .sort((a, b) => Number(a.checked) - Number(b.checked));
     });
 
     categoriesData = computed(() => {
@@ -126,6 +129,8 @@ export class DashboardComponent {
         const map = new Map<string, { label: string; color: string; total: number }>();
 
         for (const t of transactions.filter(t => t.type === 'expense')) {
+            if (!this.currencyService.canConvert(t.currency.code)) continue;
+
             const label = t.category?.label ?? 'Sans catégorie';
             const color = t.category?.color ?? 'grayMid';
             const key = t.category_id ?? 'none';
@@ -155,6 +160,8 @@ export class DashboardComponent {
         const map = new Map<string, number>();
 
         for (const t of transactions.filter(t => t.type === 'expense')) {
+            if (!this.currencyService.canConvert(t.currency.code)) continue;
+
             for (const tag of t.tags ?? []) {
                 map.set(tag.label, (map.get(tag.label) ?? 0) + this.currencyService.convertToDefault(t.amount, t.currency.code));
             }

@@ -82,7 +82,7 @@
             <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-3">
                 <div class="flex items-center justify-between gap-6">
                     <h2>{{ dayGroup.date|date:'longDate' }}</h2>
-                    <p class="font-bold">{{ dayGroup.total_amount > 0 ? '+' : '' }}{{ dayGroup.total_amount|currency:dayGroup.total_amount_currency }}</p>
+                    <p class="font-bold">{{ dayTotal(dayGroup.date) > 0 ? '+' : '' }}{{ dayTotal(dayGroup.date)|currency:defaultCurrency() }}</p>
                 </div>
 
                 <div class="space-y-1">

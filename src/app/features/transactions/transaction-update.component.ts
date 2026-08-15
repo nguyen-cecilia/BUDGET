@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, signal} from '@angular/core';
+import {Component, computed, effect, inject, signal, untracked} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {BadgeComponent} from '../../components/badge/badge.component';
 import {LucideLoaderCircle, LucidePlus, LucideSave, LucideTrash2, LucideX} from '@lucide/angular';
@@ -11,11 +11,11 @@ import {ModalService} from '../../components/modal/modal.service';
 import {TagService} from '../tags/tag.service';
 import {SubscriptionService} from '../subscriptions/subscription.service';
 import positiveNumber from '../../core/validators';
-import computeNextDate from '../../core/utilities';
 import {Transaction} from './transaction.model';
 import {AccountService} from '../accounts/account.service';
 import {CategoryService} from '../categories/category.service';
 import {CurrencyService} from '../currencies/currency.service';
+import {Subscription} from '../subscriptions/subscription.model';
 
 @Component({
     selector: 'app-update-transaction',
@@ -47,7 +47,8 @@ export class TransactionUpdateComponent {
 
     errorMessage = signal<string | null>(null);
     isSubmitting = signal(false);
-    isRecurring = signal(false);
+    mode = signal<'transaction' | 'subscription'>('transaction');
+    subscriptions = signal<Subscription[]>([]);
     currenciesOptions = signal<SelectOption[]>([]);
     accountsOptions = signal<SelectOption[]>([]);
     categoriesOptions = signal<SelectOption[]>([]);
@@ -69,17 +70,13 @@ export class TransactionUpdateComponent {
             date: [nowLocal, [Validators.required]],
             account: ['', [Validators.required]],
             category: [''],
-            isSubscription: [false],
             subscriptionFrequency: ['monthly'],
-            subscriptionNextDate: [computeNextDate('monthly')],
+            subscriptionNextDate: [this.subscriptionService.computeNextDate('monthly')],
+            selectedSubscriptionId: [''],
         });
 
         this.transactionForm.get('subscriptionFrequency')?.valueChanges.subscribe(freq => {
-            this.transactionForm.patchValue({subscriptionNextDate: computeNextDate(freq)});
-        });
-
-        this.transactionForm.get('isSubscription')?.valueChanges.subscribe(checked => {
-            this.isRecurring.set(checked);
+            this.transactionForm.patchValue({subscriptionNextDate: this.subscriptionService.computeNextDate(freq)});
         });
 
         effect(() => {
@@ -90,6 +87,7 @@ export class TransactionUpdateComponent {
                     this.tagService.tagRefreshTrigger();
                     this.categoryService.categoryRefreshTrigger();
                     this.currencyService.currencyRefreshTrigger();
+                    this.subscriptionService.subscriptionRefreshTrigger();
                     this.initOptions(userId);
                 }
             }
@@ -97,11 +95,13 @@ export class TransactionUpdateComponent {
 
         effect(() => {
             const editing = this.modalService.transaction.editing();
-            if (editing) {
-                this.fillForm(editing);
-            } else {
-                this.resetForm();
-            }
+            untracked(() => {
+                if (editing) {
+                    this.fillForm(editing);
+                } else {
+                    this.resetForm();
+                }
+            });
         });
     }
 
@@ -151,6 +151,22 @@ export class TransactionUpdateComponent {
         );
     }
 
+    setMode(mode: 'transaction' | 'subscription'): void {
+        this.mode.set(mode);
+        if (mode === 'subscription') {
+            this.transactionForm.get('type')?.setValue('expense');
+            if (this.transactionForm.get('selectedSubscriptionId')?.value) {
+                this.onSubscriptionChange();
+            }
+        }
+    }
+
+    onSubscriptionChange(): void {
+        const subId = this.transactionForm.get('selectedSubscriptionId')?.value;
+        const sub = this.subscriptions().find(s => s.id == subId);
+        if (sub) this.applySubscription(sub);
+    }
+
     async submitTransaction() {
         if (this.transactionForm.invalid) {
             this.errorMessage.set('Veuillez remplir tous les champs obligatoires');
@@ -169,53 +185,57 @@ export class TransactionUpdateComponent {
             const editing = this.modalService.transaction.editing();
             const fv = this.transactionForm.value;
 
-            if (fv.isSubscription && !fv.subscriptionNextDate) {
-                this.errorMessage.set('Veuillez renseigner la date du prochain renouvellement');
+            if (this.mode() === 'subscription' && !fv.selectedSubscriptionId) {
+                this.errorMessage.set('Veuillez choisir un abonnement');
                 return;
             }
 
             let subscriptionId: string | null = null;
-            if (fv.isSubscription) {
-                subscriptionId = await this.handleSubscription(
-                    userId,
-                    fv.label,
-                    fv.account,
-                    fv.category || undefined,
-                    fv.subscriptionFrequency,
-                    fv.subscriptionNextDate
-                );
+
+            if (this.mode() === 'subscription') {
+                const sub = await this.subscriptionService.getSubscriptionById(fv.selectedSubscriptionId);
+
+                const subscriptionChanged =
+                    parseFloat(fv.amount) !== sub.amount ||
+                    String(fv.amountCurrency) !== sub.currency_id ||
+                    fv.account !== sub.account_id ||
+                    (fv.category || null) !== sub.category_id ||
+                    fv.subscriptionFrequency !== sub.frequency ||
+                    fv.subscriptionNextDate !== sub.next_payment_date;
+
+                if (subscriptionChanged) {
+                    await this.subscriptionService.updateSubscription(sub.id, {
+                        amount: parseFloat(fv.amount),
+                        currency_id: String(fv.amountCurrency),
+                        account_id: fv.account,
+                        category_id: fv.category || null,
+                        frequency: fv.subscriptionFrequency,
+                        next_payment_date: fv.subscriptionNextDate,
+                        label: fv.label,
+                    });
+                }
+
+                subscriptionId = sub.id;
             }
 
-            if (editing) {
-                // Modification de la transaction
-                await this.transactionService.updateTransaction(editing.id, userId, {
-                    type: fv.type,
-                    amount: parseFloat(fv.amount),
-                    amount_currency_id: fv.amountCurrency,
-                    label: fv.label || '',
-                    date: fv.date,
-                    account_id: fv.account,
-                    category_id: fv.category || undefined,
-                    is_subscription: fv.isSubscription,
-                    subscription_id: subscriptionId,
-                });
+            const payload = {
+                type: this.mode() === 'subscription' ? 'expense' : fv.type,
+                amount: parseFloat(fv.amount),
+                amount_currency_id: fv.amountCurrency,
+                label: fv.label || '',
+                date: fv.date,
+                account_id: fv.account,
+                category_id: fv.category || undefined,
+                is_subscription: this.mode() === 'subscription',
+                subscription_id: subscriptionId,
+            };
 
+            if (editing) {
+                await this.transactionService.updateTransaction(editing.id, userId, payload);
                 await this.transactionService.removeTagsFromTransaction(editing.id);
                 await this.handleTags(userId, editing.id);
             } else {
-                // Création de la transaction
-                const transaction = await this.transactionService.createTransaction(userId, {
-                    type: fv.type,
-                    amount: parseFloat(fv.amount),
-                    amount_currency_id: fv.amountCurrency,
-                    label: fv.label || '',
-                    date: fv.date,
-                    account_id: fv.account,
-                    category_id: fv.category || undefined,
-                    is_subscription: fv.isSubscription,
-                    subscription_id: subscriptionId,
-                });
-
+                const transaction = await this.transactionService.createTransaction(userId, payload);
                 await this.handleTags(userId, transaction.id);
             }
 
@@ -261,17 +281,19 @@ export class TransactionUpdateComponent {
 
     private async initOptions(userId: string) {
         try {
-            const [currencies, accounts, categories, tags] = await Promise.all([
+            const [currencies, accounts, categories, tags, subscriptions] = await Promise.all([
                 this.optionsService.getCurrenciesOptions(userId),
                 this.optionsService.getAccountsOptions(userId, false),
                 this.optionsService.getCategoriesOptions(userId, false, true),
                 this.optionsService.getTagsOptions(userId),
+                this.subscriptionService.getAllSubscriptionsByUser(userId),
             ]);
 
             this.currenciesOptions.set(currencies);
             this.accountsOptions.set(accounts);
             this.categoriesOptions.set(categories);
             this.tagsOptions.set(tags);
+            this.subscriptions.set(subscriptions);
 
             if (currencies.length > 0) {
                 this.transactionForm.get('amountCurrency')?.setValue(currencies[0].value);
@@ -282,39 +304,43 @@ export class TransactionUpdateComponent {
             if (categories.length > 0) {
                 this.transactionForm.get('category')?.setValue(categories[0].value);
             }
+            this.selectDefaultSubscription();
         } catch (error) {
             console.error('Erreur lors du chargement des options:', error);
         }
     }
 
     private async fillForm(transaction: Transaction): Promise<void> {
-        this.isRecurring.set(transaction.is_subscription);
-
-        this.transactionForm.patchValue({
-            type: transaction.type,
-            amount: transaction.amount,
-            amountCurrency: transaction.amount_currency_id,
-            label: transaction.label,
-            date: transaction.date.slice(0, 16),
-            account: transaction.account_id,
-            category: transaction.category_id ?? '',
-            isSubscription: transaction.is_subscription,
-            subscriptionFrequency: 'monthly',
-            subscriptionNextDate: '',
-        });
+        this.mode.set(
+            transaction.is_subscription && transaction.subscription_id ? 'subscription' : 'transaction'
+        );
 
         if (transaction.is_subscription && transaction.subscription_id) {
             const subscription = await this.subscriptionService
                 .getSubscriptionById(transaction.subscription_id);
 
             this.transactionForm.patchValue({
+                type: 'expense',
+                amount: subscription.amount,
+                amountCurrency: String(subscription.currency_id),
+                label: subscription.label,
+                date: transaction.date.slice(0, 16),
+                account: subscription.account_id,
+                category: subscription.category_id ?? '',
                 subscriptionFrequency: subscription.frequency,
                 subscriptionNextDate: subscription.next_payment_date,
+                selectedSubscriptionId: subscription.id,
             });
-
-            this.transactionForm.get('isSubscription')?.disable();
         } else {
-            this.transactionForm.get('isSubscription')?.enable();
+            this.transactionForm.patchValue({
+                type: transaction.type,
+                amount: transaction.amount,
+                amountCurrency: String(transaction.amount_currency_id),
+                label: transaction.label,
+                date: transaction.date.slice(0, 16),
+                account: transaction.account_id,
+                category: transaction.category_id ?? '',
+            });
         }
 
         if (transaction.tags) {
@@ -327,7 +353,7 @@ export class TransactionUpdateComponent {
     private resetForm() {
         this.selectedTags.set([]);
         this.newTags.set([]);
-        this.isRecurring.set(false);
+        this.mode.set('transaction');
 
         const now = new Date();
         const nowLocal = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
@@ -344,10 +370,34 @@ export class TransactionUpdateComponent {
             date: nowLocal,
             account: accounts.length > 0 ? accounts[0].value : '',
             category: categories.length > 0 ? categories[0].value : '',
-            isSubscription: false,
             subscriptionFrequency: 'monthly',
-            subscriptionNextDate: computeNextDate('monthly'),
+            subscriptionNextDate: this.subscriptionService.computeNextDate('monthly'),
+            selectedSubscriptionId: '',
         });
+
+        this.selectDefaultSubscription();
+    }
+
+    private applySubscription(sub: Subscription): void {
+        this.transactionForm.patchValue({
+            amount: sub.amount,
+            amountCurrency: String(sub.currency_id),
+            label: sub.label,
+            account: sub.account_id,
+            category: sub.category_id ?? '',
+            subscriptionFrequency: sub.frequency,
+            subscriptionNextDate: sub.next_payment_date,
+        });
+    }
+
+    private selectDefaultSubscription(): void {
+        const subs = this.subscriptions();
+        const control = this.transactionForm.get('selectedSubscriptionId');
+        if (subs.length === 0 || control?.value) return;
+        control?.setValue(subs[0].id);
+        if (this.mode() === 'subscription') {
+            this.applySubscription(subs[0]);
+        }
     }
 
     private async handleTags(userId: string, transactionId: string) {
@@ -366,48 +416,11 @@ export class TransactionUpdateComponent {
 
         const allTagIds = [
             ...this.selectedTags().map(t => t.value),
-            ...newTagIds
+            ...newTagIds,
         ];
 
         if (allTagIds.length > 0) {
             await this.transactionService.addTagsToTransaction(transactionId, allTagIds);
         }
-    }
-
-    private async handleSubscription(
-        userId: string,
-        label: string,
-        accountId: string,
-        categoryId: string | undefined,
-        frequency: string,
-        nextDate: string,
-    ): Promise<string | null> {
-        const existing = await this.subscriptionService.getAllSubscriptionsByUser(userId);
-
-        const match = existing.find(
-            s => s.label.toLowerCase() === label.toLowerCase()
-        );
-
-        if (match) {
-            await this.subscriptionService.updateSubscription(match.id, {
-                next_payment_date: nextDate,
-                frequency,
-                account_id: accountId,
-                category_id: categoryId,
-                is_active: true,
-            });
-            return match.id;
-        }
-
-        const created = await this.subscriptionService.createSubscription(userId, {
-            label,
-            next_payment_date: nextDate,
-            is_active: true,
-            account_id: accountId,
-            category_id: categoryId || null,
-            frequency,
-        });
-
-        return created.id;
     }
 }

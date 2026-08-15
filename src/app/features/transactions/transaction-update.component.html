@@ -4,15 +4,74 @@
     }
 
     <div class="tab-switch-input">
-        <label for="expense" class="has-checked:bg-pink">
-            <input type="radio" id="expense" value="expense" name="type" formControlName="type">
-            <p>Dépense</p>
+        <label
+            for="transaction"
+            class="has-checked:bg-yellow"
+            tabindex="0"
+            (click)="setMode('transaction')"
+            (keydown.enter)="setMode('transaction')"
+            (keydown.space)="setMode('transaction')"
+        >
+            <input type="radio" id="transaction" value="transaction" name="mode" [checked]="mode() === 'transaction'">
+            <p>Transaction</p>
         </label>
-        <label for="income" class="has-checked:bg-green">
-            <input type="radio" id="income" value="income" name="type" formControlName="type">
-            <p>Revenu</p>
+        <label
+            for="subscription"
+            class="has-checked:bg-blue"
+            tabindex="0"
+            (click)="setMode('subscription')"
+            (keydown.enter)="setMode('subscription')"
+            (keydown.space)="setMode('subscription')"
+        >
+        <input type="radio" id="subscription" value="subscription" name="mode" [checked]="mode() === 'subscription'">
+            <p>Abonnement</p>
         </label>
     </div>
+
+    @if (mode() === 'transaction') {
+        <div class="tab-switch-input">
+            <label for="expense" class="has-checked:bg-pink">
+                <input type="radio" id="expense" value="expense" name="type" formControlName="type">
+                <p>Dépense</p>
+            </label>
+            <label for="income" class="has-checked:bg-green">
+                <input type="radio" id="income" value="income" name="type" formControlName="type">
+                <p>Revenu</p>
+            </label>
+        </div>
+    }  @else {
+        <label for="selectedSubscription">
+            <p>Abonnement</p>
+            <select name="selectedSubscription" id="selectedSubscription" formControlName="selectedSubscriptionId" class="custom-select" (change)="onSubscriptionChange()">
+                @for (sub of subscriptions(); track sub.id) {
+                    <option value="{{ sub.id }}">{{ sub.label }}</option>
+                }
+            </select>
+        </label>
+
+        <div class="flex items-start gap-3 *:flex-1">
+            <label for="subscriptionFrequency">
+                <p>Fréquence</p>
+                <select name="subscriptionFrequency" id="subscriptionFrequency" formControlName="subscriptionFrequency"
+                        class="custom-select">
+                    <option value="daily">Quotidien</option>
+                    <option value="weekly">Hebdomadaire</option>
+                    <option value="monthly">Mensuel</option>
+                    <option value="yearly">Annuel</option>
+                </select>
+            </label>
+
+            <label for="subscriptionNextDate">
+                <p>Prochain renouvellement</p>
+                <input
+                    type="date"
+                    id="subscriptionNextDate"
+                    formControlName="subscriptionNextDate"
+                    placeholder="jj/mm/aaaa"
+                />
+            </label>
+        </div>
+    }
 
     <label for="amount">
         <p>Montant</p>
@@ -54,20 +113,22 @@
         </label>
     </div>
 
-    <label for="label">
-        <p>Label</p>
-        <input
-            type="text"
-            id="label"
-            formControlName="label"
-            placeholder="Ex: Courses Carrefour"
-        />
-        @if (transactionForm.get('label')?.invalid && (transactionForm.get('label')?.dirty || transactionForm.get('label')?.touched)) {
-            @if (transactionForm.get('label')?.errors?.['required']) {
-                <span class="text-red text-xs">Le label est requis.</span>
+    @if (mode() === 'transaction') {
+        <label for="label">
+            <p>Label</p>
+            <input
+                type="text"
+                id="label"
+                formControlName="label"
+                placeholder="Ex: Courses Carrefour"
+            />
+            @if (transactionForm.get('label')?.invalid && (transactionForm.get('label')?.dirty || transactionForm.get('label')?.touched)) {
+                @if (transactionForm.get('label')?.errors?.['required']) {
+                    <span class="text-red text-xs">Le label est requis.</span>
+                }
             }
-        }
-    </label>
+        </label>
+    }
 
     <div class="flex items-center gap-3 *:flex-1">
         <label for="category">
@@ -90,73 +151,40 @@
         </label>
     </div>
 
-    <label for="tags" class="flex flex-col gap-1">
-        <p>Tags</p>
-        <div class="order-1 flex items-center gap-3">
-            <input
-                #newTagInput
-                type="text"
-                placeholder="Ex: travaux, vacances..."
-            />
-            <button app-button variant="tertiary" (click)="addNewTag(newTagInput)">
-                <svg lucidePlus [size]="14"></svg>
-                Ajouter
-            </button>
-        </div>
-        <div class="relative flex flex-wrap items-center gap-2">
-            @for (tag of selectedTags(); track tag.value) {
-                <button app-badge variant="secondary" (click)="removeTag(tag.label)">
-                    #{{ tag.label }}
-                    <svg lucideX [size]="12"></svg>
-                </button>
-            }
-            @for (tag of newTags(); track tag) {
-                <button app-badge variant="secondary" (click)="removeTag(tag)">
-                    #{{ tag }}
-                    <svg lucideX [size]="12" class="pointer-events-none"></svg>
-                </button>
-            }
-        </div>
-        <div class="order-2 flex flex-wrap items-center gap-2">
-            @for (tag of availableTagsOptions(); track tag.value) {
-                <button app-badge (click)="addExistingTag(tag)">+ {{ tag.label }}</button>
-            }
-        </div>
-    </label>
-
-    <label for="isSubscription">
-        <input
-            type="checkbox"
-            id="isSubscription"
-            formControlName="isSubscription"
-            class="switch"
-        />
-        <p>Abonnement récurrent</p>
-    </label>
-
-    @if (isRecurring()) {
-        <div class="space-y-3 flex items-start gap-3 *:flex-1">
-            <label for="subscriptionFrequency">
-                <p>Fréquence</p>
-                <select name="subscriptionFrequency" id="subscriptionFrequency" formControlName="subscriptionFrequency"
-                        class="custom-select">
-                    <option value="daily">Quotidien</option>
-                    <option value="weekly">Hebdomadaire</option>
-                    <option value="monthly">Mensuel</option>
-                    <option value="yearly">Annuel</option>
-                </select>
-            </label>
-
-            <label for="subscriptionNextDate">
-                <p>Prochain renouvellement</p>
+    @if (mode() === 'transaction') {
+        <label for="tags" class="flex flex-col gap-1">
+            <p>Tags</p>
+            <div class="order-1 flex items-center gap-3">
                 <input
-                    type="date"
-                    id="subscriptionNextDate"
-                    formControlName="subscriptionNextDate"
-                    placeholder="jj/mm/aaaa"
+                    #newTagInput
+                    type="text"
+                    placeholder="Ex: travaux, vacances..."
                 />
-            </label>
-        </div>
+                <button app-button variant="tertiary" (click)="addNewTag(newTagInput)">
+                    <svg lucidePlus [size]="14"></svg>
+                    Ajouter
+                </button>
+            </div>
+            <div class="relative flex flex-wrap items-center gap-2">
+                @for (tag of selectedTags(); track tag.value) {
+                    <button app-badge variant="secondary" (click)="removeTag(tag.label)">
+                        #{{ tag.label }}
+                        <svg lucideX [size]="12"></svg>
+                    </button>
+                }
+                @for (tag of newTags(); track tag) {
+                    <button app-badge variant="secondary" (click)="removeTag(tag)">
+                        #{{ tag }}
+                        <svg lucideX [size]="12" class="pointer-events-none"></svg>
+                    </button>
+                }
+            </div>
+            <div class="order-2 flex flex-wrap items-center gap-2">
+                @for (tag of availableTagsOptions(); track tag.value) {
+                    <button app-badge (click)="addExistingTag(tag)">+ {{ tag.label }}</button>
+                }
+            </div>
+        </label>
     }
 
     <div class="flex items-center justify-between">

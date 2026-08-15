@@ -158,6 +158,12 @@ export class CurrencyService {
         return rate ? amount / rate : amount;
     }
 
+    canConvert(fromCode: string): boolean {
+        if (fromCode === this.defaultCurrency()) return true;
+        const rates = this.rates();
+        return !!rates && rates[fromCode] != null;
+    }
+
     async loadDefaultCurrency(userId: string): Promise<void> {
         const currencies = await this.getUserCurrencies(userId);
         const def = currencies.find(c => c.is_default) ?? currencies[0];
