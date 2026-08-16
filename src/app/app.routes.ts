@@ -7,6 +7,7 @@ import {SettingsComponent} from './features/settings/settings.component';
 import {isDevMode} from '@angular/core';
 import {StyleGuideComponent} from './features/style-guide/style-guide.component';
 import {SavingsGoalsListingComponent} from './features/saving-goals/savings-goals-listing.component';
+import {YearlyViewComponent} from './features/yearly-view/yearly-view.component';
 
 export const routes: Routes = [
     {
@@ -31,7 +32,7 @@ export const routes: Routes = [
             },
             {
                 path: 'vue-annuelle',
-                component: DashboardComponent,
+                component: YearlyViewComponent,
             },
             {
                 path: 'parametres',

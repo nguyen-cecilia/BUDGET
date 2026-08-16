@@ -35,6 +35,7 @@ Layout:
 - [x] Desktop: sidebar with menu / Mobile: floating menu bar bottom
 - [ ] Dark mode
 - [x] Logo
+- [ ] Better manage the loading states
 
 Auth:
 
@@ -76,9 +77,9 @@ Savings goals:
 
 Yearly view:
 
-- [ ] Stats: amount spent, amount earned, real amount of money gained (after all the transactions)
-- [ ] Charts
-- [ ] Detail month by month (cards, table)
+- [x] Stats: amount spent, amount earned, real amount of money earned (after all the transactions)
+- [x] Charts
+- [x] Detail month by month (cards, table)
 
 Parameters:
 

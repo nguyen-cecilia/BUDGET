@@ -156,6 +156,42 @@ export class TransactionService {
         if (error) throw error;
     }
 
+    async getTransactionsByYear(userId: string, year: number): Promise<Transaction[]> {
+        const {data, error} = await this.supabase
+            .from(TRANSACTIONS_TABLE)
+            .select(`
+            *,
+            account:accounts(id, label),
+            category:categories(id, label, color),
+            currency:currencies(id, code, label),
+            tags(id, label)
+        `)
+            .eq('user_id', userId)
+            .gte('date', `${year}-01-01`)
+            .lte('date', `${year}-12-31`)
+            .order('date', {ascending: true});
+
+        if (error) {
+            console.error('Erreur lors de la récupération des transactions:', error);
+            throw error;
+        }
+
+        return data || [];
+    }
+
+    async getFirstTransactionYear(userId: string): Promise<number | null> {
+        const {data, error} = await this.supabase
+            .from(TRANSACTIONS_TABLE)
+            .select('date')
+            .eq('user_id', userId)
+            .order('date', {ascending: true})
+            .limit(1)
+            .maybeSingle();
+
+        if (error) throw error;
+        return data ? new Date(data.date).getFullYear() : null;
+    }
+
     private formatDate(date: Date): string {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');

@@ -1,0 +1,117 @@
+<section>
+    <div
+        class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 flex flex-col justify-between lg:flex-row lg:flex-wrap lg:items-center gap-3"
+    >
+        <div>
+            <h1>Vue annuelle</h1>
+            <p class="text-gray">Bilan sur l'année.</p>
+        </div>
+
+        <app-select
+            label="Année"
+            [options]="yearOptions()"
+            [value]="selectedYear()"
+            (valueChange)="setYear($event)"
+        ></app-select>
+
+        <div class="w-full grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-green border rounded p-3">
+                <div class="flex items-center gap-1 uppercase text-xs tracking-wide font-medium">
+                    <svg lucideTrendingUp [size]="16"></svg>
+                    <p>Revenus</p>
+                </div>
+                <p class="font-display text-lg lg:text-xl font-semibold">
+                    {{ totalIncome()|currency:currencyService.defaultCurrency() }}
+                </p>
+            </div>
+
+            <div class="bg-pink border rounded p-3">
+                <div class="flex items-center gap-1 uppercase text-xs tracking-wide font-medium">
+                    <svg lucideTrendingDown [size]="16"></svg>
+                    <p>Dépenses</p>
+                </div>
+                <p class="font-display text-lg lg:text-xl font-semibold">
+                    {{ totalExpense()|currency:currencyService.defaultCurrency() }}
+                </p>
+            </div>
+
+            <div class="bg-blue border rounded p-3">
+                <div class="flex items-center gap-1 uppercase text-xs tracking-wide font-medium">
+                    <svg lucideEqual [size]="16"></svg>
+                    <p>Net annuel</p>
+                </div>
+                <p class="font-display text-lg lg:text-xl font-semibold">
+                    {{ annualNet()|currency:currencyService.defaultCurrency() }}
+                </p>
+            </div>
+
+            <div class="bg-yellow border rounded p-3">
+                <div class="flex items-center gap-1 uppercase text-xs tracking-wide font-medium">
+                    <svg lucideEqualApproximately [size]="16"></svg>
+                    <p>Moy. mensuelle</p>
+                </div>
+                <p class="font-display text-lg lg:text-xl font-semibold">
+                    {{ monthlyAverage()|currency:currencyService.defaultCurrency() }}
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+@if (isLoading()) {
+    <section>Chargement en cours...</section>
+} @else {
+    <section>
+        <div
+            class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-6"
+        >
+            <h2>Revenus & dépenses</h2>
+
+            <app-bar-chart
+                [labels]="barLabels()"
+                [datasets]="barDatasets()"
+                [currencyCode]="currencyService.defaultCurrency()"
+                [monthLabels]="barMonthLabels()"
+            ></app-bar-chart>
+        </div>
+    </section>
+
+    <section>
+        <div
+            class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-6"
+        >
+            <h2>Détail mois par mois</h2>
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                @for (m of monthlyData(); track m.index) {
+                    <div
+                        class="bg-beige-light border rounded p-3 space-y-2
+                        {{ extremeMonths()?.best === m.index ? 'bg-green/15 border-green ring-1 ring-green' : '' }}
+                        {{ extremeMonths()?.worst === m.index ? 'bg-pink/15 border-pink ring-1 ring-pink' : '' }}"
+                    >
+                        <h3>{{ m.label }}</h3>
+
+                        <div>
+                            <p class="text-gray text-sm">Revenus</p>
+                            <p class="font-display font-semibold text-md">{{ m.income|currency:currencyService.defaultCurrency() }}</p>
+                        </div>
+
+                        <div>
+                            <p class="text-gray text-sm">Dépenses</p>
+                            <p class="font-display font-semibold text-md">{{ m.expense|currency:currencyService.defaultCurrency() }}</p>
+                        </div>
+
+                        <hr class="border-gray-light">
+
+                        <div class="flex items-center justify-between">
+                            <p class="text-gray text-sm">Net</p>
+                            <p class="font-display font-semibold text-md {{ m.net > 0 ? 'text-green' : m.net < 0 ? 'text-pink-dark' : 'text-gray' }}">
+                                {{ m.net > 0 ? '+ ' : m.net < 0 ? '- ' : '' }}{{ (m.net < 0 ? -m.net : m.net)|currency:currencyService.defaultCurrency() }}
+                            </p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}

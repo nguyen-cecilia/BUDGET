@@ -12,7 +12,7 @@ import {
 } from '@lucide/angular';
 import {ButtonComponent} from '../../components/button/button.component';
 import {RouterLink} from '@angular/router';
-import {PieChartComponent} from '../../components/chart/chart.component';
+import {DonutChartComponent} from '../../components/chart/donut-chart.component';
 import {AuthStateService} from '../auth/auth-state.service';
 import {TransactionService} from '../transactions/transaction.service';
 import {SubscriptionService} from '../subscriptions/subscription.service';
@@ -35,7 +35,7 @@ import {CurrencyService} from '../currencies/currency.service';
         LucideLayers,
         LucideTag,
         LucideWallet,
-        PieChartComponent,
+        DonutChartComponent,
         CurrencyPipe,
         DatePipe,
         DecimalPipe,
@@ -82,11 +82,13 @@ export class DashboardComponent {
     );
 
     subscriptionTotal = computed(() =>
-        this.transactionsByMonth()?.transactionsByDay
-            .flatMap(d => d.transactions)
-            .filter(t => t.is_subscription)
-            .filter(t => this.currencyService.canConvert(t.currency.code))
-            .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0) ?? 0
+        this.subscriptions()
+            .filter(s => this.currencyService.canConvert(s.currency.code))
+            .reduce(
+                (sum, s) =>
+                    sum + this.currencyService.convertToDefault(this.monthlyEquivalent(s), s.currency.code),
+                0
+            )
     );
 
     expensesRatio = computed(() =>
@@ -199,5 +201,15 @@ export class DashboardComponent {
         await this.currencyService.loadDefaultCurrency(userId);
 
         this.isLoading.set(false);
+    }
+
+    private monthlyEquivalent(sub: Subscription): number {
+        switch (sub.frequency) {
+            case 'daily': return sub.amount * (365 / 12);
+            case 'weekly': return sub.amount * (52 / 12);
+            case 'monthly': return sub.amount;
+            case 'yearly': return sub.amount / 12;
+            default: return sub.amount;
+        }
     }
 }

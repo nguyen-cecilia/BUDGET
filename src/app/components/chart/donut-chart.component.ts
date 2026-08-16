@@ -4,11 +4,11 @@ import {Chart, registerables} from 'chart.js';
 Chart.register(...registerables);
 
 @Component({
-    selector: 'app-pie-chart',
+    selector: 'app-donut-chart',
     template: '<canvas #canvas class="block"></canvas>',
     host: {'class': 'block relative w-full'}
 })
-export class PieChartComponent implements AfterViewInit, OnChanges {
+export class DonutChartComponent implements AfterViewInit, OnChanges {
     @Input() labels: string[] = [];
     @Input() data: number[] = [];
     @Input() colors: string[] = [];
