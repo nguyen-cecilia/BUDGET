@@ -6,6 +6,7 @@ import {Tag} from '../../features/tags/tag.model';
 import {Category} from '../../features/categories/category.model';
 import {UserCurrencies} from "../../features/currencies/currency.model";
 import {Subscription} from '../../features/subscriptions/subscription.model';
+import {SavingsGoal} from '../../features/saving-goals/savings-goal.model';
 
 @Injectable({
     providedIn: 'root'
@@ -17,4 +18,5 @@ export class ModalService {
     readonly category = new ModalController<Category>();
     readonly currency = new ModalController<UserCurrencies>();
     readonly subscription = new ModalController<Subscription>();
+    readonly goal = new ModalController<SavingsGoal>();
 }

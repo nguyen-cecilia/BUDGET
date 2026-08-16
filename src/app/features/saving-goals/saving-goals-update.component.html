@@ -1,0 +1,57 @@
+<form class="space-y-4" [formGroup]="goalForm" (ngSubmit)="submitSavingsGoal()">
+    @if (errorMessage()) {
+        <div class="text-red">{{ errorMessage() }}</div>
+    }
+
+    <div class="flex items-center gap-3 *:flex-1">
+        <label for="targetAmount">
+            <p>Objectif</p>
+            <input id="targetAmount" type="number" placeholder="0.00" min="0" formControlName="targetAmount" class="font-display text-md">
+        </label>
+
+        <label for="currencyId">
+            <p>Devise</p>
+            <select name="currencyId" id="currencyId" formControlName="currencyId" class="custom-select">
+                @for (currency of currenciesOptions(); track currency.value) {
+                    <option value="{{ currency.value }}">{{ currency.label }}</option>
+                }
+            </select>
+        </label>
+    </div>
+
+    <div class="flex items-center gap-3 *:flex-1">
+        <label for="currentAmount">
+            <p>Déjà épargné</p>
+            <input id="currentAmount" type="number" placeholder="0.00" min="0" formControlName="currentAmount">
+        </label>
+
+        <label for="amountPerMonth">
+            <p>Par mois</p>
+            <input id="amountPerMonth" type="number" placeholder="0.00" min="0" formControlName="amountPerMonth">
+        </label>
+    </div>
+
+    <label for="label">
+        <p>Label</p>
+        <input id="label" type="text" placeholder="Ex : Vacances" formControlName="label">
+    </label>
+
+    <div class="flex items-center justify-between">
+        @if (modalService.goal.editing()) {
+            <button app-button variant="invalid" (click)="deleteSavingsGoal()" [disabled]="isSubmitting()">
+                <svg lucideTrash2 [size]="16"></svg>
+                Supprimer
+            </button>
+        }
+
+        <button app-button type="submit" [disabled]="isSubmitting()" class="ml-auto">
+            @if (isSubmitting()) {
+                <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
+                Envoi...
+            } @else {
+                <svg lucideSave [size]="16"></svg>
+                Sauvegarder
+            }
+        </button>
+    </div>
+</form>

@@ -6,6 +6,7 @@ import {TransactionsListingComponent} from './features/transactions/transactions
 import {SettingsComponent} from './features/settings/settings.component';
 import {isDevMode} from '@angular/core';
 import {StyleGuideComponent} from './features/style-guide/style-guide.component';
+import {SavingsGoalsListingComponent} from './features/saving-goals/savings-goals-listing.component';
 
 export const routes: Routes = [
     {
@@ -26,7 +27,7 @@ export const routes: Routes = [
             },
             {
                 path: 'objectifs',
-                component: DashboardComponent,
+                component: SavingsGoalsListingComponent,
             },
             {
                 path: 'vue-annuelle',

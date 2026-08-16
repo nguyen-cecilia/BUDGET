@@ -1,0 +1,73 @@
+<app-modal
+    title="{{ modalService.goal.editing() ? 'Modifier l\'objectif d\'épargne' : 'Nouvel objectif d\'épargne' }}"
+    [isOpen]="modalService.goal.isOpen"
+    [onClose]="() => modalService.goal.close()"
+>
+    <app-saving-goals-update/>
+</app-modal>
+
+<section>
+    <div
+        class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 flex flex-col justify-between lg:flex-row lg:items-center gap-3">
+        <div>
+            <h1>Objectifs d'épargne</h1>
+            <p class="text-gray">Objectifs à atteindre pour avoir un peu de discipline !</p>
+        </div>
+
+        <button
+            app-button
+            (click)="modalService.goal.openCreate()"
+        >
+            <svg lucidePlus [size]="16"></svg>
+            Ajouter
+        </button>
+    </div>
+</section>
+
+@if (isLoading()) {
+    <section>Chargement en cours...</section>
+} @else if (savingsGoals().length > 0) {
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        @for (goal of savingsGoals(); track goal.id) {
+            <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-5">
+                <div class="space-y-1">
+                    <h2>{{ goal.label }}</h2>
+                    <p class="text-gray text-sm">{{ goal.amount_per_month|currency:goal.currency.code }} / mois</p>
+                </div>
+
+                <div class="space-y-1">
+                    <div class="flex items-end justify-between gap-3">
+                        <p class="font-display text-xl font-semibold">{{ goal.current_amount|currency:goal.currency.code }}</p>
+                        <p class="text-gray text-sm">/ {{ goal.target_amount|currency:goal.currency.code }}</p>
+                    </div>
+                    <div class="h-3 border bg-beige border-black-dark/80 rounded-sm">
+                        <div
+                            class="h-full bg-pink rounded-sm"
+                            [style.width.%]="goalRatio(goal)"
+                        ></div>
+                    </div>
+                    <p class="text-gray text-sm">{{ goalRatio(goal) }}% atteint</p>
+                </div>
+
+                <div class="flex items-center justify-between gap-6">
+                    <button app-button variant="outline" (click)="modalService.goal.openEdit(goal)">
+                        <svg lucidePencil [size]="16"></svg>
+                        Modifier
+                    </button>
+
+                    <button app-button variant="tertiary" class="font-semibold"
+                            (click)="addAmountToSavingsGoal(goal)"
+                            [disabled]="isAdding() !== null || goal.current_amount >= goal.target_amount">
+                        <svg lucidePiggyBank [size]="16"></svg>
+                        +{{ goal.amount_per_month|currency:goal.currency.code }}
+                    </button>
+                </div>
+            </div>
+        }
+    </section>
+} @else {
+    <section class="flex flex-col items-center justify-center gap-3 text-gray">
+        <svg lucideFrown [size]="40"></svg>
+        <p>Aucun objectif trouvé.</p>
+    </section>
+}

@@ -56,6 +56,7 @@ Transactions:
 - [x] Search bar with filters by category and tag
 - [x] List of transactions grouped by day, one page per month
 - [x] CRUD modal: add, edit, delete
+- [ ] Add multiple transactions at once
 
 Transaction CRUD modal:
 
@@ -70,8 +71,8 @@ Transaction CRUD modal:
 
 Savings goals:
 
-- [ ] List of goals (cards)
-- [ ] CRUD modal: add, edit, delete
+- [x] List of goals (cards)
+- [x] CRUD modal: add, edit, delete
 
 Yearly view:
 
