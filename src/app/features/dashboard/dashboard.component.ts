@@ -180,6 +180,8 @@ export class DashboardComponent {
         effect(() => {
             this.transactionService.transactionRefreshTrigger();
             this.currencyService.currencyRefreshTrigger();
+            this.monthService.selectedMonth();
+            this.monthService.selectedYear();
             const userId = this.authState.getCurrentUser()?.id;
             if (userId) this.loadData(userId);
         });
@@ -188,8 +190,8 @@ export class DashboardComponent {
     private async loadData(userId: string) {
         this.isLoading.set(true);
 
-        const monthIndex = this.monthService.getCurrentMonth();
-        const year = this.monthService.getCurrentYear();
+        const monthIndex = this.monthService.getMonth();
+        const year = this.monthService.getYear();
 
         const [transactions, subs] = await Promise.all([
             this.transactionService.getTransactionsByMonth(userId, monthIndex, year),

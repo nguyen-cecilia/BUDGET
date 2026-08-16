@@ -57,7 +57,8 @@ export class MonthService {
             .map((month, index) => ({
                 value: index,
                 label: `${month} ${currentYear}`
-            }));
+            }))
+            .reverse();
 
         this.monthOptions.set(options);
     }
