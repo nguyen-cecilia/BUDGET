@@ -46,7 +46,7 @@ Dashboard:
 - [x] Last 10 transactions of the current month
 - [x] Balance left
 - [x] Stats: number of transactions, total amount spent, total amount earned, subscriptions (number and amount)
-- [ ] View of the 7 next days
+- [x] View of the 7 next days & Future transactions
 - [x] Transactions by category: cards, pie chart
 - [ ] Savings goals
 - [ ] Based on month earnings, do the 50/30/20 rule

@@ -5,7 +5,8 @@ import {
     LucideHouse,
     LucideList,
     LucideMoon,
-    LucidePlus, LucideSettings,
+    LucidePlus,
+    LucideSettings,
     LucideTarget
 } from '@lucide/angular';
 import {ButtonComponent} from './components/button/button.component';

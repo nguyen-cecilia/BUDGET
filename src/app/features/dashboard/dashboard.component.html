@@ -27,8 +27,10 @@
                 ></div>
             </div>
             <div class="flex items-center justify-between gap-6 text-gray text-sm">
-                <p>Dépenses : <strong class="text-black-dark">{{ totalExpenses()|currency:defaultCurrency() }}</strong></p>
-                <p>Revenus : <strong class="text-black-dark">{{ totalIncomes()|currency:defaultCurrency() }}</strong></p>
+                <p>Dépenses : <strong class="text-black-dark">{{ totalExpenses()|currency:defaultCurrency() }}</strong>
+                </p>
+                <p>Revenus : <strong class="text-black-dark">{{ totalIncomes()|currency:defaultCurrency() }}</strong>
+                </p>
             </div>
         </div>
 
@@ -52,6 +54,17 @@
                 <div>
                     <p class="font-display text-lg leading-5 font-semibold">{{ subscriptionTotal()|currency:defaultCurrency() }}</p>
                     <p class="font-medium">d'abonnement</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 bg-purple rounded-full border p-2 pr-3 lg:p-3 lg:pr-4">
+                <div
+                    class="w-12 aspect-square flex justify-center items-center bg-beige-lighter rounded-full font-display text-lg font-semibold">
+                    <svg lucideSnail [size]="24"></svg>
+                </div>
+                <div>
+                    <p class="font-display text-lg leading-5 font-semibold">{{ remainingToPay()|currency:defaultCurrency() }}</p>
+                    <p class="font-medium">reste à payer</p>
                 </div>
             </div>
         </div>
@@ -85,8 +98,8 @@
         <h2 class="flex items-center gap-2">
             <svg lucideSparkles [size]="20"></svg>
             Abonnements @if (subscriptionStatus().length > 0) {
-                ({{ subscriptionStatus().length }})
-            }
+            ({{ subscriptionStatus().length }})
+        }
         </h2>
 
         <div class="flex flex-col gap-3">
@@ -115,7 +128,8 @@
                     <div class="text-right">
                         <p class="font-display font-semibold text-md">{{ sub.amount|currency:sub.currency.code }}</p>
                         @if (sub.currency.code !== currencyService.defaultCurrency() && currencyService.canConvert(sub.currency.code)) {
-                            <p class="text-sm text-gray">≈ {{ currencyService.convertToDefault(sub.amount, sub.currency.code)|currency:currencyService.defaultCurrency() }}</p>
+                            <p class="text-sm text-gray">
+                                ≈ {{ currencyService.convertToDefault(sub.amount, sub.currency.code)|currency:currencyService.defaultCurrency() }}</p>
                         }
                     </div>
                 </div>
@@ -123,6 +137,43 @@
                 <p class="text-gray text-sm">Aucun abonnement.</p>
             }
         </div>
+    </div>
+</section>
+
+<section>
+    <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
+        <h2 class="flex items-center gap-2">
+            <svg lucideCalendarDays [size]="20" class="text-purple"></svg>
+            Les prochains débits
+        </h2>
+
+        @if (upcomingDebits().length > 0) {
+            <div class="grid grid-cols-2 lg:grid-cols-7 gap-3">
+                @for (day of upcomingDebits(); track day.key) {
+                    <div class="border rounded p-3 space-y-1.5 {{ $first ? 'col-span-2 lg:col-span-1 bg-yellow/50' : 'bg-beige-light' }}">
+                        <div>
+                            <p class="text-xs text-gray uppercase">{{ day.dayLabel }}</p>
+                            <p class="text-lg font-semibold leading-7 font-display">{{ day.dayNumber }}</p>
+                        </div>
+                        @for (item of day.items; track $index) {
+                            <div
+                                class="border rounded-sm px-2 py-1 text-xs leading-4 {{ item.isSubscription ? 'bg-pink' : 'bg-purple' }}">
+                                @if (item.isSubscription) {
+                                    <svg lucideSparkles [size]="12" class="inline mr-1 align-[-2px]"></svg>
+                                }
+                                {{ item.label }} · <strong>{{ item.amount|currency:defaultCurrency() }}</strong>
+                            </div>
+                        } @empty {
+                            <div class="text-gray p-2">
+                                <svg lucidePartyPopper [size]="30"></svg>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        } @else {
+            <p class="text-gray text-sm">Aucun prochain débit.</p>
+        }
     </div>
 </section>
 
@@ -194,10 +245,15 @@
                     >
                     </div>
                 </div>
-                <div class="font-display font-medium text-md text-right">{{ tag.total|currency:defaultCurrency() }}</div>
+                <div class="font-display font-medium text-md text-right">{{ tag.total|currency:defaultCurrency() }}
+                </div>
             } @empty {
                 <p class="col-span-5 text-gray text-sm">Aucun tag ce mois-ci.</p>
             }
         </div>
     </div>
+</section>
+
+<section>
+
 </section>

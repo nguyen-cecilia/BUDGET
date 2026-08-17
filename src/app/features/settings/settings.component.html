@@ -159,10 +159,11 @@
                             <h3>{{ subscription.label }}</h3>
                             <p class="text-sm text-gray">
                                 @if (subscription.category) {
-                                    <span class="font-semibold underline decoration-2 underline-offset-3 {{ colorService.getDecoration(subscription.category.color) }}">
+                                    <span
+                                        class="font-semibold underline decoration-2 underline-offset-3 {{ colorService.getDecoration(subscription.category.color) }}">
                                         {{ subscription.category.label }}
                                     </span>
-                                     ·
+                                    ·
                                 }
                                 {{ subscription.account.label }}
                                 · {{ subscriptionService.getSubscriptionLabel(subscription.frequency) }}
@@ -174,7 +175,8 @@
                         <div class="text-right">
                             <p class="font-display text-md">{{ subscription.amount|currency:subscription.currency.code }}</p>
                             @if (subscription.currency.code !== currencyService.defaultCurrency() && currencyService.canConvert(subscription.currency.code)) {
-                                <p class="text-sm text-gray">≈ {{ currencyService.convertToDefault(subscription.amount, subscription.currency.code)|currency:currencyService.defaultCurrency() }}</p>
+                                <p class="text-sm text-gray">
+                                    ≈ {{ currencyService.convertToDefault(subscription.amount, subscription.currency.code)|currency:currencyService.defaultCurrency() }}</p>
                             }
                         </div>
                     </div>

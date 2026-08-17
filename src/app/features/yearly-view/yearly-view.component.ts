@@ -113,7 +113,7 @@ export class YearlyViewComponent {
         },
     ]);
 
-    extremeMonths = computed<{best: number; worst: number} | null>(() => {
+    extremeMonths = computed<{ best: number; worst: number } | null>(() => {
         const months = this.monthlyData();
         if (months.length === 0) return null;
 

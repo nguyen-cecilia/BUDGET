@@ -1,5 +1,5 @@
-import { CurrencyPipe } from "@angular/common";
-import {Component, ElementRef, inject, Input, AfterViewInit, OnChanges, SimpleChanges} from '@angular/core';
+import {CurrencyPipe} from "@angular/common";
+import {AfterViewInit, Component, ElementRef, inject, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {Chart, registerables} from 'chart.js';
 
 Chart.register(...registerables);

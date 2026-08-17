@@ -16,7 +16,7 @@ export class SavingsGoalService {
     async getAllSavingsGoalsByUser(userId: string): Promise<SavingsGoal[]> {
         const {data, error} = await this.supabase
             .from(SAVINGS_GOALS_TABLE)
-            .select( `
+            .select(`
                 *,
                 currency:currencies(label, code, symbol)
             `)

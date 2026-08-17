@@ -18,6 +18,7 @@ import {CurrencyService} from '../currencies/currency.service';
     template: `
         <div
             class="flex items-center justify-between gap-4 rounded px-2 py-4 cursor-pointer transition-all hover:bg-beige-light"
+            [class.opacity-60]="isFuture"
             (click)="modalService.transaction.openEdit(transaction)"
             (keydown.enter)="modalService.transaction.openEdit(transaction)"
             (keydown.space)="modalService.transaction.openEdit(transaction)"
@@ -59,7 +60,8 @@ import {CurrencyService} from '../currencies/currency.service';
             <div class="text-right">
                 <p class="font-display text-md">{{ transaction.type === 'expense' ? '-' : '+' }}{{ transaction.amount|currency:transaction.currency.code }}</p>
                 @if (transaction.currency.code !== currencyService.defaultCurrency() && currencyService.canConvert(transaction.currency.code)) {
-                    <p class="text-sm text-gray">≈ {{ transaction.type === 'expense' ? '-' : '+' }}{{ currencyService.convertToDefault(transaction.amount, transaction.currency.code)|currency:currencyService.defaultCurrency() }}</p>
+                    <p class="text-sm text-gray">
+                        ≈ {{ transaction.type === 'expense' ? '-' : '+' }}{{ currencyService.convertToDefault(transaction.amount, transaction.currency.code)|currency:currencyService.defaultCurrency() }}</p>
                 }
             </div>
         </div>
@@ -72,4 +74,8 @@ export class TransactionItemComponent {
     protected colorService = inject(ColorService);
     protected modalService = inject(ModalService);
     protected currencyService = inject(CurrencyService);
+
+    get isFuture(): boolean {
+        return new Date(this.transaction.date) > new Date();
+    }
 }

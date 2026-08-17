@@ -6,7 +6,7 @@
     <label for="amount">
         <p>Montant</p>
         <input type="number" id="amount" formControlName="amount" placeholder="0.00" min="0"
-               class="font-display text-md" />
+               class="font-display text-md"/>
         @if (subscriptionForm.get('amount')?.invalid && (subscriptionForm.get('amount')?.dirty || subscriptionForm.get('amount')?.touched)) {
             @if (subscriptionForm.get('amount')?.errors?.['required']) {
                 <span class="text-red text-xs">Le montant est requis.</span>
@@ -45,7 +45,7 @@
 
     <label for="label">
         <p>Label</p>
-        <input type="text" id="label" formControlName="label" placeholder="Ex : Netflix" />
+        <input type="text" id="label" formControlName="label" placeholder="Ex : Netflix"/>
         @if (subscriptionForm.get('label')?.invalid && (subscriptionForm.get('label')?.dirty || subscriptionForm.get('label')?.touched)) {
             @if (subscriptionForm.get('label')?.errors?.['required']) {
                 <span class="text-red text-xs">Le label est requis.</span>
@@ -65,7 +65,7 @@
 
         <label for="nextPaymentDate">
             <p>Prochain renouvellement</p>
-            <input type="date" id="nextPaymentDate" formControlName="nextPaymentDate" placeholder="jj/mm/aaaa" />
+            <input type="date" id="nextPaymentDate" formControlName="nextPaymentDate" placeholder="jj/mm/aaaa"/>
             @if (subscriptionForm.get('nextPaymentDate')?.invalid && (subscriptionForm.get('nextPaymentDate')?.dirty || subscriptionForm.get('nextPaymentDate')?.touched)) {
                 <span class="text-red text-xs">La date est requise.</span>
             }
@@ -83,7 +83,7 @@
     </label>
 
     <label for="isActive">
-        <input type="checkbox" id="isActive" formControlName="isActive" class="switch" />
+        <input type="checkbox" id="isActive" formControlName="isActive" class="switch"/>
         <p>Actif</p>
     </label>
 

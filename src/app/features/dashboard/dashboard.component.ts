@@ -2,8 +2,11 @@ import {Component, computed, effect, inject, signal} from '@angular/core';
 import {
     LucideArrowRight,
     LucideAstroid,
+    LucideCalendarDays,
     LucideCheck,
     LucideLayers,
+    LucidePartyPopper,
+    LucideSnail,
     LucideSparkles,
     LucideTag,
     LucideWallet,
@@ -17,7 +20,7 @@ import {AuthStateService} from '../auth/auth-state.service';
 import {TransactionService} from '../transactions/transaction.service';
 import {SubscriptionService} from '../subscriptions/subscription.service';
 import {MonthService} from '../month/month.service';
-import {TransactionsByMonth} from '../transactions/transaction.model';
+import {Transaction, TransactionsByMonth} from '../transactions/transaction.model';
 import {Subscription} from '../subscriptions/subscription.model';
 import {CurrencyPipe, DatePipe, DecimalPipe} from '@angular/common';
 import {ColorService} from '../../core/color.service';
@@ -43,6 +46,9 @@ import {CurrencyService} from '../currencies/currency.service';
         LucideSparkles,
         LucideCheck,
         LucideX,
+        LucideCalendarDays,
+        LucidePartyPopper,
+        LucideSnail,
     ],
     templateUrl: './dashboard.component.html',
 })
@@ -57,12 +63,14 @@ export class DashboardComponent {
     isLoading = signal(false);
     transactionsByMonth = signal<TransactionsByMonth | null>(null);
     subscriptions = signal<Subscription[]>([]);
+    upcomingTransactions = signal<Transaction[]>([]);
     protected defaultCurrency = this.currencyService.defaultCurrency;
 
     totalExpenses = computed(() =>
         this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions)
             .filter(t => t.type === 'expense')
+            .filter(t => new Date(t.date) <= new Date())
             .filter(t => this.currencyService.canConvert(t.currency.code))
             .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0) ?? 0
     );
@@ -71,6 +79,7 @@ export class DashboardComponent {
         this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions)
             .filter(t => t.type === 'income')
+            .filter(t => new Date(t.date) <= new Date())
             .filter(t => this.currencyService.canConvert(t.currency.code))
             .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0) ?? 0
     );
@@ -91,6 +100,15 @@ export class DashboardComponent {
             )
     );
 
+    remainingToPay = computed(() =>
+        (this.transactionsByMonth()?.transactionsByDay
+            .flatMap(d => d.transactions) ?? [])
+            .filter(t => t.type === 'expense')
+            .filter(t => new Date(t.date) > new Date())
+            .filter(t => this.currencyService.canConvert(t.currency.code))
+            .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0)
+    );
+
     expensesRatio = computed(() =>
         this.totalIncomes() > 0
             ? Math.round((this.totalExpenses() / this.totalIncomes()) * 100)
@@ -100,6 +118,7 @@ export class DashboardComponent {
     recentTransactions = computed(() =>
         (this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions) ?? [])
+            .filter(t => new Date(t.date) <= new Date())
             .slice(0, 6)
     );
 
@@ -122,6 +141,48 @@ export class DashboardComponent {
                 };
             })
             .sort((a, b) => Number(a.checked) - Number(b.checked));
+    });
+
+    upcomingDebits = computed(() => {
+        const days = new Map<string, {
+            date: Date;
+            items: { label: string; amount: number; isSubscription: boolean }[]
+        }>();
+
+        for (let i = 0; i < 7; i++) {
+            const date = new Date();
+            date.setDate(date.getDate() + i);
+            days.set(this.formatDayKey(date), {date, items: []});
+        }
+
+        for (const t of this.upcomingTransactions()) {
+            if (t.is_subscription) continue;
+            const bucket = days.get(String(t.date).slice(0, 10));
+            if (!bucket || !this.currencyService.canConvert(t.currency.code)) continue;
+            bucket.items.push({
+                label: t.label,
+                amount: this.currencyService.convertToDefault(t.amount, t.currency.code),
+                isSubscription: false,
+            });
+        }
+
+        for (const sub of this.subscriptions()) {
+            if (!sub.is_active) continue;
+            const bucket = days.get(String(sub.next_payment_date).slice(0, 10));
+            if (!bucket || !this.currencyService.canConvert(sub.currency.code)) continue;
+            bucket.items.push({
+                label: sub.label,
+                amount: this.currencyService.convertToDefault(sub.amount, sub.currency.code),
+                isSubscription: true,
+            });
+        }
+
+        return Array.from(days.values()).map(({date, items}) => ({
+            key: this.formatDayKey(date),
+            dayLabel: this.formatDayLabel(date),
+            dayNumber: date.getDate(),
+            items,
+        }));
     });
 
     categoriesData = computed(() => {
@@ -193,13 +254,15 @@ export class DashboardComponent {
         const monthIndex = this.monthService.getMonth();
         const year = this.monthService.getYear();
 
-        const [transactions, subs] = await Promise.all([
+        const [transactions, subs, upcoming] = await Promise.all([
             this.transactionService.getTransactionsByMonth(userId, monthIndex, year),
             this.subscriptionService.getAllSubscriptionsByUser(userId),
+            this.transactionService.getUpcomingTransactions(userId),
         ]);
 
         this.transactionsByMonth.set(transactions);
         this.subscriptions.set(subs);
+        this.upcomingTransactions.set(upcoming);
         await this.currencyService.loadDefaultCurrency(userId);
 
         this.isLoading.set(false);
@@ -207,11 +270,25 @@ export class DashboardComponent {
 
     private monthlyEquivalent(sub: Subscription): number {
         switch (sub.frequency) {
-            case 'daily': return sub.amount * (365 / 12);
-            case 'weekly': return sub.amount * (52 / 12);
-            case 'monthly': return sub.amount;
-            case 'yearly': return sub.amount / 12;
-            default: return sub.amount;
+            case 'daily':
+                return sub.amount * (365 / 12);
+            case 'weekly':
+                return sub.amount * (52 / 12);
+            case 'monthly':
+                return sub.amount;
+            case 'yearly':
+                return sub.amount / 12;
+            default:
+                return sub.amount;
         }
+    }
+
+    private formatDayKey(date: Date): string {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    }
+
+    private formatDayLabel(date: Date): string {
+        const label = new Intl.DateTimeFormat('fr-FR', {weekday: 'short'}).format(date);
+        return label.charAt(0).toUpperCase() + label.slice(1);
     }
 }

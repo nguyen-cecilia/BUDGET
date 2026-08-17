@@ -1,9 +1,4 @@
-import {
-    ApplicationConfig,
-    provideBrowserGlobalErrorListeners,
-    isDevMode,
-    LOCALE_ID,
-} from '@angular/core';
+import {ApplicationConfig, isDevMode, LOCALE_ID, provideBrowserGlobalErrorListeners,} from '@angular/core';
 import {provideRouter} from '@angular/router';
 
 import {routes} from './app.routes';

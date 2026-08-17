@@ -192,6 +192,32 @@ export class TransactionService {
         return data ? new Date(data.date).getFullYear() : null;
     }
 
+    async getUpcomingTransactions(userId: string): Promise<Transaction[]> {
+        const today = this.formatDate(new Date());
+
+        const {data, error} = await this.supabase
+            .from(TRANSACTIONS_TABLE)
+            .select(`
+            *,
+            account:accounts(id, label),
+            category:categories(id, label, color),
+            currency:currencies(id, code, label),
+            tags(id, label)
+        `)
+            .eq('user_id', userId)
+            .eq('type', 'expense')
+            .gte('date', today)
+            .order('date', {ascending: true})
+            .limit(50);
+
+        if (error) {
+            console.error('Erreur lors de la récupération des prochains débits:', error);
+            throw error;
+        }
+
+        return data || [];
+    }
+
     private formatDate(date: Date): string {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');

@@ -23,7 +23,8 @@
             (keydown.enter)="setMode('subscription')"
             (keydown.space)="setMode('subscription')"
         >
-        <input type="radio" id="subscription" value="subscription" name="mode" [checked]="mode() === 'subscription'">
+            <input type="radio" id="subscription" value="subscription" name="mode"
+                   [checked]="mode() === 'subscription'">
             <p>Abonnement</p>
         </label>
     </div>
@@ -39,10 +40,11 @@
                 <p>Revenu</p>
             </label>
         </div>
-    }  @else {
+    } @else {
         <label for="selectedSubscription">
             <p>Abonnement</p>
-            <select name="selectedSubscription" id="selectedSubscription" formControlName="selectedSubscriptionId" class="custom-select" (change)="onSubscriptionChange()">
+            <select name="selectedSubscription" id="selectedSubscription" formControlName="selectedSubscriptionId"
+                    class="custom-select" (change)="onSubscriptionChange()">
                 @for (sub of subscriptions(); track sub.id) {
                     <option value="{{ sub.id }}">{{ sub.label }}</option>
                 }

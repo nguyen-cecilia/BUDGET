@@ -1,4 +1,4 @@
-import {Component, Input, ElementRef, AfterViewInit, inject, SimpleChanges, OnChanges} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, inject, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {Chart, registerables} from 'chart.js';
 
 Chart.register(...registerables);

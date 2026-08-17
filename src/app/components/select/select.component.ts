@@ -1,12 +1,13 @@
 import {
     Component,
+    ContentChild,
+    ElementRef,
+    EventEmitter,
+    HostListener,
+    inject,
     Input,
     Output,
-    EventEmitter,
-    ContentChild,
-    TemplateRef,
-    HostListener,
-    ElementRef, inject
+    TemplateRef
 } from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {LucideChevronDown} from '@lucide/angular';
