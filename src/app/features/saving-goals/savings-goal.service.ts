@@ -32,6 +32,25 @@ export class SavingsGoalService {
         return data;
     }
 
+    async getRecentSavingsGoals(userId: string, limit = 3): Promise<SavingsGoal[]> {
+        const {data, error} = await this.supabase
+            .from(SAVINGS_GOALS_TABLE)
+            .select(`
+            *,
+            currency:currencies(label, code, symbol)
+        `)
+            .eq('user_id', userId)
+            .order('created_at', {ascending: false})
+            .limit(limit);
+
+        if (error) {
+            console.error('Erreur lors de la récupération des objectifs:', error);
+            throw error;
+        }
+
+        return data || [];
+    }
+
     async createSavingsGoal(userId: string, goal: {
         label: string,
         target_amount: number,

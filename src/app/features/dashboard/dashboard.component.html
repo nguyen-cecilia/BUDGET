@@ -75,7 +75,7 @@
     <div class="flex-1 bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
         <div class="flex justify-between items-center gap-2">
             <h2 class="flex items-center gap-2">
-                <svg lucideWallet [size]="20" class="text-pink"></svg>
+                <svg lucideWallet [size]="20" class="text-gray"></svg>
                 Dernières transactions
             </h2>
 
@@ -143,8 +143,8 @@
 <section>
     <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
         <h2 class="flex items-center gap-2">
-            <svg lucideCalendarDays [size]="20" class="text-purple"></svg>
-            Les prochains débits
+            <svg lucideCalendarDays [size]="20" class="text-gray"></svg>
+            Prochains débits
         </h2>
 
         @if (upcomingDebits().length > 0) {
@@ -181,7 +181,7 @@
     <div
         class="flex-1 lg:order-1 bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
         <h2 class="flex items-center gap-2">
-            <svg lucideLayers [size]="20" class="text-blue"></svg>
+            <svg lucideLayers [size]="20" class="text-gray"></svg>
             Par catégorie
         </h2>
 
@@ -255,5 +255,42 @@
 </section>
 
 <section>
+    <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-6">
+        <div class="flex items-center justify-between gap-3">
+            <h2 class="flex items-center gap-2">
+                <svg lucidePiggyBank [size]="20" class="text-gray"></svg>
+                Objectifs d'épargne
+            </h2>
 
+            <button
+                app-button
+                routerLink="/objectifs"
+            >
+                Gérer
+                <svg lucideArrowRight [size]="16"></svg>
+            </button>
+        </div>
+
+        @if (savingsGoals().length > 0) {
+            <div class="grid lg:grid-cols-3 gap-x-8 gap-y-8">
+                @for (goal of savingsGoals(); track goal.id) {
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-between gap-3">
+                            <p class="font-semibold">{{ goal.label }}</p>
+                            <div class="bg-blue/50 rounded text-xs px-1.5 py-0.5 font-medium text-gray">{{ goalRatio(goal) }}%</div>
+                        </div>
+                        <div class="w-full h-3 border rounded bg-beige">
+                            <div class="h-full rounded bg-blue" [style.width.%]="goalRatio(goal)"></div>
+                        </div>
+                        <div class="flex items-center justify-between gap-3 text-sm">
+                            <p class="font-semibold text-blue">{{ goal.current_amount|currency:goal.currency.code }}</p>
+                            <p class="text-gray">/ {{ goal.target_amount|currency:goal.currency.code }}</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        } @else {
+            <p class="text-gray text-sm">Aucun objectif pour l'instant.</p>
+        }
+    </div>
 </section>

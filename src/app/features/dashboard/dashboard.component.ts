@@ -6,6 +6,7 @@ import {
     LucideCheck,
     LucideLayers,
     LucidePartyPopper,
+    LucidePiggyBank,
     LucideSnail,
     LucideSparkles,
     LucideTag,
@@ -26,6 +27,8 @@ import {CurrencyPipe, DatePipe, DecimalPipe} from '@angular/common';
 import {ColorService} from '../../core/color.service';
 import {TransactionItemComponent} from '../transactions/transaction-item.component';
 import {CurrencyService} from '../currencies/currency.service';
+import {SavingsGoalService} from '../saving-goals/savings-goal.service';
+import {SavingsGoal} from '../saving-goals/savings-goal.model';
 
 @Component({
     selector: 'app-dashboard',
@@ -49,6 +52,7 @@ import {CurrencyService} from '../currencies/currency.service';
         LucideCalendarDays,
         LucidePartyPopper,
         LucideSnail,
+        LucidePiggyBank,
     ],
     templateUrl: './dashboard.component.html',
 })
@@ -56,6 +60,7 @@ export class DashboardComponent {
     private authState = inject(AuthStateService);
     private transactionService = inject(TransactionService);
     private subscriptionService = inject(SubscriptionService);
+    private goalService = inject(SavingsGoalService);
     protected currencyService = inject(CurrencyService);
     protected monthService = inject(MonthService);
     protected colorService = inject(ColorService);
@@ -64,6 +69,7 @@ export class DashboardComponent {
     transactionsByMonth = signal<TransactionsByMonth | null>(null);
     subscriptions = signal<Subscription[]>([]);
     upcomingTransactions = signal<Transaction[]>([]);
+    savingsGoals = signal<SavingsGoal[]>([]);
     protected defaultCurrency = this.currencyService.defaultCurrency;
 
     totalExpenses = computed(() =>
@@ -237,6 +243,12 @@ export class DashboardComponent {
         return {tags, maxTotal: tags[0]?.total ?? 0};
     });
 
+    goalRatio(goal: SavingsGoal): number {
+        return goal.target_amount > 0 && goal.current_amount > 0
+            ? Math.round((goal.current_amount / goal.target_amount) * 100)
+            : 0;
+    }
+
     constructor() {
         effect(() => {
             this.transactionService.transactionRefreshTrigger();
@@ -254,15 +266,17 @@ export class DashboardComponent {
         const monthIndex = this.monthService.getMonth();
         const year = this.monthService.getYear();
 
-        const [transactions, subs, upcoming] = await Promise.all([
+        const [transactions, subs, upcoming, goals] = await Promise.all([
             this.transactionService.getTransactionsByMonth(userId, monthIndex, year),
             this.subscriptionService.getAllSubscriptionsByUser(userId),
             this.transactionService.getUpcomingTransactions(userId),
+            this.goalService.getRecentSavingsGoals(userId, 3),
         ]);
 
         this.transactionsByMonth.set(transactions);
         this.subscriptions.set(subs);
         this.upcomingTransactions.set(upcoming);
+        this.savingsGoals.set(goals);
         await this.currencyService.loadDefaultCurrency(userId);
 
         this.isLoading.set(false);
