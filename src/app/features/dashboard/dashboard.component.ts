@@ -175,10 +175,20 @@ export class DashboardComponent {
             });
         }
 
+        const todayKey = this.formatDayKey(new Date());
+
         for (const sub of this.subscriptions()) {
             if (!sub.is_active) continue;
-            const bucket = days.get(String(sub.next_payment_date).slice(0, 10));
-            if (!bucket || !this.currencyService.canConvert(sub.currency.code)) continue;
+            if (!this.currencyService.canConvert(sub.currency.code)) continue;
+
+            const paidToday = this.upcomingTransactions().some(
+                t => t.subscription_id === sub.id && String(t.date).slice(0, 10) === todayKey
+            );
+
+            const targetKey = paidToday ? todayKey : String(sub.next_payment_date).slice(0, 10);
+            const bucket = days.get(targetKey);
+            if (!bucket) continue;
+
             bucket.items.push({
                 label: sub.label,
                 amount: this.currencyService.convertToDefault(sub.amount, sub.currency.code),
