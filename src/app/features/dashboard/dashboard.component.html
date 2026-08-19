@@ -220,36 +220,71 @@
         </div>
     </div>
 
-    <div
-        class="relative overflow-hidden w-full lg:w-1/3 lg:order-0 bg-pink/50 border border-gray-light shadow-md shadow-gray/10 rounded p-5 pb-20 lg:pb-35 space-y-4">
-        <h2 class="flex items-center gap-2">
-            <svg lucideTag [size]="20"></svg>
-            Par tag
-        </h2>
-        <p class="text-gray text-sm">Pourcentage par rapport aux dépenses totales.</p>
+    <div class="lg:w-1/3 lg:order-0 space-y-6">
+        <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
+            <h2 class="flex items-center gap-2">
+                <svg lucideChartPie [size]="20" class="text-gray"></svg>
+                Budget 50/30/20
+            </h2>
 
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"
-             class="size-40 z-0 absolute -left-10 -bottom-25 lg:-bottom-10 text-green">
-            <path
-                d="M 128 0 C 147.68 0 164.04 14.213 167.377 32.934 C 182.974 22.055 204.594 23.574 218.51 37.49 C 232.426 51.406 233.944 73.025 223.066 88.622 C 241.787 91.96 256 108.32 256 128 C 256 147.68 241.787 164.04 223.065 167.377 C 233.944 182.974 232.426 204.594 218.51 218.51 C 204.594 232.426 182.974 233.944 167.377 223.065 C 164.04 241.787 147.68 256 128 256 C 108.32 256 91.959 241.787 88.622 223.065 C 73.025 233.944 51.406 232.426 37.49 218.51 C 23.574 204.594 22.055 182.974 32.934 167.377 C 14.213 164.04 0 147.68 0 128 C 0 108.32 14.213 91.96 32.934 88.622 C 22.056 73.025 23.574 51.406 37.49 37.49 C 51.406 23.574 73.025 22.055 88.622 32.934 C 91.96 14.213 108.32 0 128 0 Z"
-                fill="currentColor" stroke-width="2" class="stroke-black-dark"></path>
-        </svg>
+            @if (budgetData().income > 0) {
+                <p class="text-gray text-sm">
+                    Basé sur les revenus du mois : <strong class="text-black-dark">{{ budgetData().income|currency:defaultCurrency() }}</strong>
+                </p>
 
-        <div class="relative z-1 grid grid-cols-[1fr_3fr_1fr] lg:grid-cols-[1fr_4fr_1fr] items-center gap-3">
-            @for (tag of tagsData().tags; track tag.label) {
-                <div class="text-gray text-sm">#{{ tag.label }}</div>
-                <div class="w-full h-3 bg-beige-light rounded-full border">
-                    <div
-                        class="h-full bg-yellow rounded-full transition-all"
-                        [style.width.%]="(tag.total / totalExpenses()) * 100"
-                    >
+                @for (bucket of budgetData().buckets; track bucket.key) {
+                    <div class="rounded bg-beige-light border p-4 flex flex-col items-start gap-1">
+                        <div class="{{ bucket.bg }} rounded border px-2 py-0.5 font-semibold text-xs">{{ bucket.percent }}%</div>
+                        <p class="text-xl font-semibold font-display leading-9">{{ bucket.allocated|currency:defaultCurrency() }}</p>
+                        <div>
+                            <p class="font-semibold">{{ bucket.label }}</p>
+                            @if (bucket.categories.length > 0) {
+                                <p class="text-gray text-xs">{{ bucket.categories.join(' · ') }}</p>
+                            }
+                        </div>
+                        <p class="w-full text-right text-gray text-sm">{{ bucket.progress }}% {{ bucket.key === 'savings' ? 'épargnés' : 'dépensés' }}</p>
+                        <div class="w-full h-3 rounded border bg-beige">
+                            <div class="h-full rounded {{ bucket.bg }}" [style.width.%]="bucket.barWidth"></div>
+                        </div>
+                        <p class="font-semibold">{{ bucket.spent|currency:defaultCurrency() }} <span class="text-xs text-gray font-normal">/ {{ bucket.allocated|currency:defaultCurrency() }}</span></p>
                     </div>
-                </div>
-                <div class="font-display font-medium text-md text-right">{{ tag.total|currency:defaultCurrency() }}
-                </div>
-            } @empty {
-                <p class="col-span-5 text-gray text-sm">Aucun tag ce mois-ci.</p>
+                }
+            } @else {
+                <p class="text-gray text-sm">Aucun revenu ce mois-ci.</p>
             }
+        </div>
+
+        <div
+            class="relative overflow-hidden bg-pink/50 border border-gray-light shadow-md shadow-gray/10 rounded p-5 pb-20 lg:pb-35 space-y-4">
+            <h2 class="flex items-center gap-2">
+                <svg lucideTag [size]="20"></svg>
+                Par tag
+            </h2>
+            <p class="text-gray text-sm">Pourcentage par rapport aux dépenses totales.</p>
+
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"
+                 class="size-40 z-0 absolute -left-10 -bottom-25 lg:-bottom-10 text-green">
+                <path
+                    d="M 128 0 C 147.68 0 164.04 14.213 167.377 32.934 C 182.974 22.055 204.594 23.574 218.51 37.49 C 232.426 51.406 233.944 73.025 223.066 88.622 C 241.787 91.96 256 108.32 256 128 C 256 147.68 241.787 164.04 223.065 167.377 C 233.944 182.974 232.426 204.594 218.51 218.51 C 204.594 232.426 182.974 233.944 167.377 223.065 C 164.04 241.787 147.68 256 128 256 C 108.32 256 91.959 241.787 88.622 223.065 C 73.025 233.944 51.406 232.426 37.49 218.51 C 23.574 204.594 22.055 182.974 32.934 167.377 C 14.213 164.04 0 147.68 0 128 C 0 108.32 14.213 91.96 32.934 88.622 C 22.056 73.025 23.574 51.406 37.49 37.49 C 51.406 23.574 73.025 22.055 88.622 32.934 C 91.96 14.213 108.32 0 128 0 Z"
+                    fill="currentColor" stroke-width="2" class="stroke-black-dark"></path>
+            </svg>
+
+            <div class="relative z-1 grid grid-cols-[1fr_3fr_1fr] lg:grid-cols-[1fr_4fr_1fr] items-center gap-3">
+                @for (tag of tagsData().tags; track tag.label) {
+                    <div class="text-gray text-sm">#{{ tag.label }}</div>
+                    <div class="w-full h-3 bg-beige-light rounded-full border">
+                        <div
+                            class="h-full bg-yellow rounded-full transition-all"
+                            [style.width.%]="(tag.total / totalExpenses()) * 100"
+                        >
+                        </div>
+                    </div>
+                    <div class="font-display font-medium text-md text-right">{{ tag.total|currency:defaultCurrency() }}
+                    </div>
+                } @empty {
+                    <p class="col-span-5 text-gray text-sm">Aucun tag ce mois-ci.</p>
+                }
+            </div>
         </div>
     </div>
 </section>

@@ -186,7 +186,7 @@
     </section>
 
     <section class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8">
-        <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
+        <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-6">
             <h2 class="flex items-center gap-2">
                 <svg lucideWallet [size]="20"></svg>
                 Catégories
@@ -198,7 +198,10 @@
                 @for (category of categories(); track category.id) {
                     <div class="flex items-center gap-3 bg-beige-light border p-3 rounded">
                         <div class="size-10 border rounded-full {{ colorService.getBackground(category.color) }}"></div>
-                        <h3 class="flex-1">{{ category.label }}</h3>
+                        <div class="flex-1">
+                            <h3>{{ category.label }}</h3>
+                            <p class="text-sm text-gray">{{ category.type === 'need' ? 'Besoin' : category.type === 'want' ? 'Envie' : '' }}</p>
+                        </div>
                         <button
                             app-button
                             shape="round"

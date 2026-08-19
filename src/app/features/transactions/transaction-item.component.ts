@@ -76,6 +76,12 @@ export class TransactionItemComponent {
     protected currencyService = inject(CurrencyService);
 
     get isFuture(): boolean {
-        return new Date(this.transaction.date) > new Date();
+        const transactionDate = new Date(this.transaction.date);
+        transactionDate.setHours(0, 0, 0, 0);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        return transactionDate > today;
     }
 }

@@ -26,7 +26,7 @@ export class TransactionService {
             .select(`
                 *,
                 account:accounts(id, label),
-                category:categories(id, label, color),
+                category:categories(id, label, color, type),
                 currency:currencies(id, code, label),
                 tags(id, label)
             `)
@@ -162,7 +162,7 @@ export class TransactionService {
             .select(`
             *,
             account:accounts(id, label),
-            category:categories(id, label, color),
+            category:categories(id, label, color, type),
             currency:currencies(id, code, label),
             tags(id, label)
         `)
@@ -200,7 +200,7 @@ export class TransactionService {
             .select(`
             *,
             account:accounts(id, label),
-            category:categories(id, label, color),
+            category:categories(id, label, color, type),
             currency:currencies(id, code, label),
             tags(id, label)
         `)

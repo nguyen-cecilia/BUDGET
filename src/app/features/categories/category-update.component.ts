@@ -8,6 +8,7 @@ import {ModalService} from '../../components/modal/modal.service';
 import {Category} from './category.model';
 import {ColorPickerComponent} from '../../components/color-picker/color-picker.component';
 import {SelectComponent, SelectOption} from '../../components/select/select.component';
+import {BadgeComponent} from '../../components/badge/badge.component';
 
 @Component({
     selector: 'app-category-update',
@@ -19,7 +20,8 @@ import {SelectComponent, SelectOption} from '../../components/select/select.comp
         LucideTrash2,
         LucideSave,
         ColorPickerComponent,
-        SelectComponent
+        SelectComponent,
+        BadgeComponent
     ],
     templateUrl: './category-update.component.html',
     host: {
@@ -41,6 +43,7 @@ export class CategoryUpdateComponent {
     isDeleting = signal(false);
     reassignTo = signal<string | number>('');
     reassignOptions = signal<SelectOption[]>([]);
+    typeOptions = [{value: 'need', label: 'Besoin'}, {value: 'want', label: 'Envie'}];
 
     @Input() createOnly = false;
 
@@ -48,6 +51,7 @@ export class CategoryUpdateComponent {
         this.categoryForm = this.fb.group({
             label: ['', [Validators.required]],
             color: ['gray', [Validators.required]],
+            type: ['need'],
         });
 
         this.selectedColor.set(this.categoryForm.get('color')?.value ?? 'gray');
@@ -97,20 +101,20 @@ export class CategoryUpdateComponent {
             const editing = this.editingCategory();
             const fv = this.categoryForm.value;
 
+            const payload = {
+                label: fv.label || '',
+                color: fv.color || '',
+                type: fv.type || null,
+            }
+
             if (editing) {
                 // Modification de la catégorie
-                await this.categoryService.updateCategory(editing.id, userId, {
-                    label: fv.label || '',
-                    color: fv.color || '',
-                });
+                await this.categoryService.updateCategory(editing.id, userId, payload);
 
                 this.modalService.category.close();
             } else {
                 // Création de la catégorie
-                await this.categoryService.createCategory(userId, {
-                    label: fv.label || '',
-                    color: fv.color || '',
-                });
+                await this.categoryService.createCategory(userId, payload);
             }
 
             this.categoryService.categoryRefreshTrigger.set(
@@ -156,6 +160,7 @@ export class CategoryUpdateComponent {
         this.categoryForm.patchValue({
             label: category.label,
             color: category.color,
+            type: category.type,
         });
     }
 
@@ -163,6 +168,7 @@ export class CategoryUpdateComponent {
         this.categoryForm.reset({
             label: '',
             color: 'gray',
+            type: 'need',
         });
     }
 

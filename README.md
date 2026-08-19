@@ -36,6 +36,7 @@ Layout:
 - [ ] Dark mode
 - [x] Logo
 - [ ] Better manage the loading states
+- [ ] Clean code and refactor
 
 Auth:
 
@@ -48,8 +49,8 @@ Dashboard:
 - [x] Stats: number of transactions, total amount spent, total amount earned, subscriptions (number and amount)
 - [x] View of the 7 next days & Future transactions
 - [x] Transactions by category: cards, pie chart
-- [ ] Savings goals
-- [ ] Based on month earnings, do the 50/30/20 rule
+- [x] Savings goals
+- [x] Based on month earnings, do the 50/30/20 rule
 - [x] View per month: depending on the global month chosen
 
 Transactions:
@@ -89,4 +90,5 @@ Parameters:
 - [x] Manage currencies
 - [x] Manage subscriptions
 - [ ] Manage imports / exports
-- [ ] Add types of categories: needs or wants
+- [x] Add types of categories: needs or wants
+- [ ] Sensible zone: remove all transactions

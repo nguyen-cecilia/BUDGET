@@ -1,4 +1,4 @@
-<form class="space-y-10" [formGroup]="categoryForm" (ngSubmit)="submitCategory()">
+<form class="space-y-3" [formGroup]="categoryForm" (ngSubmit)="submitCategory()">
     @if (errorMessage()) {
         <div class="text-red">{{ errorMessage() }}</div>
     }
@@ -7,9 +7,6 @@
         <app-color-picker [color]="selectedColor()" (colorChange)="selectColor($event)"/>
 
         <label for="label" class="flex-1">
-            @if (editingCategory()) {
-                <p>Label</p>
-            }
             <input id="label" type="text" placeholder="Nouvelle catégorie" formControlName="label">
         </label>
 
@@ -26,8 +23,22 @@
         }
     </div>
 
+    <div class="flex items-center gap-2">
+        <p class="text-sm font-medium text-gray">Type :</p>
+        @for (type of typeOptions; track type.value) {
+            <button
+                type="button"
+                app-badge
+                [variant]="categoryForm.get('type')?.value === type.value ? 'secondary' : 'outline'"
+                (click)="categoryForm.get('type')?.setValue(type.value)"
+            >
+                {{ type.label }}
+            </button>
+        }
+    </div>
+
     @if (editingCategory()) {
-        <div class="flex items-center justify-between gap-3">
+        <div class="mt-6 flex items-center justify-between gap-3">
             <button app-button variant="invalid" (click)="startDelete()">
                 <svg lucideTrash2 [size]="16"></svg>
                 Supprimer

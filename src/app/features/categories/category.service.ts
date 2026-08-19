@@ -1,6 +1,6 @@
 import {inject, Injectable, signal} from '@angular/core';
 import {SupabaseService} from '../../core/supabase.service';
-import {Category} from './category.model';
+import {Category, CategoryType} from './category.model';
 
 const CATEGORIES_TABLE = 'categories';
 
@@ -29,13 +29,18 @@ export class CategoryService {
         return data;
     }
 
-    async createCategory(userId: string, category: { label: string; color: string; }): Promise<Category> {
+    async createCategory(userId: string, category: {
+        label: string;
+        color: string;
+        type: CategoryType;
+    }): Promise<Category> {
         const {data, error} = await this.supabase
             .from(CATEGORIES_TABLE)
             .insert([{
                 user_id: userId,
                 label: category.label,
                 color: category.color,
+                type: category.type,
             }])
             .select()
             .single()
@@ -49,12 +54,14 @@ export class CategoryService {
     async updateCategory(id: string, userId: string, category: {
         label: string;
         color: string;
+        type: CategoryType;
     }): Promise<Category> {
         const {data, error} = await this.supabase
             .from(CATEGORIES_TABLE)
             .update({
                 label: category.label,
                 color: category.color,
+                type: category.type,
             })
             .eq('id', id)
             .eq('user_id', userId)

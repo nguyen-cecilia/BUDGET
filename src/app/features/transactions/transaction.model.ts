@@ -1,3 +1,5 @@
+import {CategoryType} from '../categories/category.model';
+
 export type TransactionType = 'expense' | 'income';
 
 export interface Transaction {
@@ -25,6 +27,7 @@ export interface Transaction {
         id: string;
         label: string;
         color: string;
+        type: CategoryType;
     } | null;
     currency: {
         id: string;
