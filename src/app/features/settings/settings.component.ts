@@ -2,11 +2,14 @@ import {Component, effect, inject, OnInit, signal} from '@angular/core';
 import {
     LucideCoins,
     LucideLandmark,
+    LucideLayers,
     LucidePencil,
     LucidePlus,
+    LucideSkull,
     LucideSparkles,
     LucideTag,
-    LucideWallet,
+    LucideTrash2,
+    LucideTriangleAlert,
 } from '@lucide/angular';
 import {ButtonComponent} from '../../components/button/button.component';
 import {BadgeComponent} from '../../components/badge/badge.component';
@@ -32,6 +35,9 @@ import {SubscriptionService} from '../subscriptions/subscription.service';
 import {Subscription} from '../subscriptions/subscription.model';
 import {CurrencyPipe, DatePipe} from '@angular/common';
 import {SubscriptionUpdate} from '../subscriptions/subscription-update.component';
+import {ConfirmComponent, ConfirmPayload} from '../../components/confirm/confirm.component';
+import {SavingsGoalService} from '../saving-goals/savings-goal.service';
+import {TransactionService} from '../transactions/transaction.service';
 
 @Component({
     selector: 'app-settings',
@@ -41,7 +47,6 @@ import {SubscriptionUpdate} from '../subscriptions/subscription-update.component
         LucidePlus,
         LucidePencil,
         LucideSparkles,
-        LucideWallet,
         LucideTag,
         BadgeComponent,
         LucideLandmark,
@@ -53,7 +58,12 @@ import {SubscriptionUpdate} from '../subscriptions/subscription-update.component
         CurrencyUpdateComponent,
         CurrencyPipe,
         DatePipe,
-        SubscriptionUpdate
+        SubscriptionUpdate,
+        LucideSkull,
+        LucideTrash2,
+        LucideLayers,
+        LucideTriangleAlert,
+        ConfirmComponent
     ],
     templateUrl: './settings.component.html',
 })
@@ -62,6 +72,8 @@ export class SettingsComponent implements OnInit {
     private accountService = inject(AccountService);
     private tagService = inject(TagService);
     private categoryService = inject(CategoryService);
+    private transactionService = inject(TransactionService);
+    private savingsGoalService = inject(SavingsGoalService);
     protected subscriptionService = inject(SubscriptionService);
     protected currencyService = inject(CurrencyService);
     protected modalService = inject(ModalService);
@@ -72,6 +84,7 @@ export class SettingsComponent implements OnInit {
     monthOptions = this.monthService.monthOptions;
 
     isLoading = signal(false);
+    isDeleting = signal(false);
     currencies = signal<UserCurrencies[]>([]);
     subscriptions = signal<Subscription[]>([]);
     accounts = signal<Account[]>([]);
@@ -111,6 +124,107 @@ export class SettingsComponent implements OnInit {
         this.getTags(userId);
         this.getAccounts(userId);
         this.isLoading.set(false);
+    }
+
+    deleteAllTransactions(): void {
+        this.confirmDelete({
+            title: 'Supprimer toutes les transactions',
+            message: 'Cette action supprime définitivement toutes les transactions. Opération irréversible.',
+            onConfirm: async () => {
+                const userId = this.authState.getCurrentUser()?.id;
+                if (!userId) return;
+                this.isDeleting.set(true);
+                try {
+                    await this.transactionService.deleteAllTransactions(userId);
+                    this.transactionService.transactionRefreshTrigger.set(!this.transactionService.transactionRefreshTrigger());
+                } finally {
+                    this.isDeleting.set(false);
+                }
+            },
+        });
+    }
+
+    deleteAllTags(): void {
+        this.confirmDelete({
+            title: 'Supprimer tous les tags',
+            message: 'Cette action supprime définitivement tous les tags et retire leurs liens des transactions.',
+            onConfirm: async () => {
+                const userId = this.authState.getCurrentUser()?.id;
+                if (!userId) return;
+                this.isDeleting.set(true);
+                try {
+                    await this.tagService.deleteAllTags(userId);
+                    this.tagService.tagRefreshTrigger.set(!this.tagService.tagRefreshTrigger());
+                } finally {
+                    this.isDeleting.set(false);
+                }
+            },
+        });
+    }
+
+    deleteAllSubscriptions(): void {
+        this.confirmDelete({
+            title: 'Supprimer tous les abonnements',
+            message: 'Cette action supprime définitivement tous les abonnements. Les transactions liées sont conservées mais perdent leur lien.',
+            onConfirm: async () => {
+                const userId = this.authState.getCurrentUser()?.id;
+                if (!userId) return;
+                this.isDeleting.set(true);
+                try {
+                    await this.subscriptionService.deleteAllSubscriptions(userId);
+                    this.subscriptionService.subscriptionRefreshTrigger.set(!this.subscriptionService.subscriptionRefreshTrigger());
+                } finally {
+                    this.isDeleting.set(false);
+                }
+            },
+        });
+    }
+
+    deleteAllCategories(): void {
+        this.confirmDelete({
+            title: 'Supprimer toutes les catégories',
+            message: 'Cette action supprime définitivement toutes les catégories. Les transactions et abonnements passeront « Sans catégorie ».',
+            onConfirm: async () => {
+                const userId = this.authState.getCurrentUser()?.id;
+                if (!userId) return;
+                this.isDeleting.set(true);
+                try {
+                    await this.categoryService.deleteAllCategories(userId);
+                    this.categoryService.categoryRefreshTrigger.set(!this.categoryService.categoryRefreshTrigger());
+                } finally {
+                    this.isDeleting.set(false);
+                }
+            },
+        });
+    }
+
+    deleteAllData(): void {
+        this.confirmDelete({
+            title: 'Supprimer toutes les données',
+            message: 'Cette action supprime définitivement (presque) toutes les données : transactions, catégories, comptes, abonnements, tags et objectifs d\'épargne. Opération irréversible.',
+            onConfirm: async () => {
+                const userId = this.authState.getCurrentUser()?.id;
+                if (!userId) return;
+                this.isDeleting.set(true);
+                try {
+                    await this.transactionService.deleteAllTransactions(userId);
+                    await this.subscriptionService.deleteAllSubscriptions(userId);
+                    await this.savingsGoalService.deleteAllSavingsGoals(userId);
+                    await this.categoryService.deleteAllCategories(userId);
+                    await this.tagService.deleteAllTags(userId);
+                    await this.accountService.deleteAllAccounts(userId);
+
+                    this.transactionService.transactionRefreshTrigger.set(!this.transactionService.transactionRefreshTrigger());
+                    this.subscriptionService.subscriptionRefreshTrigger.set(!this.subscriptionService.subscriptionRefreshTrigger());
+                    this.tagService.tagRefreshTrigger.set(!this.tagService.tagRefreshTrigger());
+                    this.categoryService.categoryRefreshTrigger.set(!this.categoryService.categoryRefreshTrigger());
+                    this.accountService.accountRefreshTrigger.set(!this.accountService.accountRefreshTrigger());
+                    this.currencyService.currencyRefreshTrigger.set(!this.currencyService.currencyRefreshTrigger());
+                } finally {
+                    this.isDeleting.set(false);
+                }
+            },
+        });
     }
 
     private getCurrencies(userId: string) {
@@ -166,5 +280,9 @@ export class SettingsComponent implements OnInit {
                 console.error('Erreur lors du chargement:', error);
             }
         );
+    }
+
+    private confirmDelete(payload: ConfirmPayload): void {
+        this.modalService.confirm.open(payload);
     }
 }

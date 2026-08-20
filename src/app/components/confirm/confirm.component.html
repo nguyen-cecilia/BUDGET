@@ -1,0 +1,16 @@
+@if (modalService.confirm.editing(); as payload) {
+    <div class="space-y-6">
+        <p>{{ payload.message }}</p>
+        <div class="flex items-center justify-between gap-3">
+            <button app-button variant="outline" type="button" (click)="cancel()">Annuler</button>
+            <button app-button variant="invalid" type="button" (click)="confirm()" [disabled]="isConfirming()">
+                @if (isConfirming()) {
+                    Suppression...
+                } @else {
+                    <svg lucideTrash2 [size]="16"></svg>
+                    Confirmer
+                }
+            </button>
+        </div>
+    </div>
+}

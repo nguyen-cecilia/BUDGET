@@ -1,8 +1,6 @@
 import {inject, Injectable, signal} from '@angular/core';
-import {SupabaseService} from '../../core/supabase.service';
+import {SAVINGS_GOALS_TABLE, SupabaseService} from '../../core/supabase.service';
 import {SavingsGoal} from './savings-goal.model';
-
-const SAVINGS_GOALS_TABLE = 'savings_goals';
 
 @Injectable({
     providedIn: 'root',
@@ -112,6 +110,14 @@ export class SavingsGoalService {
             .from(SAVINGS_GOALS_TABLE)
             .delete()
             .eq('id', id)
+            .eq('user_id', userId);
+        if (error) throw error;
+    }
+
+    async deleteAllSavingsGoals(userId: string): Promise<void> {
+        const {error} = await this.supabase
+            .from(SAVINGS_GOALS_TABLE)
+            .delete()
             .eq('user_id', userId);
         if (error) throw error;
     }

@@ -35,7 +35,7 @@ Layout:
 - [x] Desktop: sidebar with menu / Mobile: floating menu bar bottom
 - [ ] Dark mode
 - [x] Logo
-- [ ] Better manage the loading states
+- [ ] Better manage the loading states, error messages, delete confirmations
 - [ ] Clean code and refactor
 
 Auth:
@@ -91,4 +91,4 @@ Parameters:
 - [x] Manage subscriptions
 - [ ] Manage imports / exports
 - [x] Add types of categories: needs or wants
-- [ ] Sensible zone: remove all transactions
+- [x] Sensible zone: remove all transactions

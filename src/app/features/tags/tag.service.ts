@@ -1,9 +1,7 @@
 import {inject, Injectable, signal} from '@angular/core';
-import {SupabaseService} from '../../core/supabase.service';
+import {SupabaseService, TAGS_TABLE, TRANSACTION_TAGS_TABLE} from '../../core/supabase.service';
 import {Tag} from './tag.model';
 import {TransactionService} from '../transactions/transaction.service';
-
-const TAGS_TABLE = 'tags';
 
 @Injectable({
     providedIn: 'root',
@@ -72,6 +70,28 @@ export class TagService {
             .from(TAGS_TABLE)
             .delete()
             .eq('id', id)
+            .eq('user_id', userId);
+
+        if (error) throw error;
+    }
+
+    async deleteAllTags(userId: string): Promise<void> {
+        const {data} = await this.supabase
+            .from(TAGS_TABLE)
+            .select('id')
+            .eq('user_id', userId);
+
+        const ids = (data ?? []).map(t => t.id);
+        if (ids.length > 0) {
+            await this.supabase
+                .from(TRANSACTION_TAGS_TABLE)
+                .delete()
+                .in('tag_id', ids);
+        }
+
+        const {error} = await this.supabase
+            .from(TAGS_TABLE)
+            .delete()
             .eq('user_id', userId);
 
         if (error) throw error;

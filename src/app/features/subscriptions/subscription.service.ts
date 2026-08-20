@@ -1,8 +1,6 @@
 import {inject, Injectable, signal} from '@angular/core';
-import {SupabaseService} from '../../core/supabase.service';
+import {SUBSCRIPTIONS_TABLE, SupabaseService, TRANSACTIONS_TABLE} from '../../core/supabase.service';
 import {Subscription} from './subscription.model';
-
-const SUBSCRIPTIONS_TABLE = 'subscriptions';
 
 @Injectable({
     providedIn: 'root',
@@ -115,6 +113,21 @@ export class SubscriptionService {
             .delete()
             .eq('id', id)
             .eq('user_id', userId);
+        if (error) throw error;
+    }
+
+    async deleteAllSubscriptions(userId: string): Promise<void> {
+        await this.supabase
+            .from(TRANSACTIONS_TABLE)
+            .update({subscription_id: null})
+            .eq('user_id', userId)
+            .not('subscription_id', 'is', null);
+
+        const {error} = await this.supabase
+            .from(SUBSCRIPTIONS_TABLE)
+            .delete()
+            .eq('user_id', userId);
+
         if (error) throw error;
     }
 

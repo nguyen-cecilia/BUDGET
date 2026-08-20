@@ -1,8 +1,6 @@
 import {inject, Injectable, signal} from '@angular/core';
-import {SupabaseService} from '../../core/supabase.service';
+import {CATEGORIES_TABLE, SUBSCRIPTIONS_TABLE, SupabaseService, TRANSACTIONS_TABLE} from '../../core/supabase.service';
 import {Category, CategoryType} from './category.model';
-
-const CATEGORIES_TABLE = 'categories';
 
 @Injectable({
     providedIn: 'root',
@@ -75,21 +73,42 @@ export class CategoryService {
 
     async deleteCategory(userId: string, id: string, reassignTo: string | null): Promise<void> {
         await this.supabase
-            .from('transactions')
+            .from(TRANSACTIONS_TABLE)
             .update({category_id: reassignTo})
             .eq('category_id', id)
             .eq('user_id', userId);
 
         await this.supabase
-            .from('subscriptions')
+            .from(SUBSCRIPTIONS_TABLE)
             .update({category_id: reassignTo})
             .eq('category_id', id)
             .eq('user_id', userId);
 
         await this.supabase
-            .from('categories')
+            .from(CATEGORIES_TABLE)
             .delete()
             .eq('id', id)
             .eq('user_id', userId);
+    }
+
+    async deleteAllCategories(userId: string): Promise<void> {
+        await this.supabase
+            .from(TRANSACTIONS_TABLE)
+            .update({category_id: null})
+            .eq('user_id', userId)
+            .not('category_id', 'is', null);
+
+        await this.supabase
+            .from(SUBSCRIPTIONS_TABLE)
+            .update({category_id: null})
+            .eq('user_id', userId)
+            .not('category_id', 'is', null);
+
+        const {error} = await this.supabase
+            .from(CATEGORIES_TABLE)
+            .delete()
+            .eq('user_id', userId);
+
+        if (error) throw error;
     }
 }

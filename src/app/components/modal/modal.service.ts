@@ -7,6 +7,7 @@ import {Category} from '../../features/categories/category.model';
 import {UserCurrencies} from "../../features/currencies/currency.model";
 import {Subscription} from '../../features/subscriptions/subscription.model';
 import {SavingsGoal} from '../../features/saving-goals/savings-goal.model';
+import {ConfirmPayload} from '../confirm/confirm.component';
 
 @Injectable({
     providedIn: 'root'
@@ -19,4 +20,6 @@ export class ModalService {
     readonly currency = new ModalController<UserCurrencies>();
     readonly subscription = new ModalController<Subscription>();
     readonly goal = new ModalController<SavingsGoal>();
+
+    readonly confirm = new ModalController<ConfirmPayload>();
 }

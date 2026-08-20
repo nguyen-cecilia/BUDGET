@@ -1,9 +1,6 @@
 import {inject, Injectable, signal} from '@angular/core';
-import {SupabaseService} from '../../core/supabase.service';
+import {SupabaseService, TRANSACTION_TAGS_TABLE, TRANSACTIONS_TABLE} from '../../core/supabase.service';
 import {Transaction, TransactionsByDay, TransactionsByMonth, TransactionType} from './transaction.model';
-
-const TRANSACTIONS_TABLE = 'transactions';
-const TRANSACTION_TAGS_TABLE = 'transaction_tags';
 
 @Injectable({
     providedIn: 'root',
@@ -216,6 +213,28 @@ export class TransactionService {
         }
 
         return data || [];
+    }
+
+    async deleteAllTransactions(userId: string): Promise<void> {
+        const {data} = await this.supabase
+            .from(TRANSACTIONS_TABLE)
+            .select('id')
+            .eq('user_id', userId);
+
+        const ids = (data ?? []).map(t => t.id);
+        if (ids.length > 0) {
+            await this.supabase
+                .from(TRANSACTION_TAGS_TABLE)
+                .delete()
+                .in('transaction_id', ids);
+        }
+
+        const {error} = await this.supabase
+            .from(TRANSACTIONS_TABLE)
+            .delete()
+            .eq('user_id', userId);
+
+        if (error) throw error;
     }
 
     private formatDate(date: Date): string {

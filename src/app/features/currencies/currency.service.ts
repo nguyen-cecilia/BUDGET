@@ -1,9 +1,6 @@
 import {inject, Injectable, signal} from '@angular/core';
-import {SupabaseService} from '../../core/supabase.service';
+import {CURRENCIES_TABLE, SupabaseService, USERS_CURRENCIES_TABLE} from '../../core/supabase.service';
 import {Currency, UserCurrencies} from './currency.model';
-
-const CURRENCIES_TABLE = 'currencies';
-const USERS_CURRENCIES_TABLE = 'users_currencies';
 
 @Injectable({
     providedIn: 'root',

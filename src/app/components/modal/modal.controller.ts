@@ -14,6 +14,11 @@ export class ModalController<T> {
         this.isOpen.set(true);
     }
 
+    open(data?: T): void {
+        this.editing.set(data ?? null);
+        this.isOpen.set(true);
+    }
+
     close(): void {
         this.editing.set(null);
         this.isOpen.set(false);
