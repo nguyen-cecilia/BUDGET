@@ -189,11 +189,35 @@
         </label>
     }
 
+    @if (!modalService.transaction.editing()) {
+        <div class="flex items-center justify-between gap-3 text-sm">
+            <label class="flex items-center gap-2 cursor-pointer" [class.hidden]="mode() === 'subscription'">
+                <input
+                    type="checkbox"
+                    class="switch"
+                    [checked]="bulkMode()"
+                    (change)="bulkMode.set(!bulkMode())"
+                    [disabled]="mode() === 'subscription'"
+                >
+                Ajouter plusieurs
+            </label>
+            @if (bulkMode() && addedCount() > 0) {
+                <p class="text-gray">
+                    {{ addedCount() }} transaction{{ addedCount() > 1 ? 's' : '' }} ajoutée{{ addedCount() > 1 ? 's' : '' }}
+                </p>
+            }
+        </div>
+    }
+
     <div class="flex items-center justify-between">
         @if (modalService.transaction.editing()) {
             <button app-button variant="invalid" (click)="deleteTransaction()">
                 <svg lucideTrash2 [size]="16"></svg>
                 Supprimer
+            </button>
+        } @else if (bulkMode()) {
+            <button app-button variant="outline" (click)="modalService.transaction.close()">
+                Fermer
             </button>
         }
 
@@ -203,7 +227,7 @@
                 Envoi...
             } @else {
                 <svg lucideSave [size]="16"></svg>
-                Sauvegarder
+                {{ bulkMode() ? 'Ajouter' : 'Sauvegarder' }}
             }
         </button>
     </div>

@@ -58,7 +58,7 @@ Transactions:
 - [x] Search bar with filters by category and tag
 - [x] List of transactions grouped by day, one page per month
 - [x] CRUD modal: add, edit, delete
-- [ ] Add multiple transactions at once
+- [x] Add multiple transactions at once
 
 Transaction CRUD modal:
 

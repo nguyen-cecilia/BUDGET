@@ -55,6 +55,8 @@ export class TransactionUpdateComponent {
     tagsOptions = signal<SelectOption[]>([]);
     selectedTags = signal<SelectOption[]>([]);
     newTags = signal<string[]>([]);
+    bulkMode = signal(false);
+    addedCount = signal(0);
 
     constructor() {
         const now = new Date();
@@ -102,6 +104,17 @@ export class TransactionUpdateComponent {
                     this.resetForm();
                 }
             });
+        });
+
+        effect(() => {
+            this.modalService.transaction.isOpen();
+            this.modalService.transaction.bulk();
+            this.bulkMode.set(
+                this.modalService.transaction.isOpen() && this.modalService.transaction.bulk()
+            );
+            if (!this.modalService.transaction.isOpen()) {
+                this.addedCount.set(0);
+            }
         });
     }
 
@@ -154,6 +167,7 @@ export class TransactionUpdateComponent {
     setMode(mode: 'transaction' | 'subscription'): void {
         this.mode.set(mode);
         if (mode === 'subscription') {
+            this.bulkMode.set(false);
             this.transactionForm.get('type')?.setValue('expense');
             if (this.transactionForm.get('selectedSubscriptionId')?.value) {
                 this.onSubscriptionChange();
@@ -234,9 +248,24 @@ export class TransactionUpdateComponent {
                 await this.transactionService.updateTransaction(editing.id, userId, payload);
                 await this.transactionService.removeTagsFromTransaction(editing.id);
                 await this.handleTags(userId, editing.id);
+                this.modalService.transaction.close();
             } else {
                 const transaction = await this.transactionService.createTransaction(userId, payload);
                 await this.handleTags(userId, transaction.id);
+
+                if (this.bulkMode()) {
+                    const kept = {
+                        type: this.transactionForm.get('type')?.value,
+                        amountCurrency: this.transactionForm.get('amountCurrency')?.value,
+                        account: this.transactionForm.get('account')?.value,
+                        category: this.transactionForm.get('category')?.value,
+                    };
+                    this.addedCount.update(c => c + 1);
+                    this.resetForm();
+                    this.transactionForm.patchValue(kept);
+                } else {
+                    this.modalService.transaction.close();
+                }
             }
 
             this.transactionService.transactionRefreshTrigger.set(
@@ -244,8 +273,6 @@ export class TransactionUpdateComponent {
             );
 
             this.resetForm();
-
-            this.modalService.transaction.close();
         } catch (error) {
             console.error('Erreur lors de la création de la transaction:', error);
             this.errorMessage.set('Erreur lors de la création de la transaction');

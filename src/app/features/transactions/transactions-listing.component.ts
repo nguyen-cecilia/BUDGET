@@ -1,5 +1,5 @@
 import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
-import {LucideFrown, LucideSearch, LucideX} from '@lucide/angular';
+import {LucideFrown, LucidePlus, LucideSearch, LucideX} from '@lucide/angular';
 import {BadgeComponent} from '../../components/badge/badge.component';
 import {TransactionsByMonth} from './transaction.model';
 import {TransactionService} from './transaction.service';
@@ -11,6 +11,7 @@ import {TransactionOptionsService} from './transaction-options.service';
 import {ButtonComponent} from '../../components/button/button.component';
 import {TransactionItemComponent} from './transaction-item.component';
 import {CurrencyService} from '../currencies/currency.service';
+import {ModalService} from '../../components/modal/modal.service';
 
 @Component({
     selector: 'app-transactions',
@@ -23,7 +24,8 @@ import {CurrencyService} from '../currencies/currency.service';
         LucideFrown,
         LucideX,
         ButtonComponent,
-        TransactionItemComponent
+        TransactionItemComponent,
+        LucidePlus
     ],
     templateUrl: './transactions-listing.component.html',
 })
@@ -32,6 +34,7 @@ export class TransactionsListingComponent implements OnInit {
     private transactionService = inject(TransactionService);
     private currencyService = inject(CurrencyService);
     private optionsService = inject(TransactionOptionsService);
+    protected modalService = inject(ModalService);
     protected monthService = inject(MonthService);
     protected defaultCurrency = this.currencyService.defaultCurrency;
 
