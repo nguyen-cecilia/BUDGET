@@ -21,7 +21,7 @@ import {DonutChartComponent} from '../../components/chart/donut-chart.component'
 import {AuthStateService} from '../auth/auth-state.service';
 import {TransactionService} from '../transactions/transaction.service';
 import {SubscriptionService} from '../subscriptions/subscription.service';
-import {MonthService} from '../month/month.service';
+import {PeriodService} from '../../core/period.service';
 import {Transaction, TransactionsByMonth} from '../transactions/transaction.model';
 import {Subscription} from '../subscriptions/subscription.model';
 import {CurrencyPipe, DatePipe, DecimalPipe} from '@angular/common';
@@ -31,6 +31,9 @@ import {CurrencyService} from '../currencies/currency.service';
 import {SavingsGoalService} from '../saving-goals/savings-goal.service';
 import {SavingsGoal} from '../saving-goals/savings-goal.model';
 import {CategoryType} from '../categories/category.model';
+import {DateService} from '../../core/date.service';
+
+const RECENT_TRANSACTIONS_NUMBER = 6;
 
 @Component({
     selector: 'app-dashboard',
@@ -64,8 +67,9 @@ export class DashboardComponent {
     private transactionService = inject(TransactionService);
     private subscriptionService = inject(SubscriptionService);
     private goalService = inject(SavingsGoalService);
+    private dateService = inject(DateService);
     protected currencyService = inject(CurrencyService);
-    protected monthService = inject(MonthService);
+    protected periodService = inject(PeriodService);
     protected colorService = inject(ColorService);
 
     isLoading = signal(false);
@@ -79,7 +83,7 @@ export class DashboardComponent {
         this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions)
             .filter(t => t.type === 'expense')
-            .filter(t => this.isPastOrToday(t.date))
+            .filter(t => this.dateService.isPastOrToday(t.date))
             .filter(t => this.currencyService.canConvert(t.currency.code))
             .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0) ?? 0
     );
@@ -88,7 +92,7 @@ export class DashboardComponent {
         this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions)
             .filter(t => t.type === 'income')
-            .filter(t => this.isPastOrToday(t.date))
+            .filter(t => this.dateService.isPastOrToday(t.date))
             .filter(t => this.currencyService.canConvert(t.currency.code))
             .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0) ?? 0
     );
@@ -103,8 +107,8 @@ export class DashboardComponent {
         this.subscriptions()
             .filter(s => this.currencyService.canConvert(s.currency.code))
             .reduce(
-                (sum, s) =>
-                    sum + this.currencyService.convertToDefault(this.monthlyEquivalent(s), s.currency.code),
+                (sum, sub) =>
+                    sum + this.currencyService.convertToDefault(this.subscriptionService.monthlyEquivalent(sub), sub.currency.code),
                 0
             )
     );
@@ -113,7 +117,7 @@ export class DashboardComponent {
         (this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions) ?? [])
             .filter(t => t.type === 'expense')
-            .filter(t => this.isFuture(t.date))
+            .filter(t => this.dateService.isFuture(t.date))
             .filter(t => this.currencyService.canConvert(t.currency.code))
             .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0)
     );
@@ -124,35 +128,36 @@ export class DashboardComponent {
             : 0
     );
 
+    // TODO: En faire une requête ?
     recentTransactions = computed(() =>
         (this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions) ?? [])
-            .filter(t => this.isPastOrToday(t.date))
-            .slice(0, 6)
+            .filter(t => this.dateService.isPastOrToday(t.date))
+            .slice(0, RECENT_TRANSACTIONS_NUMBER)
     );
 
-    subscriptionStatus = computed(() => {
-        const subs = this.subscriptions();
+    subscriptionsStatus = computed(() => {
+        const subscriptions = this.subscriptions();
         const transactions = this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions) ?? [];
 
-        return subs
-            .map(sub => {
-                const linked = transactions.filter(t => t.subscription_id === sub.id);
+        return subscriptions
+            .map(s => {
+                const linked = transactions.filter(t => t.subscription_id === s.id);
                 const paidThisMonth = linked.length > 0;
-                const lastTx = paidThisMonth ? linked[0] : undefined;
-                const isPast = lastTx ? this.isPastOrToday(lastTx.date) : false;
+                const lastTransaction = paidThisMonth ? linked[0] : null;
+                const isPast = lastTransaction ? this.dateService.isPastOrToday(lastTransaction.date) : false;
 
                 return {
-                    ...sub,
-                    last_payment_date: lastTx?.date,
+                    ...s,
+                    last_payment_date: lastTransaction?.date,
                     checked: isPast && paidThisMonth,
                 };
             })
             .sort((a, b) => Number(a.checked) - Number(b.checked));
     });
 
-    upcomingDebits = computed(() => {
+    upcomingPayments = computed(() => {
         const days = new Map<string, {
             date: Date;
             items: { label: string; amount: number; isSubscription: boolean }[]
@@ -161,7 +166,7 @@ export class DashboardComponent {
         for (let i = 0; i < 7; i++) {
             const date = new Date();
             date.setDate(date.getDate() + i);
-            days.set(this.formatDayKey(date), {date, items: []});
+            days.set(this.dateService.formatDateToString(date), {date, items: []});
         }
 
         for (const t of this.upcomingTransactions()) {
@@ -175,7 +180,7 @@ export class DashboardComponent {
             });
         }
 
-        const todayKey = this.formatDayKey(new Date());
+        const todayKey = this.dateService.formatDateToString(new Date());
 
         for (const sub of this.subscriptions()) {
             if (!sub.is_active) continue;
@@ -197,14 +202,14 @@ export class DashboardComponent {
         }
 
         return Array.from(days.values()).map(({date, items}) => ({
-            key: this.formatDayKey(date),
-            dayLabel: this.formatDayLabel(date),
+            dateString: this.dateService.formatDateToString(date),
+            dayLabel: this.dateService.formatWeekdayLabel(date),
             dayNumber: date.getDate(),
             items,
         }));
     });
 
-    budgetData = computed(() => {
+    budget = computed(() => {
         const transactions = this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions) ?? [];
 
@@ -213,7 +218,7 @@ export class DashboardComponent {
             .filter(t => this.currencyService.canConvert(t.currency.code))
             .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0);
 
-        const expenseByType = (type: CategoryType) =>
+        const expensesByType = (type: CategoryType) =>
             transactions
                 .filter(t => t.type === 'expense')
                 .filter(t => t.category?.type === type)
@@ -230,8 +235,8 @@ export class DashboardComponent {
             return Array.from(labels).sort((a, b) => a.localeCompare(b, 'fr'));
         };
 
-        const needs = expenseByType('need');
-        const wants = expenseByType('want');
+        const needs = expensesByType('need');
+        const wants = expensesByType('want');
         const savings = income - needs - wants;
 
         const buckets = [
@@ -280,9 +285,9 @@ export class DashboardComponent {
         return {
             categories,
             grandTotal,
-            pieLabels: categories.map(c => c.label),
-            pieData: categories.map(c => c.total),
-            pieColors: categories.map(c => this.colorService.getHex(c.color))
+            donutLabels: categories.map(c => c.label),
+            donutData: categories.map(c => c.total),
+            donutColors: categories.map(c => this.colorService.getHex(c.color))
         };
     });
 
@@ -317,18 +322,18 @@ export class DashboardComponent {
         effect(() => {
             this.transactionService.transactionRefreshTrigger();
             this.currencyService.currencyRefreshTrigger();
-            this.monthService.selectedMonth();
-            this.monthService.selectedYear();
+            this.periodService.selectedMonth();
+            this.periodService.selectedYear();
             const userId = this.authState.getCurrentUser()?.id;
-            if (userId) this.loadData(userId);
+            if (userId) this.loadDashboard(userId);
         });
     }
 
-    private async loadData(userId: string) {
+    private async loadDashboard(userId: string) {
         this.isLoading.set(true);
 
-        const monthIndex = this.monthService.getMonth();
-        const year = this.monthService.getYear();
+        const monthIndex = this.periodService.getMonth();
+        const year = this.periodService.getYear();
 
         const [transactions, subs, upcoming, goals] = await Promise.all([
             this.transactionService.getTransactionsByMonth(userId, monthIndex, year),
@@ -344,49 +349,5 @@ export class DashboardComponent {
         await this.currencyService.loadDefaultCurrency(userId);
 
         this.isLoading.set(false);
-    }
-
-    private monthlyEquivalent(sub: Subscription): number {
-        switch (sub.frequency) {
-            case 'daily':
-                return sub.amount * (365 / 12);
-            case 'weekly':
-                return sub.amount * (52 / 12);
-            case 'monthly':
-                return sub.amount;
-            case 'yearly':
-                return sub.amount / 12;
-            default:
-                return sub.amount;
-        }
-    }
-
-    private formatDayKey(date: Date): string {
-        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    }
-
-    private formatDayLabel(date: Date): string {
-        const label = new Intl.DateTimeFormat('fr-FR', {weekday: 'short'}).format(date);
-        return label.charAt(0).toUpperCase() + label.slice(1);
-    }
-
-    private isPastOrToday(dateStr: string): boolean {
-        const date = new Date(dateStr);
-        date.setHours(0, 0, 0, 0);
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        return date <= today;
-    }
-
-    private isFuture(dateStr: string): boolean {
-        const date = new Date(dateStr);
-        date.setHours(0, 0, 0, 0);
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        return date > today;
     }
 }

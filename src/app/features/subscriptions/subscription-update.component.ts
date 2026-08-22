@@ -56,7 +56,7 @@ export class SubscriptionUpdate {
         });
 
         this.subscriptionForm.get('frequency')?.valueChanges.subscribe(freq => {
-            this.subscriptionForm.patchValue({nextPaymentDate: this.subscriptionService.computeNextDate(freq)});
+            this.subscriptionForm.patchValue({nextPaymentDate: this.subscriptionService.computeNextDateFrom('today', freq)});
         });
 
         effect(() => {
@@ -204,7 +204,7 @@ export class SubscriptionUpdate {
             accountId: this.accountsOptions().length > 0 ? String(this.accountsOptions()[0].value) : '',
             categoryId: this.categoriesOptions().length > 0 ? String(this.categoriesOptions()[0].value) : '',
             frequency: 'monthly',
-            nextPaymentDate: this.subscriptionService.computeNextDate('monthly'),
+            nextPaymentDate: this.subscriptionService.computeNextDateFrom('today', 'monthly'),
         });
     }
 }

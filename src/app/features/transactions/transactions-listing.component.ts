@@ -6,7 +6,7 @@ import {TransactionService} from './transaction.service';
 import {CurrencyPipe, DatePipe} from '@angular/common';
 import {SelectComponent, SelectOption} from '../../components/select/select.component';
 import {AuthStateService} from '../auth/auth-state.service';
-import {MonthService} from '../month/month.service';
+import {PeriodService} from '../../core/period.service';
 import {TransactionOptionsService} from './transaction-options.service';
 import {ButtonComponent} from '../../components/button/button.component';
 import {TransactionItemComponent} from './transaction-item.component';
@@ -35,7 +35,7 @@ export class TransactionsListingComponent implements OnInit {
     private currencyService = inject(CurrencyService);
     private optionsService = inject(TransactionOptionsService);
     protected modalService = inject(ModalService);
-    protected monthService = inject(MonthService);
+    protected periodService = inject(PeriodService);
     protected defaultCurrency = this.currencyService.defaultCurrency;
 
     isLoading = signal(false);
@@ -161,8 +161,8 @@ export class TransactionsListingComponent implements OnInit {
     }
 
     private getTransactions(userId: string) {
-        const monthIndex = this.monthService.getMonth();
-        const year = this.monthService.getYear();
+        const monthIndex = this.periodService.getMonth();
+        const year = this.periodService.getYear();
 
         this.transactionService.getTransactionsByMonth(userId, monthIndex, year).then(
             (data) => {

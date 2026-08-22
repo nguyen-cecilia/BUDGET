@@ -15,7 +15,7 @@ import {TransactionUpdateComponent} from './features/transactions/transaction-up
 import {ModalService} from './components/modal/modal.service';
 import {AuthStateService} from './features/auth/auth-state.service';
 import {SelectComponent} from './components/select/select.component';
-import {MonthService} from './features/month/month.service';
+import {PeriodService} from './core/period.service';
 
 @Component({
     selector: 'app-root',
@@ -26,10 +26,10 @@ export class App {
     protected readonly title = signal('budget');
     protected readonly authState = inject(AuthStateService);
     protected modalService = inject(ModalService);
-    protected monthService = inject(MonthService);
+    protected periodService = inject(PeriodService);
 
-    selectedMonth = this.monthService.selectedMonth;
-    monthOptions = this.monthService.monthOptions;
+    selectedMonth = this.periodService.selectedMonth;
+    monthOptions = this.periodService.monthOptions;
 
     links = [
         {icon: 'lucideHome', path: '', label: 'Tableau de bord', shortLabel: 'Accueil'},

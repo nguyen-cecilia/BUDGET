@@ -2,6 +2,8 @@ import {inject, Injectable, signal} from '@angular/core';
 import {CURRENCIES_TABLE, SupabaseService, USERS_CURRENCIES_TABLE} from '../../core/supabase.service';
 import {Currency, UserCurrencies} from './currency.model';
 
+const DEFAULT_CURRENCY = 'EUR';
+
 @Injectable({
     providedIn: 'root',
 })
@@ -11,7 +13,7 @@ export class CurrencyService {
 
     currencyRefreshTrigger = signal(false);
 
-    defaultCurrency = signal<string>('EUR');
+    defaultCurrency = signal<string>(DEFAULT_CURRENCY);
     private baseCode = signal<string>('');
     private rates = signal<Record<string, number> | null>(null);
 
@@ -40,7 +42,7 @@ export class CurrencyService {
             .order('is_default', {ascending: false});
 
         if (error) {
-            console.error('Erreur lors de la récupération des devises:', error);
+            console.error('Erreur lors de la récupération des devises utilisateurs:', error);
             throw error;
         }
 
@@ -164,6 +166,6 @@ export class CurrencyService {
     async loadDefaultCurrency(userId: string): Promise<void> {
         const currencies = await this.getUserCurrencies(userId);
         const def = currencies.find(c => c.is_default) ?? currencies[0];
-        await this.refreshRates(def?.code ?? 'EUR');
+        await this.refreshRates(def?.code ?? DEFAULT_CURRENCY);
     }
 }

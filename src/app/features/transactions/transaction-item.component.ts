@@ -5,6 +5,7 @@ import {Transaction} from './transaction.model';
 import {ColorService} from '../../core/color.service';
 import {ModalService} from '../../components/modal/modal.service';
 import {CurrencyService} from '../currencies/currency.service';
+import {DateService} from '../../core/date.service';
 
 @Component({
     selector: 'app-transaction-item',
@@ -18,7 +19,7 @@ import {CurrencyService} from '../currencies/currency.service';
     template: `
         <div
             class="flex items-center justify-between gap-4 rounded px-2 py-4 cursor-pointer transition-all hover:bg-beige-light"
-            [class.opacity-60]="isFuture"
+            [class.opacity-60]="dateService.isFuture(transaction.date)"
             (click)="modalService.transaction.openEdit(transaction)"
             (keydown.enter)="modalService.transaction.openEdit(transaction)"
             (keydown.space)="modalService.transaction.openEdit(transaction)"
@@ -74,14 +75,5 @@ export class TransactionItemComponent {
     protected colorService = inject(ColorService);
     protected modalService = inject(ModalService);
     protected currencyService = inject(CurrencyService);
-
-    get isFuture(): boolean {
-        const transactionDate = new Date(this.transaction.date);
-        transactionDate.setHours(0, 0, 0, 0);
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        return transactionDate > today;
-    }
+    protected dateService = inject(DateService);
 }

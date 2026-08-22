@@ -104,8 +104,7 @@ export class CurrencyUpdateComponent {
                 await this.currencyService.updateUserCurrency(editing.currency_id, userId, fv.isDefault);
             } else {
                 // Ajout de la devise
-                const isDefault = fv.isDefault || this.userCurrencies().length === 0;
-                await this.currencyService.createUserCurrency(userId, fv.currencyId, isDefault);
+                await this.currencyService.createUserCurrency(userId, fv.currencyId, fv.isDefault || this.userCurrencies().length === 0);
             }
 
             this.currencyService.currencyRefreshTrigger.set(

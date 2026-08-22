@@ -70,18 +70,18 @@ export class TagUpdateComponent {
             const editing = this.editingTag();
             const fv = this.tagForm.value;
 
+            const payload = {
+                label: fv.label || '',
+            }
+
             if (editing) {
                 // Modification du tag
-                await this.tagService.updateTag(editing.id, userId, {
-                    label: fv.label || '',
-                });
+                await this.tagService.updateTag(editing.id, userId, payload);
 
                 this.modalService.tag.close();
             } else {
                 // Création du tag
-                await this.tagService.createTag(userId, {
-                    label: fv.label || '',
-                });
+                await this.tagService.createTag(userId, payload);
             }
 
             this.tagService.tagRefreshTrigger.set(

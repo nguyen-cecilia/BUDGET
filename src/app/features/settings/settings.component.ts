@@ -14,7 +14,7 @@ import {
 import {ButtonComponent} from '../../components/button/button.component';
 import {BadgeComponent} from '../../components/badge/badge.component';
 import {SelectComponent} from '../../components/select/select.component';
-import {MonthService} from '../month/month.service';
+import {PeriodService} from '../../core/period.service';
 import {ModalComponent} from '../../components/modal/modal.component';
 import {AccountUpdateComponent} from '../accounts/account-update.component';
 import {ModalService} from '../../components/modal/modal.service';
@@ -77,11 +77,11 @@ export class SettingsComponent implements OnInit {
     protected subscriptionService = inject(SubscriptionService);
     protected currencyService = inject(CurrencyService);
     protected modalService = inject(ModalService);
-    protected monthService = inject(MonthService);
+    protected periodService = inject(PeriodService);
     protected colorService = inject(ColorService);
 
-    selectedMonth = this.monthService.selectedMonth;
-    monthOptions = this.monthService.monthOptions;
+    selectedMonth = this.periodService.selectedMonth;
+    monthOptions = this.periodService.monthOptions;
 
     isLoading = signal(false);
     isDeleting = signal(false);

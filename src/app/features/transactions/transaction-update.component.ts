@@ -73,12 +73,12 @@ export class TransactionUpdateComponent {
             account: ['', [Validators.required]],
             category: [''],
             subscriptionFrequency: ['monthly'],
-            subscriptionNextDate: [this.subscriptionService.computeNextDate('monthly')],
+            subscriptionNextDate: [this.subscriptionService.computeNextDateFrom('today','monthly')],
             selectedSubscriptionId: [''],
         });
 
         this.transactionForm.get('subscriptionFrequency')?.valueChanges.subscribe(freq => {
-            this.transactionForm.patchValue({subscriptionNextDate: this.subscriptionService.computeNextDate(freq)});
+            this.transactionForm.patchValue({subscriptionNextDate: this.subscriptionService.computeNextDateFrom('today', freq)});
         });
 
         effect(() => {
@@ -398,7 +398,7 @@ export class TransactionUpdateComponent {
             account: accounts.length > 0 ? accounts[0].value : '',
             category: categories.length > 0 ? categories[0].value : '',
             subscriptionFrequency: 'monthly',
-            subscriptionNextDate: this.subscriptionService.computeNextDate('monthly'),
+            subscriptionNextDate: this.subscriptionService.computeNextDateFrom('today', 'monthly'),
             selectedSubscriptionId: '',
         });
 

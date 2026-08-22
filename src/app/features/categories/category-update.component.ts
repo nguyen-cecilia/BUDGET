@@ -39,7 +39,7 @@ export class CategoryUpdateComponent {
     errorMessage = signal<string | null>(null);
     isSubmitting = signal(false);
     selectedColor = signal<string>('gray');
-    showDelete = signal(false);
+    confirmDelete = signal(false);
     isDeleting = signal(false);
     reassignTo = signal<string | number>('');
     reassignOptions = signal<SelectOption[]>([]);
@@ -64,7 +64,7 @@ export class CategoryUpdateComponent {
                 this.loadReassignOptions(editing);
             } else {
                 this.resetForm();
-                this.showDelete.set(false);
+                this.confirmDelete.set(false);
             }
         });
     }
@@ -73,14 +73,6 @@ export class CategoryUpdateComponent {
 
     selectColor(color: string): void {
         this.categoryForm.get('color')?.setValue(color);
-    }
-
-    startDelete(): void {
-        this.showDelete.set(true);
-    }
-
-    cancelDelete(): void {
-        this.showDelete.set(false);
     }
 
     async submitCategory() {
@@ -130,7 +122,7 @@ export class CategoryUpdateComponent {
         }
     }
 
-    async confirmDelete(): Promise<void> {
+    async deleteCategory(): Promise<void> {
         const editing = this.editingCategory();
         if (!editing) return;
 

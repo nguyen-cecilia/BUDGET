@@ -1,12 +1,14 @@
 import {inject, Injectable, signal} from '@angular/core';
 import {SUBSCRIPTIONS_TABLE, SupabaseService, TRANSACTIONS_TABLE} from '../../core/supabase.service';
 import {Subscription} from './subscription.model';
+import {DateService} from '../../core/date.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class SubscriptionService {
     private supabaseService = inject(SupabaseService);
+    private dateService = inject(DateService);
     private supabase = this.supabaseService.getClient();
 
     subscriptionRefreshTrigger = signal<boolean>(false);
@@ -131,17 +133,44 @@ export class SubscriptionService {
         if (error) throw error;
     }
 
-    computeNextDate(frequency: string): string {
-        return this.computeNextDateFrom(this.formatDate(new Date()), frequency);
+    getSubscriptionLabel(frequency: string): string | null {
+        switch (frequency) {
+            case 'daily':
+                return 'Journalier';
+            case 'weekly':
+                return 'Hebdomadaire';
+            case 'monthly': {
+                return 'Mensuel';
+            }
+            case 'yearly':
+                return 'Annuel';
+            default:
+                return null;
+        }
+    }
+
+    monthlyEquivalent(subscription: Subscription): number {
+        switch (subscription.frequency) {
+            case 'daily':
+                return subscription.amount * (365 / 12);
+            case 'weekly':
+                return subscription.amount * (52 / 12);
+            case 'monthly':
+                return subscription.amount;
+            case 'yearly':
+                return subscription.amount / 12;
+            default:
+                return subscription.amount;
+        }
     }
 
     computeNextDateFrom(date: string, frequency: string): string {
+        if (date === 'today') {
+            date = this.dateService.formatDateToString(new Date());
+        }
         const dayPart = date.slice(0, 10);
         const base = new Date(dayPart + 'T00:00:00');
-        return this.computeNextDateFromDate(base, frequency);
-    }
 
-    private computeNextDateFromDate(base: Date, frequency: string): string {
         let next: Date;
 
         switch (frequency) {
@@ -164,29 +193,6 @@ export class SubscriptionService {
                 next = new Date(base.getFullYear(), base.getMonth() + 1, base.getDate());
         }
 
-        return this.formatDate(next);
-    }
-
-    private formatDate(date: Date): string {
-        const y = date.getFullYear();
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        const d = String(date.getDate()).padStart(2, '0');
-        return `${y}-${m}-${d}`;
-    }
-
-    getSubscriptionLabel(frequency: string): string | null {
-        switch (frequency) {
-            case 'daily':
-                return 'Journalier';
-            case 'weekly':
-                return 'Hebdomadaire';
-            case 'monthly': {
-                return 'Mensuel';
-            }
-            case 'yearly':
-                return 'Annuel';
-            default:
-                return null;
-        }
+        return this.dateService.formatDateToString(next);
     }
 }

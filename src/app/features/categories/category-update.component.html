@@ -39,12 +39,12 @@
 
     @if (editingCategory()) {
         <div class="mt-6 flex items-center justify-between gap-3">
-            <button app-button variant="invalid" (click)="startDelete()">
+            <button app-button variant="invalid" (click)="confirmDelete.set(true)" [disabled]="confirmDelete()">
                 <svg lucideTrash2 [size]="16"></svg>
                 Supprimer
             </button>
 
-            <button app-button (click)="submitCategory()" [disabled]="isSubmitting() || showDelete()">
+            <button app-button (click)="submitCategory()" [disabled]="isSubmitting() || confirmDelete()">
                 @if (isSubmitting()) {
                     <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
                     Envoi...
@@ -55,8 +55,8 @@
             </button>
         </div>
 
-        @if (showDelete()) {
-            <div class="space-y-3 rounded border border-red/40 bg-red/6 p-5">
+        @if (confirmDelete()) {
+            <div class="mt-6 space-y-3 rounded border border-red/40 bg-red/6 p-5">
                 <p class="font-semibold text-red">
                     Supprimer « {{ editingCategory()?.label }} » ?
                 </p>
@@ -75,14 +75,14 @@
                 </div>
 
                 <div class="flex items-center justify-between gap-3">
-                    <button app-button variant="outline" type="button" (click)="cancelDelete()">
+                    <button app-button variant="outline" type="button" (click)="confirmDelete.set(false)">
                         Annuler
                     </button>
                     <button
                         app-button
                         variant="invalid"
                         type="button"
-                        (click)="confirmDelete()"
+                        (click)="deleteCategory()"
                         [disabled]="isDeleting()"
                     >
                         @if (isDeleting()) {

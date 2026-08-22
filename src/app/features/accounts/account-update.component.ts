@@ -87,20 +87,18 @@ export class AccountUpdateComponent {
             const editing = this.modalService.account.editing();
             const fv = this.accountForm.getRawValue();
 
+            const payload = {
+                label: fv.label || '',
+                is_default: fv.isDefault,
+                is_active: fv.isActive,
+            }
+
             if (editing) {
                 // Modification du compte
-                await this.accountService.updateAccount(editing.id, userId, {
-                    label: fv.label || '',
-                    is_default: fv.isDefault,
-                    is_active: fv.isActive,
-                });
+                await this.accountService.updateAccount(editing.id, userId, payload);
             } else {
                 // Création du compte
-                await this.accountService.createAccount(userId, {
-                    label: fv.label || '',
-                    is_default: fv.isDefault,
-                    is_active: fv.isActive,
-                });
+                await this.accountService.createAccount(userId, payload);
             }
 
             this.accountService.accountRefreshTrigger.set(

@@ -1,12 +1,14 @@
 import {inject, Injectable, signal} from '@angular/core';
 import {SupabaseService, TRANSACTION_TAGS_TABLE, TRANSACTIONS_TABLE} from '../../core/supabase.service';
 import {Transaction, TransactionsByDay, TransactionsByMonth, TransactionType} from './transaction.model';
+import {DateService} from '../../core/date.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class TransactionService {
     private supabaseService = inject(SupabaseService);
+    private dateService = inject(DateService);
     private supabase = this.supabaseService.getClient();
 
     transactionRefreshTrigger = signal<boolean>(false);
@@ -15,8 +17,8 @@ export class TransactionService {
         const firstDay = new Date(year, monthIndex, 1);
         const lastDay = new Date(year, monthIndex + 1, 0);
 
-        const startDate = this.formatDate(firstDay);
-        const endDate = this.formatDate(lastDay);
+        const startDate = this.dateService.formatDateToString(firstDay);
+        const endDate = this.dateService.formatDateToString(lastDay);
 
         const {data, error} = await this.supabase
             .from(TRANSACTIONS_TABLE)
@@ -190,7 +192,7 @@ export class TransactionService {
     }
 
     async getUpcomingTransactions(userId: string): Promise<Transaction[]> {
-        const today = this.formatDate(new Date());
+        const today = this.dateService.formatDateToString(new Date());
 
         const {data, error} = await this.supabase
             .from(TRANSACTIONS_TABLE)
@@ -235,13 +237,6 @@ export class TransactionService {
             .eq('user_id', userId);
 
         if (error) throw error;
-    }
-
-    private formatDate(date: Date): string {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
     }
 
     private groupByDay(transactions: Transaction[]): TransactionsByDay[] {

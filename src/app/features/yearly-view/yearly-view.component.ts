@@ -8,15 +8,7 @@ import {ColorService} from '../../core/color.service';
 import {AuthStateService} from '../auth/auth-state.service';
 import {CurrencyPipe} from '@angular/common';
 import {BarChartComponent} from '../../components/chart/bar-chart.component';
-
-const MONTH_LABELS = [
-    'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
-];
-const MONTH_SHORT = [
-    'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin',
-    'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'
-];
+import {DateService} from '../../core/date.service';
 
 @Component({
     selector: 'app-yearly-view',
@@ -51,7 +43,7 @@ export class YearlyViewComponent {
             this.currencyService.currencyRefreshTrigger();
             const year = this.selectedYear();
             const userId = this.authState.getCurrentUser()?.id;
-            if (userId) this.loadData(userId, year);
+            if (userId) this.loadYearlyView(userId, year);
         });
     }
 
@@ -60,7 +52,7 @@ export class YearlyViewComponent {
     }
 
     monthlyData = computed(() => {
-        const months = MONTH_LABELS.map((label, index) => ({
+        const months = DateService.MONTHS.map((label, index) => ({
             index,
             label,
             income: 0,
@@ -96,9 +88,9 @@ export class YearlyViewComponent {
 
     monthlyAverage = computed(() => this.annualNet() / 12);
 
-    barLabels = computed(() => MONTH_SHORT);
+    barLabels = computed(() => DateService.MONTHS_SHORT);
 
-    barMonthLabels = computed(() => MONTH_LABELS);
+    barMonthLabels = computed(() => DateService.MONTHS);
 
     barDatasets = computed(() => [
         {
@@ -130,7 +122,7 @@ export class YearlyViewComponent {
         return {best: bestIndex, worst: worstIndex};
     });
 
-    private async loadData(userId: string, year: number) {
+    private async loadYearlyView(userId: string, year: number) {
         this.isLoading.set(true);
         try {
             const [transactions, firstYear] = await Promise.all([
