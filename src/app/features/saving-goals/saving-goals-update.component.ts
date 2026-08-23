@@ -38,6 +38,8 @@ export class SavingGoalsUpdateComponent {
     errorMessage = signal<string | null>(null);
     isSubmitting = signal(false);
     currenciesOptions = signal<SelectOption[]>([]);
+    confirmDelete = signal(false);
+    isDeleting = signal(false);
 
     constructor() {
         this.goalForm = this.fb.group({
@@ -63,6 +65,7 @@ export class SavingGoalsUpdateComponent {
                 this.fillForm(editing);
             } else {
                 this.resetForm();
+                this.confirmDelete.set(false);
             }
         });
     }
@@ -120,10 +123,7 @@ export class SavingGoalsUpdateComponent {
         const editing = this.modalService.goal.editing();
         if (!editing) return;
 
-        const confirmed = confirm('Supprimer cet objectif d\'épargne ?');
-        if (!confirmed) return;
-
-        this.isSubmitting.set(true);
+        this.isDeleting.set(true);
 
         try {
             await this.goalService.deleteSavingsGoal(editing.id, editing.user_id);
@@ -137,7 +137,7 @@ export class SavingGoalsUpdateComponent {
             console.error('Erreur lors de la suppression:', error);
             this.errorMessage.set(deletionError());
         } finally {
-            this.isSubmitting.set(false);
+            this.isDeleting.set(false);
         }
     }
 

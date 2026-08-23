@@ -62,6 +62,8 @@ export class TransactionUpdateComponent {
     newTags = signal<string[]>([]);
     bulkMode = signal(false);
     addedCount = signal(0);
+    confirmDelete = signal(false);
+    isDeleting = signal(false);
 
     constructor() {
         const now = new Date();
@@ -109,6 +111,7 @@ export class TransactionUpdateComponent {
                     this.fillForm(editing);
                 } else {
                     this.resetForm();
+                    this.confirmDelete.set(false);
                 }
             });
         });
@@ -296,10 +299,7 @@ export class TransactionUpdateComponent {
         const editing = this.modalService.transaction.editing();
         if (!editing) return;
 
-        const confirmed = confirm('Supprimer cette transaction ?');
-        if (!confirmed) return;
-
-        this.isSubmitting.set(true);
+        this.isDeleting.set(true);
 
         try {
             await this.transactionService.deleteTransaction(editing.id, editing.user_id);
@@ -313,7 +313,7 @@ export class TransactionUpdateComponent {
             console.error('Erreur lors de la suppression:', error);
             this.errorMessage.set(deletionError());
         } finally {
-            this.isSubmitting.set(false);
+            this.isDeleting.set(false);
         }
     }
 

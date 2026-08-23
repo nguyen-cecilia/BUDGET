@@ -47,6 +47,8 @@ export class SubscriptionUpdate {
     currenciesOptions = signal<SelectOption[]>([]);
     accountsOptions = signal<SelectOption[]>([]);
     categoriesOptions = signal<SelectOption[]>([]);
+    confirmDelete = signal(false);
+    isDeleting = signal(false);
 
     constructor() {
         this.subscriptionForm = this.fb.group({
@@ -70,6 +72,7 @@ export class SubscriptionUpdate {
                 this.fillForm(editing);
             } else {
                 this.resetForm();
+                this.confirmDelete.set(false);
             }
         });
 
@@ -140,10 +143,7 @@ export class SubscriptionUpdate {
         const editing = this.modalService.subscription.editing();
         if (!editing) return;
 
-        const confirmed = confirm('Supprimer cet abonnement ?');
-        if (!confirmed) return;
-
-        this.isSubmitting.set(true);
+        this.isDeleting.set(true);
 
         try {
             await this.subscriptionService.deleteSubscription(editing.id, editing.user_id);
@@ -157,7 +157,7 @@ export class SubscriptionUpdate {
             console.error('Erreur lors de la suppression:', error);
             this.errorMessage.set(deletionError());
         } finally {
-            this.isSubmitting.set(false);
+            this.isDeleting.set(false);
         }
     }
 

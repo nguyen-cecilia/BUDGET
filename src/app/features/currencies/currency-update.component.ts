@@ -37,6 +37,8 @@ export class CurrencyUpdateComponent {
     allCurrencies = signal<Currency[]>([]);
     userCurrencies = signal<UserCurrencies[]>([]);
     selectedCurrency = signal<string | number>('');
+    confirmDelete = signal(false);
+    isDeleting = signal(false);
 
     constructor() {
         this.currencyForm = this.fb.group({
@@ -60,6 +62,7 @@ export class CurrencyUpdateComponent {
                 this.fillForm(editing);
             } else {
                 this.resetForm();
+                this.confirmDelete.set(false);
             }
         });
 
@@ -129,10 +132,7 @@ export class CurrencyUpdateComponent {
         const editing = this.modalService.currency.editing();
         if (!editing) return;
 
-        const confirmed = confirm(`Retirer la devise « ${editing.label} » ?`);
-        if (!confirmed) return;
-
-        this.isSubmitting.set(true);
+        this.isDeleting.set(true);
 
         try {
             const userId = this.authState.getCurrentUser()?.id;
@@ -149,7 +149,7 @@ export class CurrencyUpdateComponent {
             console.error('Erreur lors de la suppression de la devise:', error);
             this.errorMessage.set(deletionError());
         } finally {
-            this.isSubmitting.set(false);
+            this.isDeleting.set(false);
         }
     }
 

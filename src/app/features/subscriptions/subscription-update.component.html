@@ -95,13 +95,13 @@
 
     <div class="flex items-center justify-between">
         @if (modalService.subscription.editing()) {
-            <button app-button variant="invalid" (click)="deleteSubscription()">
+            <button app-button variant="invalid" (click)="confirmDelete.set(true)" [disabled]="confirmDelete()">
                 <svg lucideTrash2 [size]="16"></svg>
                 Supprimer
             </button>
         }
 
-        <button app-button type="submit" [disabled]="isSubmitting()" class="ml-auto">
+        <button app-button type="submit" [disabled]="isSubmitting() || confirmDelete()" class="ml-auto">
             @if (isSubmitting()) {
                 <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
                 Envoi...
@@ -111,4 +111,32 @@
             }
         </button>
     </div>
+
+    @if (confirmDelete()) {
+        <div class="mt-6 space-y-3 rounded border border-red/40 bg-red/6 p-5">
+            <p class="font-semibold text-red">
+                Êtes-vous sûr de supprimer cet abonnement ?
+            </p>
+            <div class="flex items-center justify-between gap-3">
+                <button app-button variant="outline" type="button" (click)="confirmDelete.set(false)">
+                    Annuler
+                </button>
+                <button
+                    app-button
+                    variant="invalid"
+                    type="button"
+                    (click)="deleteSubscription()"
+                    [disabled]="isDeleting()"
+                >
+                    @if (isDeleting()) {
+                        <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
+                        Suppression...
+                    } @else {
+                        <svg lucideTrash2 [size]="16"></svg>
+                        Confirmer
+                    }
+                </button>
+            </div>
+        </div>
+    }
 </form>

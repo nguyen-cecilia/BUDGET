@@ -37,6 +37,8 @@ export class TagUpdateComponent {
 
     errorMessage = signal<string | null>(null);
     isSubmitting = signal(false);
+    confirmDelete = signal(false);
+    isDeleting = signal(false);
 
     @Input() createOnly = false;
 
@@ -51,6 +53,7 @@ export class TagUpdateComponent {
                 this.fillForm(editing);
             } else {
                 this.resetForm();
+                this.confirmDelete.set(false);
             }
         });
     }
@@ -106,10 +109,7 @@ export class TagUpdateComponent {
         const editing = this.editingTag();
         if (!editing) return;
 
-        const confirmed = confirm('Supprimer cette transaction ?');
-        if (!confirmed) return;
-
-        this.isSubmitting.set(true);
+        this.isDeleting.set(true);
 
         try {
             await this.tagService.deleteTag(editing.id, editing.user_id);
@@ -123,7 +123,7 @@ export class TagUpdateComponent {
             console.error('Erreur lors de la suppression:', error);
             this.errorMessage.set(deletionError());
         } finally {
-            this.isSubmitting.set(false);
+            this.isDeleting.set(false);
         }
     }
 
