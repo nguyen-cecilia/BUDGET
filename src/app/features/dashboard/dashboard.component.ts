@@ -113,14 +113,29 @@ export class DashboardComponent {
             )
     );
 
-    remainingToPay = computed(() =>
-        (this.transactionsByMonth()?.transactionsByDay
+    remainingToPay = computed(() => {
+        const futureExpenses = (this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions) ?? [])
             .filter(t => t.type === 'expense')
             .filter(t => this.dateService.isFuture(t.date))
             .filter(t => this.currencyService.canConvert(t.currency.code))
-            .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0)
-    );
+            .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0);
+
+        const monthEnd = this.dateService.formatDateToString(
+            new Date(this.periodService.getYear(), this.periodService.getMonth() + 1, 0)
+        );
+
+        const unpaidSubscriptions = this.subscriptionsStatus()
+            .filter(s => s.is_active && !s.checked)
+            .filter(s => String(s.next_payment_date).slice(0, 10) <= monthEnd)
+            .filter(s => this.currencyService.canConvert(s.currency.code))
+            .reduce((sum, s) =>
+                sum + this.currencyService.convertToDefault(
+                    this.subscriptionService.monthlyEquivalent(s), s.currency.code
+                ), 0);
+
+        return futureExpenses + unpaidSubscriptions;
+    });
 
     expensesRatio = computed(() =>
         this.totalIncomes() > 0
@@ -128,7 +143,6 @@ export class DashboardComponent {
             : 0
     );
 
-    // TODO: En faire une requête ?
     recentTransactions = computed(() =>
         (this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions) ?? [])
@@ -258,8 +272,6 @@ export class DashboardComponent {
         return {income, buckets};
     });
 
-    // TODO: Mettre en amount dans la légende du graphique
-    // TODO: Bug au premier chargement de la page ?
     categoriesData = computed(() => {
         const transactions = this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions) ?? [];

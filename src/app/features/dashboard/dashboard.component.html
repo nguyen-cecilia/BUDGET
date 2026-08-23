@@ -164,7 +164,7 @@
                                 {{ item.label }} · <strong>{{ item.amount|currency:defaultCurrency() }}</strong>
                             </div>
                         } @empty {
-                            <div class="text-gray p-2">
+                            <div class="text-gray-light p-2">
                                 <svg lucidePartyPopper [size]="30"></svg>
                             </div>
                         }
@@ -191,6 +191,7 @@
                     [labels]="categoriesData().donutLabels"
                     [data]="categoriesData().donutData"
                     [colors]="categoriesData().donutColors"
+                    [currencyCode]="defaultCurrency()"
                 ></app-donut-chart>
             </div>
         }

@@ -1,11 +1,7 @@
 import {CurrencyPipe} from "@angular/common";
 import {AfterViewInit, Component, ElementRef, inject, Input, OnChanges, SimpleChanges} from '@angular/core';
-import {Chart, registerables} from 'chart.js';
-
-Chart.register(...registerables);
-Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
-Chart.defaults.font.size = 12;
-Chart.defaults.color = '#515869';
+import {Chart} from 'chart.js';
+import './chart-setup';
 
 export interface BarChartDataset {
     label: string;

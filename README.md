@@ -36,9 +36,9 @@ Layout:
 - [ ] Dark mode
 - [x] Logo
 - [ ] Better manage the loading states, error messages, delete confirmations
-- [ ] Clean code and refactor
-- [ ] Bug: scroll when a modal is open
-- [ ] When doing get requests, do it in bulk with Promise
+- [x] Clean code and refactor
+- [x] Bug: scroll when a modal is open
+- [x] When doing get requests, do it in bulk with Promise
 
 Auth:
 
@@ -72,7 +72,7 @@ Transaction CRUD modal:
 - [x] Date picker
 - [x] Tag selector
 - [x] Subscription
-- [ ] Bug: when adding a subscription transaction, next date is not updated
+- [x] Bug: when adding a subscription transaction, next date is not updated
 
 Savings goals:
 

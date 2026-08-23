@@ -100,11 +100,7 @@ export class SettingsComponent implements OnInit {
             this.categoryService.categoryRefreshTrigger();
             const userId = this.authState.getCurrentUser()?.id;
             if (userId) {
-                this.getCurrencies(userId);
-                this.getSubscriptions(userId);
-                this.getCategories(userId);
-                this.getTags(userId);
-                this.getAccounts(userId);
+                this.loadSettings(userId);
             }
         });
     }
@@ -118,11 +114,7 @@ export class SettingsComponent implements OnInit {
             return;
         }
 
-        this.getCurrencies(userId);
-        this.getSubscriptions(userId);
-        this.getCategories(userId);
-        this.getTags(userId);
-        this.getAccounts(userId);
+        this.loadSettings(userId);
         this.isLoading.set(false);
     }
 
@@ -227,59 +219,24 @@ export class SettingsComponent implements OnInit {
         });
     }
 
-    private getCurrencies(userId: string) {
-        this.currencyService.getUserCurrencies(userId).then(
-            (data) => {
-                this.currencies.set(data);
-            },
-            (error) => {
-                console.error('Erreur lors du chargement:', error);
-            }
-        );
-    }
+    private async loadSettings(userId: string) {
+        try {
+            const [currencies, subscriptions, categories, tags, accounts] = await Promise.all([
+                this.currencyService.getUserCurrencies(userId),
+                this.subscriptionService.getAllSubscriptionsByUser(userId, true),
+                this.categoryService.getAllCategoriesByUser(userId),
+                this.tagService.getAllTagsByUser(userId),
+                this.accountService.getAllAccountsByUser(userId, true),
+            ]);
 
-    private getSubscriptions(userId: string) {
-        this.subscriptionService.getAllSubscriptionsByUser(userId, true).then(
-            (data) => {
-                this.subscriptions.set(data);
-            },
-            (error) => {
-                console.error('Erreur lors du chargement:', error);
-            }
-        );
-    }
-
-    private getCategories(userId: string) {
-        this.categoryService.getAllCategoriesByUser(userId).then(
-            (data) => {
-                this.categories.set(data);
-            },
-            (error) => {
-                console.error('Erreur lors du chargement:', error);
-            }
-        );
-    }
-
-    private getTags(userId: string) {
-        this.tagService.getAllTagsByUser(userId).then(
-            (data) => {
-                this.tags.set(data);
-            },
-            (error) => {
-                console.error('Erreur lors du chargement:', error);
-            }
-        );
-    }
-
-    private getAccounts(userId: string) {
-        this.accountService.getAllAccountsByUser(userId, true).then(
-            (data) => {
-                this.accounts.set(data);
-            },
-            (error) => {
-                console.error('Erreur lors du chargement:', error);
-            }
-        );
+            this.currencies.set(currencies);
+            this.subscriptions.set(subscriptions);
+            this.categories.set(categories);
+            this.tags.set(tags);
+            this.accounts.set(accounts);
+        } catch (error) {
+            console.error('Erreur lors du chargement des paramètres:', error);
+        }
     }
 
     private confirmDelete(payload: ConfirmPayload): void {

@@ -77,8 +77,10 @@ export class TransactionUpdateComponent {
             selectedSubscriptionId: [''],
         });
 
-        this.transactionForm.get('subscriptionFrequency')?.valueChanges.subscribe(freq => {
-            this.transactionForm.patchValue({subscriptionNextDate: this.subscriptionService.computeNextDateFrom('today', freq)});
+        this.transactionForm.get('subscriptionFrequency')?.valueChanges.subscribe(() => this.handleNextDate());
+
+        this.transactionForm.get('date')?.valueChanges.subscribe(() => {
+            if (this.mode() === 'subscription') this.handleNextDate();
         });
 
         effect(() => {
@@ -209,13 +211,17 @@ export class TransactionUpdateComponent {
             if (this.mode() === 'subscription') {
                 const sub = await this.subscriptionService.getSubscriptionById(fv.selectedSubscriptionId);
 
+                const nextPaymentDate = editing
+                    ? fv.subscriptionNextDate
+                    : this.subscriptionService.computeNextDateFrom(String(fv.date), String(fv.subscriptionFrequency));
+
                 const subscriptionChanged =
                     parseFloat(fv.amount) !== sub.amount ||
                     String(fv.amountCurrency) !== sub.currency_id ||
                     fv.account !== sub.account_id ||
                     (fv.category || null) !== sub.category_id ||
                     fv.subscriptionFrequency !== sub.frequency ||
-                    fv.subscriptionNextDate !== sub.next_payment_date;
+                    nextPaymentDate !== sub.next_payment_date;
 
                 if (subscriptionChanged) {
                     await this.subscriptionService.updateSubscription(sub.id, {
@@ -224,7 +230,7 @@ export class TransactionUpdateComponent {
                         account_id: fv.account,
                         category_id: fv.category || null,
                         frequency: fv.subscriptionFrequency,
-                        next_payment_date: fv.subscriptionNextDate,
+                        next_payment_date: nextPaymentDate,
                         label: fv.label,
                     });
                 }
@@ -413,8 +419,10 @@ export class TransactionUpdateComponent {
             account: sub.account_id,
             category: sub.category_id ?? '',
             subscriptionFrequency: sub.frequency,
-            subscriptionNextDate: sub.next_payment_date,
+            subscriptionNextDate: '',
         });
+
+        this.handleNextDate();
     }
 
     private selectDefaultSubscription(): void {
@@ -449,5 +457,15 @@ export class TransactionUpdateComponent {
         if (allTagIds.length > 0) {
             await this.transactionService.addTagsToTransaction(transactionId, allTagIds);
         }
+    }
+
+    private handleNextDate(): void {
+        const date = this.transactionForm.get('date')?.value;
+        const frequency = this.transactionForm.get('subscriptionFrequency')?.value;
+        this.transactionForm.patchValue({
+            subscriptionNextDate: this.subscriptionService.computeNextDateFrom(
+                String(date ?? ''), String(frequency)
+            ),
+        });
     }
 }
