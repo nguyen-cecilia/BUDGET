@@ -35,7 +35,7 @@ Layout:
 - [x] Desktop: sidebar with menu / Mobile: floating menu bar bottom
 - [ ] Dark mode
 - [x] Logo
-- [ ] Better manage the loading states, error messages, delete confirmations
+- [x] Better manage the loading states, error messages, delete confirmations
 - [x] Clean code and refactor
 - [x] Bug: scroll when a modal is open
 - [x] When doing get requests, do it in bulk with Promise
