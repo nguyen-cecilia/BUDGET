@@ -9,6 +9,7 @@ import {ModalComponent} from '../../components/modal/modal.component';
 import {SavingGoalsUpdateComponent} from './saving-goals-update.component';
 import {ModalService} from '../../components/modal/modal.service';
 import {CurrencyPipe} from '@angular/common';
+import {LoadingComponent} from '../../components/loading/loading.component';
 
 @Component({
     selector: 'app-saving-goals',
@@ -20,7 +21,8 @@ import {CurrencyPipe} from '@angular/common';
         LucideFrown,
         ModalComponent,
         SavingGoalsUpdateComponent,
-        CurrencyPipe
+        CurrencyPipe,
+        LoadingComponent
     ],
     templateUrl: './savings-goals-listing.component.html',
 })

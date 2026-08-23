@@ -1,332 +1,336 @@
-<section>
-    <div
-        class="relative bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-6">
-        <div class="absolute inset-0 overflow-hidden rounded pointer-events-none">
-            <div class="absolute z-0 -top-11 -right-11 fill-yellow">
-                <svg viewBox="0 0 100 100" class="w-40 h-40">
-                    <polygon
-                        points="100,50 78.53,59.27 90.45,79.39 67.63,74.27 65.45,97.55 50,80 34.55,97.55 32.37,74.27 9.55,79.39 21.47,59.27 0,50 21.47,40.73 9.55,20.61 32.37,25.73 34.55,2.45 50,20 65.45,2.45 67.63,25.73 90.45,20.61 78.53,40.73"
-                        stroke-width="0.75"
-                        class="stroke-current"
-                    />
-                </svg>
-            </div>
-        </div>
-
-        <div class="relative z-1">
-            <p class="uppercase text-gray font-semibold">{{ periodService.getMonthLabel() }}</p>
-            <p class="font-display text-2xl leading-12">Il reste</p>
-            <p class="font-display text-3xl leading-20 font-medium">{{ balance()|currency:defaultCurrency() }}</p>
-        </div>
-
-        <div class="space-y-1">
-            <div class="w-full h-3 border bg-beige border-black-dark/80 rounded-sm">
-                <div
-                    class="h-full bg-pink rounded-sm"
-                    [style.width.%]="expensesRatio()"
-                ></div>
-            </div>
-            <div class="flex items-center justify-between gap-6 text-gray text-sm">
-                <p>Dépenses : <strong class="text-black-dark">{{ totalExpenses()|currency:defaultCurrency() }}</strong>
-                </p>
-                <p>Revenus : <strong class="text-black-dark">{{ totalIncomes()|currency:defaultCurrency() }}</strong>
-                </p>
-            </div>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-3 lg:gap-4">
-            <div class="flex items-center gap-3 bg-blue rounded-full border p-2 pr-3 lg:p-3 lg:pr-4">
-                <div
-                    class="w-12 aspect-square flex justify-center items-center bg-beige-lighter rounded-full font-display text-lg font-semibold">
-                    <svg lucideAstroid [size]="24"></svg>
-                </div>
-                <div>
-                    <p class="font-display text-lg leading-5 font-semibold">{{ transactionCount() }}</p>
-                    <p class="font-medium">transaction{{ transactionCount() > 1 ? 's' : '' }}</p>
+@if (isLoading()) {
+    <app-loading/>
+} @else {
+    <section>
+        <div
+            class="relative bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-6">
+            <div class="absolute inset-0 overflow-hidden rounded pointer-events-none">
+                <div class="absolute z-0 -top-11 -right-11 fill-yellow">
+                    <svg viewBox="0 0 100 100" class="w-40 h-40">
+                        <polygon
+                            points="100,50 78.53,59.27 90.45,79.39 67.63,74.27 65.45,97.55 50,80 34.55,97.55 32.37,74.27 9.55,79.39 21.47,59.27 0,50 21.47,40.73 9.55,20.61 32.37,25.73 34.55,2.45 50,20 65.45,2.45 67.63,25.73 90.45,20.61 78.53,40.73"
+                            stroke-width="0.75"
+                            class="stroke-current"
+                        />
+                    </svg>
                 </div>
             </div>
 
-            <div class="flex items-center gap-3 bg-green rounded-full border p-2 pr-3 lg:p-3 lg:pr-4">
-                <div
-                    class="w-12 aspect-square flex justify-center items-center bg-beige-lighter rounded-full font-display text-lg font-semibold">
-                    <svg lucideZap [size]="24"></svg>
-                </div>
-                <div>
-                    <p class="font-display text-lg leading-5 font-semibold">{{ subscriptionTotal()|currency:defaultCurrency() }}</p>
-                    <p class="font-medium">d'abonnement</p>
-                </div>
+            <div class="relative z-1">
+                <p class="uppercase text-gray font-semibold">{{ periodService.getMonthLabel() }}</p>
+                <p class="font-display text-2xl leading-12">Il reste</p>
+                <p class="font-display text-3xl leading-20 font-medium">{{ balance()|currency:defaultCurrency() }}</p>
             </div>
 
-            <div class="flex items-center gap-3 bg-purple rounded-full border p-2 pr-3 lg:p-3 lg:pr-4">
-                <div
-                    class="w-12 aspect-square flex justify-center items-center bg-beige-lighter rounded-full font-display text-lg font-semibold">
-                    <svg lucideSnail [size]="24"></svg>
-                </div>
-                <div>
-                    <p class="font-display text-lg leading-5 font-semibold">{{ remainingToPay()|currency:defaultCurrency() }}</p>
-                    <p class="font-medium">reste à payer</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="flex flex-col lg:flex-row gap-8">
-    <div class="flex-1 bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
-        <div class="flex justify-between items-center gap-2">
-            <h2 class="flex items-center gap-2">
-                <svg lucideWallet [size]="20" class="text-gray"></svg>
-                Dernières transactions
-            </h2>
-
-            <button app-button routerLink="/transactions">
-                Voir tout
-                <svg lucideArrowRight [size]="16"></svg>
-            </button>
-        </div>
-
-        <div>
-            @for (transaction of recentTransactions(); track transaction.id) {
-                <app-transaction-item [transaction]="transaction" [hasDate]="true"></app-transaction-item>
-            } @empty {
-                <p class="text-gray text-sm">Aucune transaction.</p>
-            }
-        </div>
-    </div>
-
-    <div class="w-full lg:w-1/3 bg-blue/50 border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
-        <h2 class="flex items-center gap-2">
-            <svg lucideSparkles [size]="20"></svg>
-            Abonnements @if (subscriptionsStatus().length > 0) {
-            ({{ subscriptionsStatus().length }})
-        }
-        </h2>
-
-        <div class="flex flex-col gap-3">
-            @for (sub of subscriptionsStatus(); track sub.id) {
-                <div class="flex items-center gap-3 bg-beige-lighter border border-black-dark p-3 rounded">
+            <div class="space-y-1">
+                <div class="w-full h-3 border bg-beige border-black-dark/80 rounded-sm">
                     <div
-                        class="size-10 border rounded-full flex justify-center items-center font-display text-md {{ sub.checked ? 'bg-green' : 'bg-pink' }}">
-                        @if (sub.checked) {
-                            <svg lucideCheck [size]="16"></svg>
-                        } @else {
-                            <svg lucideX [size]="16"></svg>
-                        }
+                        class="h-full bg-pink rounded-sm"
+                        [style.width.%]="expensesRatio()"
+                    ></div>
+                </div>
+                <div class="flex items-center justify-between gap-6 text-gray text-sm">
+                    <p>Dépenses : <strong class="text-black-dark">{{ totalExpenses()|currency:defaultCurrency() }}</strong>
+                    </p>
+                    <p>Revenus : <strong class="text-black-dark">{{ totalIncomes()|currency:defaultCurrency() }}</strong>
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3 lg:gap-4">
+                <div class="flex items-center gap-3 bg-blue rounded-full border p-2 pr-3 lg:p-3 lg:pr-4">
+                    <div
+                        class="w-12 aspect-square flex justify-center items-center bg-beige-lighter rounded-full font-display text-lg font-semibold">
+                        <svg lucideAstroid [size]="24"></svg>
                     </div>
-                    <div class="flex-1">
-                        <p class="font-semibold">{{ sub.label }}</p>
-                        @if (sub.last_payment_date) {
-                            <p class="text-xs text-gray">
-                                Payé le : {{ sub.last_payment_date|date:'dd/MM/yyyy' }}
-                            </p>
-                        }
-                        <div class="flex items-center gap-0.75 text-xs text-gray font-medium">
-                            <svg lucideArrowRight [size]="12"></svg>
-                            Prochain paiement : {{ sub.next_payment_date|date:'dd/MM/yyyy' }}
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-display font-semibold text-md">{{ sub.amount|currency:sub.currency.code }}</p>
-                        @if (sub.currency.code !== currencyService.defaultCurrency() && currencyService.canConvert(sub.currency.code)) {
-                            <p class="text-sm text-gray">
-                                ≈ {{ currencyService.convertToDefault(sub.amount, sub.currency.code)|currency:currencyService.defaultCurrency() }}</p>
-                        }
+                    <div>
+                        <p class="font-display text-lg leading-5 font-semibold">{{ transactionCount() }}</p>
+                        <p class="font-medium">transaction{{ transactionCount() > 1 ? 's' : '' }}</p>
                     </div>
                 </div>
-            } @empty {
-                <p class="text-gray text-sm">Aucun abonnement.</p>
-            }
-        </div>
-    </div>
-</section>
 
-<section>
-    <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
-        <h2 class="flex items-center gap-2">
-            <svg lucideCalendarDays [size]="20" class="text-gray"></svg>
-            Prochains débits
-        </h2>
-
-        @if (upcomingPayments().length > 0) {
-            <div class="grid grid-cols-2 lg:grid-cols-7 gap-3">
-                @for (day of upcomingPayments(); track day.dateString) {
-                    <div class="border rounded p-3 space-y-1.5 {{ $first ? 'col-span-2 lg:col-span-1 bg-yellow/50' : 'bg-beige-light' }}">
-                        <div>
-                            <p class="text-xs text-gray uppercase">{{ day.dayLabel }}</p>
-                            <p class="text-lg font-semibold leading-7 font-display">{{ day.dayNumber }}</p>
-                        </div>
-                        @for (item of day.items; track $index) {
-                            <div
-                                class="border rounded-sm px-2 py-1 text-xs leading-4 {{ item.isSubscription ? 'bg-pink' : 'bg-purple' }}">
-                                @if (item.isSubscription) {
-                                    <svg lucideSparkles [size]="12" class="inline mr-1 align-[-2px]"></svg>
-                                }
-                                {{ item.label }} · <strong>{{ item.amount|currency:defaultCurrency() }}</strong>
-                            </div>
-                        } @empty {
-                            <div class="text-gray-light p-2">
-                                <svg lucidePartyPopper [size]="30"></svg>
-                            </div>
-                        }
+                <div class="flex items-center gap-3 bg-green rounded-full border p-2 pr-3 lg:p-3 lg:pr-4">
+                    <div
+                        class="w-12 aspect-square flex justify-center items-center bg-beige-lighter rounded-full font-display text-lg font-semibold">
+                        <svg lucideZap [size]="24"></svg>
                     </div>
+                    <div>
+                        <p class="font-display text-lg leading-5 font-semibold">{{ subscriptionTotal()|currency:defaultCurrency() }}</p>
+                        <p class="font-medium">d'abonnement</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 bg-purple rounded-full border p-2 pr-3 lg:p-3 lg:pr-4">
+                    <div
+                        class="w-12 aspect-square flex justify-center items-center bg-beige-lighter rounded-full font-display text-lg font-semibold">
+                        <svg lucideSnail [size]="24"></svg>
+                    </div>
+                    <div>
+                        <p class="font-display text-lg leading-5 font-semibold">{{ remainingToPay()|currency:defaultCurrency() }}</p>
+                        <p class="font-medium">reste à payer</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="flex flex-col lg:flex-row gap-8">
+        <div class="flex-1 bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
+            <div class="flex justify-between items-center gap-2">
+                <h2 class="flex items-center gap-2">
+                    <svg lucideWallet [size]="20" class="text-gray"></svg>
+                    Dernières transactions
+                </h2>
+
+                <button app-button routerLink="/transactions">
+                    Voir tout
+                    <svg lucideArrowRight [size]="16"></svg>
+                </button>
+            </div>
+
+            <div>
+                @for (transaction of recentTransactions(); track transaction.id) {
+                    <app-transaction-item [transaction]="transaction" [hasDate]="true"></app-transaction-item>
+                } @empty {
+                    <p class="text-gray text-sm">Aucune transaction.</p>
                 }
             </div>
-        } @else {
-            <p class="text-gray text-sm">Aucun prochain débit.</p>
-        }
-    </div>
-</section>
-
-<section class="flex flex-col lg:flex-row gap-8">
-    <div
-        class="flex-1 lg:order-1 bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
-        <h2 class="flex items-center gap-2">
-            <svg lucideLayers [size]="20" class="text-gray"></svg>
-            Par catégorie
-        </h2>
-
-        @if (categoriesData().grandTotal > 0) {
-            <div class="w-9/10 lg:max-w-1/2 mx-auto">
-                <app-donut-chart
-                    [labels]="categoriesData().donutLabels"
-                    [data]="categoriesData().donutData"
-                    [colors]="categoriesData().donutColors"
-                    [currencyCode]="defaultCurrency()"
-                ></app-donut-chart>
-            </div>
-        }
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            @for (cat of categoriesData().categories; track cat.label) {
-                <div class="bg-beige-light rounded p-4 space-y-3 border">
-                    <div class="flex items-center gap-2">
-                        <div class="size-3 rounded-full {{ colorService.getBackground(cat.color) }}"></div>
-                        <h3 class="flex-1">{{ cat.label }}</h3>
-                        <div class="font-display">{{ cat.total|currency:defaultCurrency() }}</div>
-                    </div>
-                    <div class="space-y-1">
-                        <div class="w-full h-2 bg-beige rounded-full">
-                            <div
-                                class="h-full rounded-full {{ colorService.getBackground(cat.color) }}"
-                                [style.width.%]="(cat.total / categoriesData().grandTotal) * 100"
-                            ></div>
-                        </div>
-                        <p class="text-xs text-gray">{{ (cat.total / categoriesData().grandTotal * 100|number:'1.0-0') }}
-                            % du total</p>
-                    </div>
-                </div>
-            } @empty {
-                <p class="text-gray text-sm">Aucune dépense ce mois-ci.</p>
-            }
         </div>
-    </div>
 
-    <div class="lg:w-1/3 lg:order-0 space-y-6">
-        <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
+        <div class="w-full lg:w-1/3 bg-blue/50 border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
             <h2 class="flex items-center gap-2">
-                <svg lucideChartPie [size]="20" class="text-gray"></svg>
-                Budget 50/30/20
+                <svg lucideSparkles [size]="20"></svg>
+                Abonnements @if (subscriptionsStatus().length > 0) {
+                ({{ subscriptionsStatus().length }})
+            }
             </h2>
 
-            @if (budget().income > 0) {
-                <p class="text-gray text-sm">
-                    Basé sur les revenus du mois : <strong class="text-black-dark">{{ budget().income|currency:defaultCurrency() }}</strong>
-                </p>
-
-                @for (bucket of budget().buckets; track bucket.key) {
-                    <div class="rounded bg-beige-light border p-4 flex flex-col items-start gap-1">
-                        <div class="{{ bucket.bg }} rounded border px-2 py-0.5 font-semibold text-xs">{{ bucket.percent }}%</div>
-                        <p class="text-xl font-semibold font-display leading-9">{{ bucket.allocated|currency:defaultCurrency() }}</p>
-                        <div>
-                            <p class="font-semibold">{{ bucket.label }}</p>
-                            @if (bucket.categories.length > 0) {
-                                <p class="text-gray text-xs">{{ bucket.categories.join(' · ') }}</p>
+            <div class="flex flex-col gap-3">
+                @for (sub of subscriptionsStatus(); track sub.id) {
+                    <div class="flex items-center gap-3 bg-beige-lighter border border-black-dark p-3 rounded">
+                        <div
+                            class="size-10 border rounded-full flex justify-center items-center font-display text-md {{ sub.checked ? 'bg-green' : 'bg-pink' }}">
+                            @if (sub.checked) {
+                                <svg lucideCheck [size]="16"></svg>
+                            } @else {
+                                <svg lucideX [size]="16"></svg>
                             }
                         </div>
-                        <p class="w-full text-right text-gray text-sm">{{ bucket.progress }}% {{ bucket.key === 'savings' ? 'épargnés' : 'dépensés' }}</p>
-                        <div class="w-full h-3 rounded border bg-beige">
-                            <div class="h-full rounded {{ bucket.bg }}" [style.width.%]="bucket.barWidth"></div>
+                        <div class="flex-1">
+                            <p class="font-semibold">{{ sub.label }}</p>
+                            @if (sub.last_payment_date) {
+                                <p class="text-xs text-gray">
+                                    Payé le : {{ sub.last_payment_date|date:'dd/MM/yyyy' }}
+                                </p>
+                            }
+                            <div class="flex items-center gap-0.75 text-xs text-gray font-medium">
+                                <svg lucideArrowRight [size]="12"></svg>
+                                Prochain paiement : {{ sub.next_payment_date|date:'dd/MM/yyyy' }}
+                            </div>
                         </div>
-                        <p class="font-semibold">{{ bucket.spent|currency:defaultCurrency() }} <span class="text-xs text-gray font-normal">/ {{ bucket.allocated|currency:defaultCurrency() }}</span></p>
-                    </div>
-                }
-            } @else {
-                <p class="text-gray text-sm">Aucun revenu ce mois-ci.</p>
-            }
-        </div>
-
-        <div
-            class="relative overflow-hidden bg-pink/50 border border-gray-light shadow-md shadow-gray/10 rounded p-5 pb-20 lg:pb-35 space-y-4">
-            <h2 class="flex items-center gap-2">
-                <svg lucideTag [size]="20"></svg>
-                Par tag
-            </h2>
-            <p class="text-gray text-sm">Pourcentage par rapport aux dépenses totales.</p>
-
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"
-                 class="size-40 z-0 absolute -left-10 -bottom-25 lg:-bottom-10 text-green">
-                <path
-                    d="M 128 0 C 147.68 0 164.04 14.213 167.377 32.934 C 182.974 22.055 204.594 23.574 218.51 37.49 C 232.426 51.406 233.944 73.025 223.066 88.622 C 241.787 91.96 256 108.32 256 128 C 256 147.68 241.787 164.04 223.065 167.377 C 233.944 182.974 232.426 204.594 218.51 218.51 C 204.594 232.426 182.974 233.944 167.377 223.065 C 164.04 241.787 147.68 256 128 256 C 108.32 256 91.959 241.787 88.622 223.065 C 73.025 233.944 51.406 232.426 37.49 218.51 C 23.574 204.594 22.055 182.974 32.934 167.377 C 14.213 164.04 0 147.68 0 128 C 0 108.32 14.213 91.96 32.934 88.622 C 22.056 73.025 23.574 51.406 37.49 37.49 C 51.406 23.574 73.025 22.055 88.622 32.934 C 91.96 14.213 108.32 0 128 0 Z"
-                    fill="currentColor" stroke-width="2" class="stroke-black-dark"></path>
-            </svg>
-
-            <div class="relative z-1 grid grid-cols-[1fr_3fr_1fr] lg:grid-cols-[1fr_4fr_1fr] items-center gap-3">
-                @for (tag of tagsData().tags; track tag.label) {
-                    <div class="text-gray text-sm">#{{ tag.label }}</div>
-                    <div class="w-full h-3 bg-beige-light rounded-full border">
-                        <div
-                            class="h-full bg-yellow rounded-full transition-all"
-                            [style.width.%]="(tag.total / totalExpenses()) * 100"
-                        >
+                        <div class="text-right">
+                            <p class="font-display font-semibold text-md">{{ sub.amount|currency:sub.currency.code }}</p>
+                            @if (sub.currency.code !== currencyService.defaultCurrency() && currencyService.canConvert(sub.currency.code)) {
+                                <p class="text-sm text-gray">
+                                    ≈ {{ currencyService.convertToDefault(sub.amount, sub.currency.code)|currency:currencyService.defaultCurrency() }}</p>
+                            }
                         </div>
-                    </div>
-                    <div class="font-display font-medium text-md text-right">{{ tag.total|currency:defaultCurrency() }}
                     </div>
                 } @empty {
-                    <p class="col-span-5 text-gray text-sm">Aucun tag ce mois-ci.</p>
+                    <p class="text-gray text-sm">Aucun abonnement.</p>
                 }
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section>
-    <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-6">
-        <div class="flex items-center justify-between gap-3">
+    <section>
+        <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
             <h2 class="flex items-center gap-2">
-                <svg lucidePiggyBank [size]="20" class="text-gray"></svg>
-                Objectifs d'épargne
+                <svg lucideCalendarDays [size]="20" class="text-gray"></svg>
+                Prochains débits
             </h2>
 
-            <button
-                app-button
-                routerLink="/objectifs"
-            >
-                Gérer
-                <svg lucideArrowRight [size]="16"></svg>
-            </button>
+            @if (upcomingPayments().length > 0) {
+                <div class="grid grid-cols-2 lg:grid-cols-7 gap-3">
+                    @for (day of upcomingPayments(); track day.dateString) {
+                        <div class="border rounded p-3 space-y-1.5 {{ $first ? 'col-span-2 lg:col-span-1 bg-yellow/50' : 'bg-beige-light' }}">
+                            <div>
+                                <p class="text-xs text-gray uppercase">{{ day.dayLabel }}</p>
+                                <p class="text-lg font-semibold leading-7 font-display">{{ day.dayNumber }}</p>
+                            </div>
+                            @for (item of day.items; track $index) {
+                                <div
+                                    class="border rounded-sm px-2 py-1 text-xs leading-4 {{ item.isSubscription ? 'bg-pink' : 'bg-purple' }}">
+                                    @if (item.isSubscription) {
+                                        <svg lucideSparkles [size]="12" class="inline mr-1 align-[-2px]"></svg>
+                                    }
+                                    {{ item.label }} · <strong>{{ item.amount|currency:defaultCurrency() }}</strong>
+                                </div>
+                            } @empty {
+                                <div class="text-gray-light p-2">
+                                    <svg lucidePartyPopper [size]="30"></svg>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            } @else {
+                <p class="text-gray text-sm">Aucun prochain débit.</p>
+            }
         </div>
+    </section>
 
-        @if (savingsGoals().length > 0) {
-            <div class="grid lg:grid-cols-3 gap-x-8 gap-y-8">
-                @for (goal of savingsGoals(); track goal.id) {
-                    <div class="space-y-1">
-                        <div class="flex items-center justify-between gap-3">
-                            <p class="font-semibold">{{ goal.label }}</p>
-                            <div class="bg-blue/50 rounded text-xs px-1.5 py-0.5 font-medium text-gray">{{ goalRatio(goal) }}%</div>
+    <section class="flex flex-col lg:flex-row gap-8">
+        <div
+            class="flex-1 lg:order-1 bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
+            <h2 class="flex items-center gap-2">
+                <svg lucideLayers [size]="20" class="text-gray"></svg>
+                Par catégorie
+            </h2>
+
+            @if (categoriesData().grandTotal > 0) {
+                <div class="w-9/10 lg:max-w-1/2 mx-auto">
+                    <app-donut-chart
+                        [labels]="categoriesData().donutLabels"
+                        [data]="categoriesData().donutData"
+                        [colors]="categoriesData().donutColors"
+                        [currencyCode]="defaultCurrency()"
+                    ></app-donut-chart>
+                </div>
+            }
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                @for (cat of categoriesData().categories; track cat.label) {
+                    <div class="bg-beige-light rounded p-4 space-y-3 border">
+                        <div class="flex items-center gap-2">
+                            <div class="size-3 rounded-full {{ colorService.getBackground(cat.color) }}"></div>
+                            <h3 class="flex-1">{{ cat.label }}</h3>
+                            <div class="font-display">{{ cat.total|currency:defaultCurrency() }}</div>
                         </div>
-                        <div class="w-full h-3 border rounded bg-beige">
-                            <div class="h-full rounded bg-blue" [style.width.%]="goalRatio(goal)"></div>
-                        </div>
-                        <div class="flex items-center justify-between gap-3 text-sm">
-                            <p class="font-semibold text-blue">{{ goal.current_amount|currency:goal.currency.code }}</p>
-                            <p class="text-gray">/ {{ goal.target_amount|currency:goal.currency.code }}</p>
+                        <div class="space-y-1">
+                            <div class="w-full h-2 bg-beige rounded-full">
+                                <div
+                                    class="h-full rounded-full {{ colorService.getBackground(cat.color) }}"
+                                    [style.width.%]="(cat.total / categoriesData().grandTotal) * 100"
+                                ></div>
+                            </div>
+                            <p class="text-xs text-gray">{{ (cat.total / categoriesData().grandTotal * 100|number:'1.0-0') }}
+                                % du total</p>
                         </div>
                     </div>
+                } @empty {
+                    <p class="text-gray text-sm">Aucune dépense ce mois-ci.</p>
                 }
             </div>
-        } @else {
-            <p class="text-gray text-sm">Aucun objectif pour l'instant.</p>
-        }
-    </div>
-</section>
+        </div>
+
+        <div class="lg:w-1/3 lg:order-0 space-y-6">
+            <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
+                <h2 class="flex items-center gap-2">
+                    <svg lucideChartPie [size]="20" class="text-gray"></svg>
+                    Budget 50/30/20
+                </h2>
+
+                @if (budget().income > 0) {
+                    <p class="text-gray text-sm">
+                        Basé sur les revenus du mois : <strong class="text-black-dark">{{ budget().income|currency:defaultCurrency() }}</strong>
+                    </p>
+
+                    @for (bucket of budget().buckets; track bucket.key) {
+                        <div class="rounded bg-beige-light border p-4 flex flex-col items-start gap-1">
+                            <div class="{{ bucket.bg }} rounded border px-2 py-0.5 font-semibold text-xs">{{ bucket.percent }}%</div>
+                            <p class="text-xl font-semibold font-display leading-9">{{ bucket.allocated|currency:defaultCurrency() }}</p>
+                            <div>
+                                <p class="font-semibold">{{ bucket.label }}</p>
+                                @if (bucket.categories.length > 0) {
+                                    <p class="text-gray text-xs">{{ bucket.categories.join(' · ') }}</p>
+                                }
+                            </div>
+                            <p class="w-full text-right text-gray text-sm">{{ bucket.progress }}% {{ bucket.key === 'savings' ? 'épargnés' : 'dépensés' }}</p>
+                            <div class="w-full h-3 rounded border bg-beige">
+                                <div class="h-full rounded {{ bucket.bg }}" [style.width.%]="bucket.barWidth"></div>
+                            </div>
+                            <p class="font-semibold">{{ bucket.spent|currency:defaultCurrency() }} <span class="text-xs text-gray font-normal">/ {{ bucket.allocated|currency:defaultCurrency() }}</span></p>
+                        </div>
+                    }
+                } @else {
+                    <p class="text-gray text-sm">Aucun revenu ce mois-ci.</p>
+                }
+            </div>
+
+            <div
+                class="relative overflow-hidden bg-pink/50 border border-gray-light shadow-md shadow-gray/10 rounded p-5 pb-20 lg:pb-35 space-y-4">
+                <h2 class="flex items-center gap-2">
+                    <svg lucideTag [size]="20"></svg>
+                    Par tag
+                </h2>
+                <p class="text-gray text-sm">Pourcentage par rapport aux dépenses totales.</p>
+
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"
+                     class="size-40 z-0 absolute -left-10 -bottom-25 lg:-bottom-10 text-green">
+                    <path
+                        d="M 128 0 C 147.68 0 164.04 14.213 167.377 32.934 C 182.974 22.055 204.594 23.574 218.51 37.49 C 232.426 51.406 233.944 73.025 223.066 88.622 C 241.787 91.96 256 108.32 256 128 C 256 147.68 241.787 164.04 223.065 167.377 C 233.944 182.974 232.426 204.594 218.51 218.51 C 204.594 232.426 182.974 233.944 167.377 223.065 C 164.04 241.787 147.68 256 128 256 C 108.32 256 91.959 241.787 88.622 223.065 C 73.025 233.944 51.406 232.426 37.49 218.51 C 23.574 204.594 22.055 182.974 32.934 167.377 C 14.213 164.04 0 147.68 0 128 C 0 108.32 14.213 91.96 32.934 88.622 C 22.056 73.025 23.574 51.406 37.49 37.49 C 51.406 23.574 73.025 22.055 88.622 32.934 C 91.96 14.213 108.32 0 128 0 Z"
+                        fill="currentColor" stroke-width="2" class="stroke-black-dark"></path>
+                </svg>
+
+                <div class="relative z-1 grid grid-cols-[1fr_3fr_1fr] lg:grid-cols-[1fr_4fr_1fr] items-center gap-3">
+                    @for (tag of tagsData().tags; track tag.label) {
+                        <div class="text-gray text-sm">#{{ tag.label }}</div>
+                        <div class="w-full h-3 bg-beige-light rounded-full border">
+                            <div
+                                class="h-full bg-yellow rounded-full transition-all"
+                                [style.width.%]="(tag.total / totalExpenses()) * 100"
+                            >
+                            </div>
+                        </div>
+                        <div class="font-display font-medium text-md text-right">{{ tag.total|currency:defaultCurrency() }}
+                        </div>
+                    } @empty {
+                        <p class="col-span-5 text-gray text-sm">Aucun tag ce mois-ci.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-6">
+            <div class="flex items-center justify-between gap-3">
+                <h2 class="flex items-center gap-2">
+                    <svg lucidePiggyBank [size]="20" class="text-gray"></svg>
+                    Objectifs d'épargne
+                </h2>
+
+                <button
+                    app-button
+                    routerLink="/objectifs"
+                >
+                    Gérer
+                    <svg lucideArrowRight [size]="16"></svg>
+                </button>
+            </div>
+
+            @if (savingsGoals().length > 0) {
+                <div class="grid lg:grid-cols-3 gap-x-8 gap-y-8">
+                    @for (goal of savingsGoals(); track goal.id) {
+                        <div class="space-y-1">
+                            <div class="flex items-center justify-between gap-3">
+                                <p class="font-semibold">{{ goal.label }}</p>
+                                <div class="bg-blue/50 rounded text-xs px-1.5 py-0.5 font-medium text-gray">{{ goalRatio(goal) }}%</div>
+                            </div>
+                            <div class="w-full h-3 border rounded bg-beige">
+                                <div class="h-full rounded bg-blue" [style.width.%]="goalRatio(goal)"></div>
+                            </div>
+                            <div class="flex items-center justify-between gap-3 text-sm">
+                                <p class="font-semibold text-blue">{{ goal.current_amount|currency:goal.currency.code }}</p>
+                                <p class="text-gray">/ {{ goal.target_amount|currency:goal.currency.code }}</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            } @else {
+                <p class="text-gray text-sm">Aucun objectif pour l'instant.</p>
+            }
+        </div>
+    </section>
+}

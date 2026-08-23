@@ -25,7 +25,7 @@
 </section>
 
 @if (isLoading()) {
-    <section>Chargement en cours...</section>
+    <app-loading/>
 } @else if (savingsGoals().length > 0) {
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         @for (goal of savingsGoals(); track goal.id) {

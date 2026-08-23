@@ -32,6 +32,7 @@ import {SavingsGoalService} from '../saving-goals/savings-goal.service';
 import {SavingsGoal} from '../saving-goals/savings-goal.model';
 import {CategoryType} from '../categories/category.model';
 import {DateService} from '../../core/date.service';
+import {LoadingComponent} from '../../components/loading/loading.component';
 
 const RECENT_TRANSACTIONS_NUMBER = 6;
 
@@ -59,6 +60,7 @@ const RECENT_TRANSACTIONS_NUMBER = 6;
         LucideSnail,
         LucidePiggyBank,
         LucideChartPie,
+        LoadingComponent,
     ],
     templateUrl: './dashboard.component.html',
 })

@@ -9,6 +9,7 @@ import {AuthStateService} from '../auth/auth-state.service';
 import {CurrencyPipe} from '@angular/common';
 import {BarChartComponent} from '../../components/chart/bar-chart.component';
 import {DateService} from '../../core/date.service';
+import {LoadingComponent} from '../../components/loading/loading.component';
 
 @Component({
     selector: 'app-yearly-view',
@@ -19,7 +20,8 @@ import {DateService} from '../../core/date.service';
         LucideEqualApproximately,
         SelectComponent,
         CurrencyPipe,
-        BarChartComponent
+        BarChartComponent,
+        LoadingComponent
     ],
     templateUrl: './yearly-view.component.html',
 })
@@ -43,7 +45,7 @@ export class YearlyViewComponent {
             this.currencyService.currencyRefreshTrigger();
             const year = this.selectedYear();
             const userId = this.authState.getCurrentUser()?.id;
-            if (userId) this.loadYearlyView(userId, year);
+            if (userId) void this.loadYearlyView(userId, year);
         });
     }
 

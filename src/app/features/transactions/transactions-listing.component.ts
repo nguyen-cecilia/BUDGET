@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
+import {Component, computed, effect, inject, signal} from '@angular/core';
 import {LucideFrown, LucidePlus, LucideSearch, LucideX} from '@lucide/angular';
 import {BadgeComponent} from '../../components/badge/badge.component';
 import {TransactionsByMonth} from './transaction.model';
@@ -12,6 +12,7 @@ import {ButtonComponent} from '../../components/button/button.component';
 import {TransactionItemComponent} from './transaction-item.component';
 import {CurrencyService} from '../currencies/currency.service';
 import {ModalService} from '../../components/modal/modal.service';
+import {LoadingComponent} from '../../components/loading/loading.component';
 
 @Component({
     selector: 'app-transactions',
@@ -25,11 +26,12 @@ import {ModalService} from '../../components/modal/modal.service';
         LucideX,
         ButtonComponent,
         TransactionItemComponent,
-        LucidePlus
+        LucidePlus,
+        LoadingComponent,
     ],
     templateUrl: './transactions-listing.component.html',
 })
-export class TransactionsListingComponent implements OnInit {
+export class TransactionsListingComponent {
     private authState = inject(AuthStateService);
     private transactionService = inject(TransactionService);
     private currencyService = inject(CurrencyService);
@@ -54,27 +56,11 @@ export class TransactionsListingComponent implements OnInit {
         effect(() => {
             this.transactionService.transactionRefreshTrigger();
             this.currencyService.currencyRefreshTrigger();
+            this.periodService.selectedMonth();
+            this.periodService.selectedYear();
             const userId = this.authState.getCurrentUser()?.id;
-            if (userId) {
-                this.getTransactions(userId);
-                this.getFilters(userId);
-                this.currencyService.loadDefaultCurrency(userId);
-            }
+            if (userId) void this.loadList(userId);
         });
-    }
-
-    ngOnInit() {
-        this.isLoading.set(true);
-        const userId = this.authState.getCurrentUser()?.id;
-
-        if (!userId) {
-            console.error('Utilisateur non authentifié');
-            return;
-        }
-
-        this.getFilters(userId);
-        this.getTransactions(userId);
-        this.isLoading.set(false);
     }
 
     filteredTransactions = computed(() => {
@@ -144,33 +130,26 @@ export class TransactionsListingComponent implements OnInit {
         this.selectedTags.set(new Set());
     }
 
-    private async getFilters(userId: string) {
+    private async loadList(userId: string): Promise<void> {
+        this.isLoading.set(true);
+
+        const monthIndex = this.periodService.getMonth();
+        const year = this.periodService.getYear();
+
         try {
-            const [accounts, categories, tags] = await Promise.all([
+            const [transactions, accounts, categories, tags] = await Promise.all([
+                this.transactionService.getTransactionsByMonth(userId, monthIndex, year),
                 this.optionsService.getAccountsOptions(userId, true),
                 this.optionsService.getCategoriesOptions(userId, true, true),
                 this.optionsService.getTagsOptions(userId),
             ]);
 
+            this.transactionsByMonth.set(transactions);
             this.accountsFilters.set(accounts);
             this.categoriesFilters.set(categories);
             this.tagsFilters.set(tags);
-        } catch (error) {
-            console.error('Erreur lors du chargement des options:', error);
+        } finally {
+            this.isLoading.set(false);
         }
-    }
-
-    private getTransactions(userId: string) {
-        const monthIndex = this.periodService.getMonth();
-        const year = this.periodService.getYear();
-
-        this.transactionService.getTransactionsByMonth(userId, monthIndex, year).then(
-            (data) => {
-                this.transactionsByMonth.set(data);
-            },
-            (error) => {
-                console.error('Erreur lors du chargement:', error);
-            }
-        );
     }
 }

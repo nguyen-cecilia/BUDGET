@@ -1,4 +1,4 @@
-import {Component, effect, inject, OnInit, signal} from '@angular/core';
+import {Component, effect, inject, signal} from '@angular/core';
 import {
     LucideCoins,
     LucideLandmark,
@@ -38,6 +38,7 @@ import {SubscriptionUpdate} from '../subscriptions/subscription-update.component
 import {ConfirmComponent, ConfirmPayload} from '../../components/confirm/confirm.component';
 import {SavingsGoalService} from '../saving-goals/savings-goal.service';
 import {TransactionService} from '../transactions/transaction.service';
+import {LoadingComponent} from '../../components/loading/loading.component';
 
 @Component({
     selector: 'app-settings',
@@ -63,11 +64,12 @@ import {TransactionService} from '../transactions/transaction.service';
         LucideTrash2,
         LucideLayers,
         LucideTriangleAlert,
-        ConfirmComponent
+        ConfirmComponent,
+        LoadingComponent
     ],
     templateUrl: './settings.component.html',
 })
-export class SettingsComponent implements OnInit {
+export class SettingsComponent {
     private authState = inject(AuthStateService);
     private accountService = inject(AccountService);
     private tagService = inject(TagService);
@@ -100,22 +102,9 @@ export class SettingsComponent implements OnInit {
             this.categoryService.categoryRefreshTrigger();
             const userId = this.authState.getCurrentUser()?.id;
             if (userId) {
-                this.loadSettings(userId);
+                void this.loadSettings(userId);
             }
         });
-    }
-
-    ngOnInit() {
-        this.isLoading.set(true);
-        const userId = this.authState.getCurrentUser()?.id;
-
-        if (!userId) {
-            console.error('Utilisateur non authentifié');
-            return;
-        }
-
-        this.loadSettings(userId);
-        this.isLoading.set(false);
     }
 
     deleteAllTransactions(): void {
@@ -219,7 +208,8 @@ export class SettingsComponent implements OnInit {
         });
     }
 
-    private async loadSettings(userId: string) {
+    private async loadSettings(userId: string): Promise<void> {
+        this.isLoading.set(true);
         try {
             const [currencies, subscriptions, categories, tags, accounts] = await Promise.all([
                 this.currencyService.getUserCurrencies(userId),
@@ -236,6 +226,8 @@ export class SettingsComponent implements OnInit {
             this.accounts.set(accounts);
         } catch (error) {
             console.error('Erreur lors du chargement des paramètres:', error);
+        } finally {
+            this.isLoading.set(false);
         }
     }
 
