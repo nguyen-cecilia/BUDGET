@@ -4,11 +4,13 @@ import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} fr
 import {Router} from '@angular/router';
 import {AuthService} from '../auth/auth.service';
 import {ButtonComponent} from '../../components/button/button.component';
+import {FieldErrorComponent} from '../../components/form-error/field-error.component';
+import {FormErrorComponent} from '../../components/form-error/form-error.component';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [CommonModule, FormsModule, ButtonComponent, ReactiveFormsModule],
+    imports: [CommonModule, FormsModule, ButtonComponent, ReactiveFormsModule, FieldErrorComponent, FormErrorComponent],
     templateUrl: './login.component.html',
 })
 export class LoginComponent {
@@ -17,7 +19,7 @@ export class LoginComponent {
     private fb = inject(FormBuilder);
 
     loginForm: FormGroup;
-    error = signal('');
+    errorMessage = signal('');
     isLoading = signal(false);
 
     constructor() {
@@ -28,10 +30,10 @@ export class LoginComponent {
     }
 
     async login(): Promise<void> {
-        this.error.set('');
+        this.errorMessage.set('');
 
         if (!this.loginForm.valid) {
-            this.error.set('Veuillez vérifier les champs du formulaire.');
+            this.errorMessage.set('Veuillez vérifier les champs du formulaire.');
             return;
         }
 
@@ -41,7 +43,7 @@ export class LoginComponent {
         const {error} = await this.authService.signInWithPassword(email, password);
 
         if (error) {
-            this.error.set(error.message || 'Erreur lors de la connexion.');
+            this.errorMessage.set(error.message || 'Erreur lors de la connexion.');
             return;
         }
 

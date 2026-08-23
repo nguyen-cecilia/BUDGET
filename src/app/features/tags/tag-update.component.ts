@@ -6,6 +6,9 @@ import {ButtonComponent} from '../../components/button/button.component';
 import {LucideLoaderCircle, LucidePlus, LucideSave, LucideTrash2} from '@lucide/angular';
 import {Tag} from './tag.model';
 import {ModalService} from '../../components/modal/modal.service';
+import {FORM_ERRORS, creationError, deletionError} from '../../core/form-errors.service';
+import {FieldErrorComponent} from '../../components/form-error/field-error.component';
+import {FormErrorComponent} from '../../components/form-error/form-error.component';
 
 @Component({
     selector: 'app-tag-update',
@@ -15,7 +18,9 @@ import {ModalService} from '../../components/modal/modal.service';
         LucidePlus,
         LucideLoaderCircle,
         LucideTrash2,
-        LucideSave
+        LucideSave,
+        FieldErrorComponent,
+        FormErrorComponent
     ],
     templateUrl: './tag-update.component.html',
     host: {
@@ -54,7 +59,7 @@ export class TagUpdateComponent {
 
     async submitTag() {
         if (this.tagForm.invalid) {
-            this.errorMessage.set('Veuillez remplir tous les champs obligatoires');
+            this.errorMessage.set(FORM_ERRORS.REQUIRED);
             return;
         }
 
@@ -91,7 +96,7 @@ export class TagUpdateComponent {
             this.resetForm();
         } catch (error) {
             console.error('Erreur lors de la création du tag:', error);
-            this.errorMessage.set('Erreur lors de la création du tag');
+            this.errorMessage.set(creationError('du tag'));
         } finally {
             this.isSubmitting.set(false);
         }
@@ -116,7 +121,7 @@ export class TagUpdateComponent {
             this.modalService.tag.close();
         } catch (error) {
             console.error('Erreur lors de la suppression:', error);
-            this.errorMessage.set('Erreur lors de la suppression');
+            this.errorMessage.set(deletionError());
         } finally {
             this.isSubmitting.set(false);
         }

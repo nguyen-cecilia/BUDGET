@@ -1,19 +1,13 @@
 <form class="space-y-4" [formGroup]="subscriptionForm" (ngSubmit)="submitSubscription()">
-    @if (errorMessage()) {
-        <div class="text-red">{{ errorMessage() }}</div>
-    }
-
     <label for="amount">
         <p>Montant</p>
         <input type="number" id="amount" formControlName="amount" placeholder="0.00" min="0"
                class="font-display text-md"/>
         @if (subscriptionForm.get('amount')?.invalid && (subscriptionForm.get('amount')?.dirty || subscriptionForm.get('amount')?.touched)) {
-            @if (subscriptionForm.get('amount')?.errors?.['required']) {
-                <span class="text-red text-xs">Le montant est requis.</span>
-            }
-            @if (subscriptionForm.get('amount')?.errors?.['positiveNumber']) {
-                <span class="text-red text-xs">Le montant doit être un nombre positif.</span>
-            }
+            <app-field-error
+                [control]="subscriptionForm.controls['amount']"
+                [messages]="{required: 'Le montant est requis.', positiveNumber: 'Le montant doit être un nombre positif.'}"
+            />
         }
     </label>
 
@@ -26,7 +20,10 @@
                 }
             </select>
             @if (subscriptionForm.get('currencyId')?.invalid && (subscriptionForm.get('currencyId')?.dirty || subscriptionForm.get('currencyId')?.touched)) {
-                <span class="text-red text-xs">La devise est requise.</span>
+                <app-field-error
+                    [control]="subscriptionForm.controls['currencyId']"
+                    [messages]="{required: 'La devise est requise.'}"
+                />
             }
         </label>
 
@@ -38,7 +35,10 @@
                 }
             </select>
             @if (subscriptionForm.get('accountId')?.invalid && (subscriptionForm.get('accountId')?.dirty || subscriptionForm.get('accountId')?.touched)) {
-                <span class="text-red text-xs">Le compte est requis.</span>
+                <app-field-error
+                    [control]="subscriptionForm.controls['accountId']"
+                    [messages]="{required: 'Le compte est requis.'}"
+                />
             }
         </label>
     </div>
@@ -47,9 +47,10 @@
         <p>Label</p>
         <input type="text" id="label" formControlName="label" placeholder="Ex : Netflix"/>
         @if (subscriptionForm.get('label')?.invalid && (subscriptionForm.get('label')?.dirty || subscriptionForm.get('label')?.touched)) {
-            @if (subscriptionForm.get('label')?.errors?.['required']) {
-                <span class="text-red text-xs">Le label est requis.</span>
-            }
+            <app-field-error
+                [control]="subscriptionForm.controls['label']"
+                [messages]="{required: 'Le label est requis.'}"
+            />
         }
     </label>
 
@@ -67,7 +68,10 @@
             <p>Prochain renouvellement</p>
             <input type="date" id="nextPaymentDate" formControlName="nextPaymentDate" placeholder="jj/mm/aaaa"/>
             @if (subscriptionForm.get('nextPaymentDate')?.invalid && (subscriptionForm.get('nextPaymentDate')?.dirty || subscriptionForm.get('nextPaymentDate')?.touched)) {
-                <span class="text-red text-xs">La date est requise.</span>
+                <app-field-error
+                    [control]="subscriptionForm.controls['nextPaymentDate']"
+                    [messages]="{required: 'La date est requise.'}"
+                />
             }
         </label>
     </div>
@@ -86,6 +90,8 @@
         <input type="checkbox" id="isActive" formControlName="isActive" class="switch"/>
         <p>Actif</p>
     </label>
+
+    <app-form-error [message]="errorMessage()"/>
 
     <div class="flex items-center justify-between">
         @if (modalService.subscription.editing()) {

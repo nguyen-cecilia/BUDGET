@@ -6,9 +6,12 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {CategoryService} from './category.service';
 import {ModalService} from '../../components/modal/modal.service';
 import {Category} from './category.model';
+import {FORM_ERRORS, creationError, deletionError} from '../../core/form-errors.service';
 import {ColorPickerComponent} from '../../components/color-picker/color-picker.component';
 import {SelectComponent, SelectOption} from '../../components/select/select.component';
 import {BadgeComponent} from '../../components/badge/badge.component';
+import {FieldErrorComponent} from '../../components/form-error/field-error.component';
+import {FormErrorComponent} from '../../components/form-error/form-error.component';
 
 @Component({
     selector: 'app-category-update',
@@ -21,7 +24,9 @@ import {BadgeComponent} from '../../components/badge/badge.component';
         LucideSave,
         ColorPickerComponent,
         SelectComponent,
-        BadgeComponent
+        BadgeComponent,
+        FieldErrorComponent,
+        FormErrorComponent
     ],
     templateUrl: './category-update.component.html',
     host: {
@@ -77,7 +82,7 @@ export class CategoryUpdateComponent {
 
     async submitCategory() {
         if (this.categoryForm.invalid) {
-            this.errorMessage.set('Veuillez remplir tous les champs obligatoires');
+            this.errorMessage.set(FORM_ERRORS.REQUIRED);
             return;
         }
 
@@ -116,7 +121,7 @@ export class CategoryUpdateComponent {
             this.resetForm();
         } catch (error) {
             console.error('Erreur lors de la création da la catégorie:', error);
-            this.errorMessage.set('Erreur lors de la création de la catégorie');
+            this.errorMessage.set(creationError('de la catégorie'));
         } finally {
             this.isSubmitting.set(false);
         }
@@ -142,7 +147,7 @@ export class CategoryUpdateComponent {
             this.modalService.category.close();
         } catch (error) {
             console.error('Erreur lors de la suppression de la catégorie:', error);
-            this.errorMessage.set('Erreur lors de la suppression de la catégorie');
+            this.errorMessage.set(deletionError());
         } finally {
             this.isDeleting.set(false);
         }

@@ -11,11 +11,14 @@ import {ModalService} from '../../components/modal/modal.service';
 import {TagService} from '../tags/tag.service';
 import {SubscriptionService} from '../subscriptions/subscription.service';
 import positiveNumber from '../../core/validators';
+import {FORM_ERRORS, creationError, deletionError} from '../../core/form-errors.service';
 import {Transaction} from './transaction.model';
 import {AccountService} from '../accounts/account.service';
 import {CategoryService} from '../categories/category.service';
 import {CurrencyService} from '../currencies/currency.service';
 import {Subscription} from '../subscriptions/subscription.model';
+import {FieldErrorComponent} from '../../components/form-error/field-error.component';
+import {FormErrorComponent} from '../../components/form-error/form-error.component';
 
 @Component({
     selector: 'app-update-transaction',
@@ -28,6 +31,8 @@ import {Subscription} from '../subscriptions/subscription.model';
         LucideLoaderCircle,
         LucidePlus,
         LucideTrash2,
+        FieldErrorComponent,
+        FormErrorComponent,
     ],
     templateUrl: './transaction-update.component.html',
 })
@@ -185,7 +190,7 @@ export class TransactionUpdateComponent {
 
     async submitTransaction() {
         if (this.transactionForm.invalid) {
-            this.errorMessage.set('Veuillez remplir tous les champs obligatoires');
+                this.errorMessage.set(FORM_ERRORS.REQUIRED);
             return;
         }
 
@@ -202,7 +207,7 @@ export class TransactionUpdateComponent {
             const fv = this.transactionForm.value;
 
             if (this.mode() === 'subscription' && !fv.selectedSubscriptionId) {
-                this.errorMessage.set('Veuillez choisir un abonnement');
+                this.errorMessage.set(FORM_ERRORS.SUBSCRIPTION_REQUIRED);
                 return;
             }
 
@@ -281,7 +286,7 @@ export class TransactionUpdateComponent {
             this.resetForm();
         } catch (error) {
             console.error('Erreur lors de la création de la transaction:', error);
-            this.errorMessage.set('Erreur lors de la création de la transaction');
+            this.errorMessage.set(creationError('la transaction'));
         } finally {
             this.isSubmitting.set(false);
         }
@@ -306,7 +311,7 @@ export class TransactionUpdateComponent {
             this.modalService.transaction.close();
         } catch (error) {
             console.error('Erreur lors de la suppression:', error);
-            this.errorMessage.set('Erreur lors de la suppression');
+            this.errorMessage.set(deletionError());
         } finally {
             this.isSubmitting.set(false);
         }

@@ -7,6 +7,8 @@ import {Currency, UserCurrencies} from './currency.model';
 import {SelectComponent, SelectOption} from '../../components/select/select.component';
 import {ButtonComponent} from '../../components/button/button.component';
 import {LucideLoaderCircle, LucideSave, LucideTrash2} from '@lucide/angular';
+import {FORM_ERRORS, creationError, deletionError} from '../../core/form-errors.service';
+import {FormErrorComponent} from '../../components/form-error/form-error.component';
 
 @Component({
     selector: 'app-currency-update',
@@ -17,7 +19,8 @@ import {LucideLoaderCircle, LucideSave, LucideTrash2} from '@lucide/angular';
         ButtonComponent,
         LucideTrash2,
         LucideLoaderCircle,
-        LucideSave
+        LucideSave,
+        FormErrorComponent
     ],
     templateUrl: './currency-update.component.html',
 })
@@ -83,7 +86,7 @@ export class CurrencyUpdateComponent {
         this.currencyForm.get('currencyId')?.setValue(String(this.selectedCurrency()));
 
         if (this.currencyForm.invalid) {
-            this.errorMessage.set('Veuillez remplir tous les champs obligatoires');
+            this.errorMessage.set(FORM_ERRORS.REQUIRED);
             return;
         }
 
@@ -116,7 +119,7 @@ export class CurrencyUpdateComponent {
             this.modalService.currency.close();
         } catch (error) {
             console.error('Erreur lors de la création de la devise:', error);
-            this.errorMessage.set('Erreur lors de la création de la devise');
+            this.errorMessage.set(creationError('de la devise'));
         } finally {
             this.isSubmitting.set(false);
         }
@@ -144,7 +147,7 @@ export class CurrencyUpdateComponent {
             this.modalService.currency.close();
         } catch (error) {
             console.error('Erreur lors de la suppression de la devise:', error);
-            this.errorMessage.set('Erreur lors de la suppression de la devise');
+            this.errorMessage.set(deletionError());
         } finally {
             this.isSubmitting.set(false);
         }

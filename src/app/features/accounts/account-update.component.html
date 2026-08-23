@@ -1,8 +1,4 @@
 <form class="space-y-4" [formGroup]="accountForm" (ngSubmit)="submitAccount()">
-    @if (errorMessage()) {
-        <div class="text-red">{{ errorMessage() }}</div>
-    }
-
     @if (!modalService.account.editing()) {
         <p class="text-gray text-sm">Une fois créé, le compte ne pourra plus être supprimé.</p>
     }
@@ -10,6 +6,10 @@
     <label for="label">
         <p>Label</p>
         <input id="label" type="text" placeholder="Ex : Caisse d'Epargne" formControlName="label">
+        <app-field-error
+            [control]="accountForm.controls['label']"
+            [messages]="{required: 'Le label est requis.'}"
+        />
     </label>
 
     <label for="isDefault">
@@ -21,6 +21,8 @@
         <input id="isActive" type="checkbox" formControlName="isActive">
         <p>Actif</p>
     </label>
+
+    <app-form-error [message]="errorMessage()"/>
 
     <div class="flex items-center justify-end">
         <button app-button type="submit" [disabled]="isSubmitting()" class="ml-auto">

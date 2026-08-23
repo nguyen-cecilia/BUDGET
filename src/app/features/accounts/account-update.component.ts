@@ -6,6 +6,9 @@ import {AuthStateService} from '../auth/auth-state.service';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {AccountService} from './account.service';
 import {Account} from './account.model';
+import {FORM_ERRORS, creationError} from '../../core/form-errors.service';
+import {FieldErrorComponent} from '../../components/form-error/field-error.component';
+import {FormErrorComponent} from '../../components/form-error/form-error.component';
 
 @Component({
     selector: 'app-account-update',
@@ -14,7 +17,9 @@ import {Account} from './account.model';
         LucideLoaderCircle,
         LucideSave,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        FieldErrorComponent,
+        FormErrorComponent
     ],
     templateUrl: './account-update.component.html',
 })
@@ -71,7 +76,7 @@ export class AccountUpdateComponent {
 
     async submitAccount() {
         if (this.accountForm.invalid) {
-            this.errorMessage.set('Veuillez remplir tous les champs obligatoires');
+            this.errorMessage.set(FORM_ERRORS.REQUIRED);
             return;
         }
 
@@ -110,7 +115,7 @@ export class AccountUpdateComponent {
             this.modalService.account.close();
         } catch (error) {
             console.error('Erreur lors de la création du compte:', error);
-            this.errorMessage.set('Erreur lors de la création du compte');
+            this.errorMessage.set(creationError('le compte'));
         } finally {
             this.isSubmitting.set(false);
         }

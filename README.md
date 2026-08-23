@@ -43,6 +43,7 @@ Layout:
 Auth:
 
 - [x] Simple lock with a password
+- [ ] Bug: when already logged in
 
 Dashboard:
 

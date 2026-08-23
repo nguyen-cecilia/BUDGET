@@ -1,8 +1,4 @@
 <form class="space-y-4" [formGroup]="transactionForm" (ngSubmit)="submitTransaction()">
-    @if (errorMessage()) {
-        <div class="text-red">{{ errorMessage() }}</div>
-    }
-
     <div class="tab-switch-input">
         <label
             for="transaction"
@@ -85,14 +81,10 @@
             min="0"
             class="font-display text-md"
         />
-        @if (transactionForm.get('amount')?.invalid && (transactionForm.get('amount')?.dirty || transactionForm.get('amount')?.touched)) {
-            @if (transactionForm.get('amount')?.errors?.['required']) {
-                <span class="text-red text-xs">Le montant est requis.</span>
-            }
-            @if (transactionForm.get('amount')?.errors?.['positiveNumber']) {
-                <span class="text-red text-xs">Le montant doit être un nombre positif.</span>
-            }
-        }
+        <app-field-error
+            [control]="transactionForm.controls['amount']"
+            [messages]="{required: 'Le montant est requis.', positiveNumber: 'Le montant doit être un nombre positif.'}"
+        />
     </label>
 
     <div class="flex items-center gap-3 *:flex-1">
@@ -124,11 +116,10 @@
                 formControlName="label"
                 placeholder="Ex: Courses Carrefour"
             />
-            @if (transactionForm.get('label')?.invalid && (transactionForm.get('label')?.dirty || transactionForm.get('label')?.touched)) {
-                @if (transactionForm.get('label')?.errors?.['required']) {
-                    <span class="text-red text-xs">Le label est requis.</span>
-                }
-            }
+            <app-field-error
+                [control]="transactionForm.controls['label']"
+                [messages]="{required: 'Le label est requis.'}"
+            />
         </label>
     }
 
@@ -208,6 +199,8 @@
             }
         </div>
     }
+
+    <app-form-error [message]="errorMessage()"/>
 
     <div class="flex items-center justify-between">
         @if (modalService.transaction.editing()) {

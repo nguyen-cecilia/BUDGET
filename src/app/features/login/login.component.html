@@ -9,6 +9,10 @@
                     placeholder="votre@email.com"
                     [disabled]="isLoading()"
                 />
+                <app-field-error
+                    [control]="loginForm.controls['email']"
+                    [messages]="{required: 'L\'email est requis.', email: 'L\'email est invalide.'}"
+                />
             </label>
 
             <label>
@@ -18,6 +22,10 @@
                     formControlName="password"
                     placeholder="Votre mot de passe"
                     [disabled]="isLoading()"
+                />
+                <app-field-error
+                    [control]="loginForm.controls['password']"
+                    [messages]="{required: 'Le mot de passe est requis.', minlength: '6 caractères minimum.'}"
                 />
             </label>
 
@@ -30,11 +38,7 @@
                 {{ isLoading() ? 'Connexion en cours...' : 'Se connecter' }}
             </button>
 
-            @if (error()) {
-                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                    {{ error() }}
-                </div>
-            }
+            <app-form-error [message]="errorMessage()"/>
         </form>
     </div>
 </div>

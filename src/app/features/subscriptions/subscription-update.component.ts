@@ -2,6 +2,7 @@ import {Component, effect, inject, signal} from '@angular/core';
 import {AuthStateService} from '../auth/auth-state.service';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import positiveNumber from '../../core/validators';
+import {FORM_ERRORS, creationError, deletionError} from '../../core/form-errors.service';
 import {ModalService} from '../../components/modal/modal.service';
 import {SubscriptionService} from './subscription.service';
 import {Subscription} from './subscription.model';
@@ -12,6 +13,8 @@ import {TransactionOptionsService} from '../transactions/transaction-options.ser
 import {AccountService} from '../accounts/account.service';
 import {CategoryService} from '../categories/category.service';
 import {CurrencyService} from '../currencies/currency.service';
+import {FieldErrorComponent} from '../../components/form-error/field-error.component';
+import {FormErrorComponent} from '../../components/form-error/form-error.component';
 
 @Component({
     selector: 'app-subscription-update',
@@ -21,7 +24,9 @@ import {CurrencyService} from '../currencies/currency.service';
         ButtonComponent,
         LucideLoaderCircle,
         LucideSave,
-        LucideTrash2
+        LucideTrash2,
+        FieldErrorComponent,
+        FormErrorComponent
     ],
     templateUrl: './subscription-update.component.html',
 })
@@ -83,7 +88,7 @@ export class SubscriptionUpdate {
 
     async submitSubscription() {
         if (this.subscriptionForm.invalid) {
-            this.errorMessage.set('Veuillez remplir tous les champs obligatoires');
+            this.errorMessage.set(FORM_ERRORS.REQUIRED);
             return;
         }
 
@@ -125,7 +130,7 @@ export class SubscriptionUpdate {
             this.modalService.subscription.close();
         } catch (error) {
             console.error('Erreur lors de la création de l\'abonnement:', error);
-            this.errorMessage.set('Erreur lors de la création de l\'abonnement');
+            this.errorMessage.set(creationError('l\'abonnement'));
         } finally {
             this.isSubmitting.set(false);
         }
@@ -150,7 +155,7 @@ export class SubscriptionUpdate {
             this.modalService.subscription.close();
         } catch (error) {
             console.error('Erreur lors de la suppression:', error);
-            this.errorMessage.set('Erreur lors de la suppression');
+            this.errorMessage.set(deletionError());
         } finally {
             this.isSubmitting.set(false);
         }

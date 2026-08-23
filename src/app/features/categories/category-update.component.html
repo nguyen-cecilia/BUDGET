@@ -1,26 +1,29 @@
-<form class="space-y-3" [formGroup]="categoryForm" (ngSubmit)="submitCategory()">
-    @if (errorMessage()) {
-        <div class="text-red">{{ errorMessage() }}</div>
-    }
+<form class="space-y-4" [formGroup]="categoryForm" (ngSubmit)="submitCategory()">
+    <div class="space-y-1">
+        <div class="flex items-end gap-3">
+            <app-color-picker [color]="selectedColor()" (colorChange)="selectColor($event)"/>
 
-    <div class="flex items-end gap-3">
-        <app-color-picker [color]="selectedColor()" (colorChange)="selectColor($event)"/>
+            <label for="label" class="flex-1">
+                <input id="label" type="text" placeholder="Nouvelle catégorie" formControlName="label">
+            </label>
 
-        <label for="label" class="flex-1">
-            <input id="label" type="text" placeholder="Nouvelle catégorie" formControlName="label">
-        </label>
+            @if (!editingCategory()) {
+                <button app-button (click)="submitCategory()" [disabled]="isSubmitting()">
+                    @if (isSubmitting()) {
+                        <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
+                        Envoi...
+                    } @else {
+                        <svg lucidePlus [size]="16"></svg>
+                        Ajouter
+                    }
+                </button>
+            }
+        </div>
 
-        @if (!editingCategory()) {
-            <button app-button (click)="submitCategory()" [disabled]="isSubmitting()">
-                @if (isSubmitting()) {
-                    <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
-                    Envoi...
-                } @else {
-                    <svg lucidePlus [size]="16"></svg>
-                    Ajouter
-                }
-            </button>
-        }
+        <app-field-error
+            [control]="categoryForm.controls['label']"
+            [messages]="{required: 'Le label est requis.'}"
+        />
     </div>
 
     <div class="flex items-center gap-2">
@@ -36,6 +39,8 @@
             </button>
         }
     </div>
+
+    <app-form-error [message]="errorMessage()"/>
 
     @if (editingCategory()) {
         <div class="mt-6 flex items-center justify-between gap-3">
