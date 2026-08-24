@@ -1,6 +1,6 @@
 import {Routes} from '@angular/router';
 import {LoginComponent} from './features/login/login.component';
-import {authGuard} from './features/auth/auth.guard';
+import {authGuard, guestGuard} from './core/auth/auth.guard';
 import {DashboardComponent} from './features/dashboard/dashboard.component';
 import {TransactionsListingComponent} from './features/transactions/transactions-listing.component';
 import {SettingsComponent} from './features/settings/settings.component';
@@ -13,6 +13,7 @@ export const routes: Routes = [
     {
         path: 'connexion',
         component: LoginComponent,
+        canActivate: [guestGuard],
     },
     {
         path: '',

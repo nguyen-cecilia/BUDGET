@@ -1,5 +1,5 @@
 import {Component, effect, inject, signal} from '@angular/core';
-import {AuthStateService} from '../auth/auth-state.service';
+import {AuthStateService} from '../../core/auth/auth-state.service';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ModalService} from '../../components/modal/modal.service';
 import {SavingsGoalService} from './savings-goal.service';

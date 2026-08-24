@@ -5,7 +5,7 @@ import {TransactionService} from '../transactions/transaction.service';
 import {SelectComponent, SelectOption} from '../../components/select/select.component';
 import {Transaction} from '../transactions/transaction.model';
 import {ColorService} from '../../core/color.service';
-import {AuthStateService} from '../auth/auth-state.service';
+import {AuthStateService} from '../../core/auth/auth-state.service';
 import {CurrencyPipe} from '@angular/common';
 import {BarChartComponent} from '../../components/chart/bar-chart.component';
 import {DateService} from '../../core/date.service';

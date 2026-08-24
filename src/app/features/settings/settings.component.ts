@@ -20,7 +20,7 @@ import {AccountUpdateComponent} from '../accounts/account-update.component';
 import {ModalService} from '../../components/modal/modal.service';
 import {AccountService} from '../accounts/account.service';
 import {Account} from '../accounts/account.model';
-import {AuthStateService} from '../auth/auth-state.service';
+import {AuthStateService} from '../../core/auth/auth-state.service';
 import {TagService} from '../tags/tag.service';
 import {Tag} from '../tags/tag.model';
 import {TagUpdateComponent} from '../tags/tag-update.component';

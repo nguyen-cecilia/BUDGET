@@ -18,7 +18,7 @@ import {
 import {ButtonComponent} from '../../components/button/button.component';
 import {RouterLink} from '@angular/router';
 import {DonutChartComponent} from '../../components/chart/donut-chart.component';
-import {AuthStateService} from '../auth/auth-state.service';
+import {AuthStateService} from '../../core/auth/auth-state.service';
 import {TransactionService} from '../transactions/transaction.service';
 import {SubscriptionService} from '../subscriptions/subscription.service';
 import {PeriodService} from '../../core/period.service';

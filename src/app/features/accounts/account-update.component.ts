@@ -2,7 +2,7 @@ import {Component, computed, effect, inject, signal} from '@angular/core';
 import {ButtonComponent} from '../../components/button/button.component';
 import {LucideLoaderCircle, LucideSave} from '@lucide/angular';
 import {ModalService} from '../../components/modal/modal.service';
-import {AuthStateService} from '../auth/auth-state.service';
+import {AuthStateService} from '../../core/auth/auth-state.service';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {AccountService} from './account.service';
 import {Account} from './account.model';

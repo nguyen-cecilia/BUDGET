@@ -1,6 +1,6 @@
 import {Component, computed, effect, inject, Input, signal} from '@angular/core';
 import {TagService} from './tag.service';
-import {AuthStateService} from '../auth/auth-state.service';
+import {AuthStateService} from '../../core/auth/auth-state.service';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ButtonComponent} from '../../components/button/button.component';
 import {LucideLoaderCircle, LucidePlus, LucideSave, LucideTrash2} from '@lucide/angular';

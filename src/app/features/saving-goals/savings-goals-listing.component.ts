@@ -1,7 +1,7 @@
 import {Component, effect, inject, signal} from '@angular/core';
 import {ButtonComponent} from '../../components/button/button.component';
 import {LucideFrown, LucidePencil, LucidePiggyBank, LucidePlus} from '@lucide/angular';
-import {AuthStateService} from '../auth/auth-state.service';
+import {AuthStateService} from '../../core/auth/auth-state.service';
 import {SavingsGoalService} from './savings-goal.service';
 import {CurrencyService} from '../currencies/currency.service';
 import {SavingsGoal} from './savings-goal.model';

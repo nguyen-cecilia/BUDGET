@@ -2,7 +2,7 @@ import {Component, inject, signal} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {AuthService} from '../auth/auth.service';
+import {AuthService} from '../../core/auth/auth.service';
 import {ButtonComponent} from '../../components/button/button.component';
 import {FieldErrorComponent} from '../../components/form-error/field-error.component';
 import {FormErrorComponent} from '../../components/form-error/form-error.component';

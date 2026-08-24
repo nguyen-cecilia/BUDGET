@@ -1,6 +1,6 @@
 import {inject, Injectable, signal} from '@angular/core';
 import {User} from '@supabase/supabase-js';
-import {SupabaseService} from '../../core/supabase.service';
+import {SupabaseService} from '../supabase.service';
 
 @Injectable({
     providedIn: 'root',
@@ -17,8 +17,10 @@ export class AuthStateService {
     private loadingSignal = signal<boolean>(true);
     loading$ = this.loadingSignal.asReadonly();
 
+    ready: Promise<void>;
+
     constructor() {
-        this.initializeAuth();
+        this.ready = this.initializeAuth();
     }
 
     private async initializeAuth() {

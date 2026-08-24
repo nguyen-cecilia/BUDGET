@@ -5,7 +5,7 @@ import {TransactionsByMonth} from './transaction.model';
 import {TransactionService} from './transaction.service';
 import {CurrencyPipe, DatePipe} from '@angular/common';
 import {SelectComponent, SelectOption} from '../../components/select/select.component';
-import {AuthStateService} from '../auth/auth-state.service';
+import {AuthStateService} from '../../core/auth/auth-state.service';
 import {PeriodService} from '../../core/period.service';
 import {TransactionOptionsService} from './transaction-options.service';
 import {ButtonComponent} from '../../components/button/button.component';

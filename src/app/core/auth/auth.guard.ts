@@ -6,8 +6,24 @@ export const authGuard: CanActivateFn = async () => {
     const authState = inject(AuthStateService);
     const router = inject(Router);
 
+    await authState.ready;
+
     if (!authState.isAuthenticated()) {
         await router.navigate(['connexion']);
+        return false;
+    }
+
+    return true;
+};
+
+export const guestGuard: CanActivateFn = async () => {
+    const authState = inject(AuthStateService);
+    const router = inject(Router);
+
+    await authState.ready;
+
+    if (authState.isAuthenticated()) {
+        await router.navigate(['']);
         return false;
     }
 

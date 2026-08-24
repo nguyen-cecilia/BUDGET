@@ -4,7 +4,7 @@ import {BadgeComponent} from '../../components/badge/badge.component';
 import {LucideLoaderCircle, LucidePlus, LucideSave, LucideTrash2, LucideX} from '@lucide/angular';
 import {ButtonComponent} from '../../components/button/button.component';
 import {SelectOption} from '../../components/select/select.component';
-import {AuthStateService} from '../auth/auth-state.service';
+import {AuthStateService} from '../../core/auth/auth-state.service';
 import {TransactionOptionsService} from './transaction-options.service';
 import {TransactionService} from './transaction.service';
 import {ModalService} from '../../components/modal/modal.service';

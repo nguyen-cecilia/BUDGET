@@ -13,7 +13,7 @@ import {ButtonComponent} from './components/button/button.component';
 import {ModalComponent} from './components/modal/modal.component';
 import {TransactionUpdateComponent} from './features/transactions/transaction-update.component';
 import {ModalService} from './components/modal/modal.service';
-import {AuthStateService} from './features/auth/auth-state.service';
+import {AuthStateService} from './core/auth/auth-state.service';
 import {SelectComponent} from './components/select/select.component';
 import {PeriodService} from './core/period.service';
 
