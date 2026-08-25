@@ -285,7 +285,7 @@
             </h2>
 
             <form [formGroup]="passwordForm" (ngSubmit)="updatePassword()" class="mx-auto flex flex-col gap-4">
-                <app-form-error [message]="passwordMessage()"/>
+                <app-form-error [message]="passwordMessage()?.text ?? null" [type]="passwordMessage()?.type ?? 'error'"/>
 
                 <label>
                     <p>Nouveau mot de passe</p>

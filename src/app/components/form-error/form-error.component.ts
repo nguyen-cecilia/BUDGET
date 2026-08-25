@@ -4,7 +4,11 @@ import {Component, input} from '@angular/core';
     selector: 'app-form-error',
     template: `
         @if (message()) {
-            <div class="text-red bg-red/15 px-3 py-2 border border-red/50 rounded-xs font-medium">{{ message() }}</div>
+            @if (type() === 'success') {
+                <div class="text-green bg-green/15 px-3 py-2 border border-green/50 rounded-xs font-medium">{{ message() }}</div>
+            } @else {
+                <div class="text-red bg-red/15 px-3 py-2 border border-red/50 rounded-xs font-medium">{{ message() }}</div>
+            }
         }
     `,
     host: {
@@ -13,4 +17,5 @@ import {Component, input} from '@angular/core';
 })
 export class FormErrorComponent {
     message = input<string | null>(null);
+    type = input<'error' | 'success'>('error');
 }

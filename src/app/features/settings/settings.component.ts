@@ -111,7 +111,7 @@ export class SettingsComponent {
     categories = signal<Category[]>([]);
 
     passwordForm: FormGroup;
-    passwordMessage = signal<string | null>(null);
+    passwordMessage = signal<{text: string; type: 'error' | 'success'} | null>(null);
     isSubmittingPassword = signal(false);
 
     constructor() {
@@ -137,7 +137,7 @@ export class SettingsComponent {
         const {newPassword, confirmPassword} = this.passwordForm.value;
 
         if (newPassword !== confirmPassword) {
-            this.passwordMessage.set('Les mots de passe ne correspondent pas.');
+            this.passwordMessage.set({text: 'Les mots de passe ne correspondent pas.', type: 'error'});
             return;
         }
 
@@ -145,9 +145,9 @@ export class SettingsComponent {
         const {error} = await this.authService.updatePassword(newPassword);
 
         if (error) {
-            this.passwordMessage.set(error.message || 'Erreur lors de la mise à jour.');
+            this.passwordMessage.set({text: error.message || 'Erreur lors de la mise à jour.', type: 'error'});
         } else {
-            this.passwordMessage.set('Mot de passe mis à jour avec succès.');
+            this.passwordMessage.set({text: 'Mot de passe mis à jour avec succès.', type: 'success'});
             this.passwordForm.reset();
         }
         this.isSubmittingPassword.set(false);
