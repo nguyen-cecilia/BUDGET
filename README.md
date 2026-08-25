@@ -39,6 +39,7 @@ Layout:
 - [x] Clean code and refactor
 - [x] Bug: scroll when a modal is open
 - [x] When doing get requests, do it in bulk with Promise
+- [ ] Messages: type success
 
 Auth:
 

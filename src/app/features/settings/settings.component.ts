@@ -1,6 +1,7 @@
 import {Component, effect, inject, signal, untracked} from '@angular/core';
 import {
     LucideCoins,
+    LucideKey,
     LucideLandmark,
     LucideLayers,
     LucideLogOut,
@@ -43,6 +44,9 @@ import {LoadingComponent} from '../../components/loading/loading.component';
 import {RefreshService} from '../../core/refresh.service';
 import {Router} from '@angular/router';
 import {AuthService} from '../../core/auth/auth.service';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormErrorComponent} from '../../components/form-error/form-error.component';
+import {FieldErrorComponent} from '../../components/form-error/field-error.component';
 
 @Component({
     selector: 'app-settings',
@@ -70,7 +74,11 @@ import {AuthService} from '../../core/auth/auth.service';
         LucideTriangleAlert,
         ConfirmComponent,
         LoadingComponent,
-        LucideLogOut
+        LucideLogOut,
+        FormErrorComponent,
+        LucideKey,
+        ReactiveFormsModule,
+        FieldErrorComponent
     ],
     templateUrl: './settings.component.html',
 })
@@ -84,6 +92,7 @@ export class SettingsComponent {
     private authService = inject(AuthService);
     private router = inject(Router);
     private refreshService = inject(RefreshService);
+    private fb = inject(FormBuilder);
     protected subscriptionService = inject(SubscriptionService);
     protected currencyService = inject(CurrencyService);
     protected modalService = inject(ModalService);
@@ -101,7 +110,16 @@ export class SettingsComponent {
     tags = signal<Tag[]>([]);
     categories = signal<Category[]>([]);
 
+    passwordForm: FormGroup;
+    passwordMessage = signal<string | null>(null);
+    isSubmittingPassword = signal(false);
+
     constructor() {
+        this.passwordForm = this.fb.group({
+            newPassword: ['', [Validators.required, Validators.minLength(6)]],
+            confirmPassword: ['', [Validators.required]],
+        });
+
         effect(() => {
             this.refreshService.trigger();
             const key = this.refreshService.lastKey();
@@ -112,6 +130,27 @@ export class SettingsComponent {
                 }
             });
         });
+    }
+
+    async updatePassword(): Promise<void> {
+        this.passwordMessage.set(null);
+        const {newPassword, confirmPassword} = this.passwordForm.value;
+
+        if (newPassword !== confirmPassword) {
+            this.passwordMessage.set('Les mots de passe ne correspondent pas.');
+            return;
+        }
+
+        this.isSubmittingPassword.set(true);
+        const {error} = await this.authService.updatePassword(newPassword);
+
+        if (error) {
+            this.passwordMessage.set(error.message || 'Erreur lors de la mise à jour.');
+        } else {
+            this.passwordMessage.set('Mot de passe mis à jour avec succès.');
+            this.passwordForm.reset();
+        }
+        this.isSubmittingPassword.set(false);
     }
 
     deleteAllTransactions(): void {
