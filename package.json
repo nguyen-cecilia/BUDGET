@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "prebuild": "node -e \"const fs=require('fs');let c=fs.readFileSync('src/environments/environment.ts','utf8');c=c.replace('%%SUPABASE_URL%%',process.env.SUPABASE_URL||'');c=c.replace('%%SUPABASE_KEY%%',process.env.SUPABASE_KEY||'');fs.writeFileSync('src/environments/environment.ts',c)\"",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
