@@ -46,12 +46,22 @@
     <app-confirm/>
 </app-modal>
 
-<section>
-    <div class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-3 lg:space-y-0">
+<section class="space-y-6">
+    <button app-button variant="outline" (click)="logout()" class="lg:hidden ml-auto">
+        <svg lucideLogOut [size]="16"></svg>
+        Se déconnecter
+    </button>
+
+    <div class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-3 lg:space-y-0 lg:flex lg:justify-between lg:items-start">
         <div>
             <h1>Paramètres</h1>
             <p class="text-muted">Gestion de l'application : catégories, tags, devises, abonnements...</p>
         </div>
+
+        <button app-button variant="outline" (click)="logout()">
+            <svg lucideLogOut [size]="16"></svg>
+            Se déconnecter
+        </button>
 
         <div class="lg:hidden">
             <app-select

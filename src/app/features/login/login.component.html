@@ -1,6 +1,8 @@
-<div class="min-h-screen flex items-center justify-center">
+<div class="h-full flex items-center justify-center">
     <div class="w-full max-w-sm bg-surface border border-line rounded shadow-2xl shadow-ink/10 p-8">
-        <form [formGroup]="loginForm" (ngSubmit)="login()" class="space-y-6">
+        <form [formGroup]="loginForm" (ngSubmit)="login()" class="flex flex-col gap-4">
+            <app-form-error [message]="errorMessage()"/>
+
             <label>
                 <p>Email</p>
                 <input
@@ -37,8 +39,6 @@
             >
                 {{ isLoading() ? 'Connexion en cours...' : 'Se connecter' }}
             </button>
-
-            <app-form-error [message]="errorMessage()"/>
         </form>
     </div>
 </div>

@@ -11,7 +11,7 @@
             <button
                 app-button
                 routerLink="parametres"
-                routerLinkActive="bg-blue"
+                routerLinkActive="bg-blue! dark:text-deep"
                 shape="round"
                 variant="outline"
             >
@@ -129,7 +129,7 @@
 @if (authState.isAuthenticated()) {
     <!-- VERSION MOBILE -->
     <nav
-        class="lg:hidden z-2 fixed left-0 right-0 bottom-5 mx-5 bg-ink text-base rounded-full py-2 px-6 flex items-center justify-evenly gap-2">
+        class="lg:hidden z-2 fixed left-0 right-0 bottom-5 mx-5 bg-ink text-base dark:bg-deep dark:text-ink dark:border dark:border-line rounded-full py-2 px-6 flex items-center justify-evenly gap-2">
         @for (link of links; track link.label; let i = $index; let isLast = $last) {
             @if (!isLast) {
                 @if (i === 2) {

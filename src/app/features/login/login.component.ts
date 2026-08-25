@@ -44,6 +44,7 @@ export class LoginComponent {
 
         if (error) {
             this.errorMessage.set(error.message || 'Erreur lors de la connexion.');
+            this.isLoading.set(false);
             return;
         }
 

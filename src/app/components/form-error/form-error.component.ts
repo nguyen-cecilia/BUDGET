@@ -8,7 +8,7 @@ import {Component, input} from '@angular/core';
         }
     `,
     host: {
-        'class': 'block',
+        '[class]': `message() ? 'block' : 'hidden'`,
     }
 })
 export class FormErrorComponent {

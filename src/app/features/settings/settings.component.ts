@@ -3,6 +3,7 @@ import {
     LucideCoins,
     LucideLandmark,
     LucideLayers,
+    LucideLogOut,
     LucidePencil,
     LucidePlus,
     LucideSkull,
@@ -39,6 +40,8 @@ import {ConfirmComponent, ConfirmPayload} from '../../components/confirm/confirm
 import {SavingsGoalService} from '../saving-goals/savings-goal.service';
 import {TransactionService} from '../transactions/transaction.service';
 import {LoadingComponent} from '../../components/loading/loading.component';
+import {Router} from '@angular/router';
+import {AuthService} from '../../core/auth/auth.service';
 
 @Component({
     selector: 'app-settings',
@@ -65,7 +68,8 @@ import {LoadingComponent} from '../../components/loading/loading.component';
         LucideLayers,
         LucideTriangleAlert,
         ConfirmComponent,
-        LoadingComponent
+        LoadingComponent,
+        LucideLogOut
     ],
     templateUrl: './settings.component.html',
 })
@@ -76,6 +80,8 @@ export class SettingsComponent {
     private categoryService = inject(CategoryService);
     private transactionService = inject(TransactionService);
     private savingsGoalService = inject(SavingsGoalService);
+    private authService = inject(AuthService);
+    private router = inject(Router);
     protected subscriptionService = inject(SubscriptionService);
     protected currencyService = inject(CurrencyService);
     protected modalService = inject(ModalService);
@@ -206,6 +212,11 @@ export class SettingsComponent {
                 }
             },
         });
+    }
+
+    async logout(): Promise<void> {
+        await this.authService.signOut();
+        await this.router.navigate(['connexion']);
     }
 
     private async loadSettings(userId: string): Promise<void> {
