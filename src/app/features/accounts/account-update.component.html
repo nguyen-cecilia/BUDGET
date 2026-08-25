@@ -1,6 +1,6 @@
 <form class="space-y-4" [formGroup]="accountForm" (ngSubmit)="submitAccount()">
     @if (!modalService.account.editing()) {
-        <p class="text-gray text-sm">Une fois créé, le compte ne pourra plus être supprimé.</p>
+        <p class="text-muted text-sm">Une fois créé, le compte ne pourra plus être supprimé.</p>
     }
 
     <label for="label">

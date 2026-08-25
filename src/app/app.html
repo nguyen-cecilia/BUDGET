@@ -1,5 +1,5 @@
 @if (authState.isAuthenticated()) {
-    <header class="lg:hidden border-b border-gray-light py-3 px-5 flex justify-between">
+    <header class="lg:hidden border-b border-line py-3 px-5 flex justify-between">
         <a routerLink="" class="flex items-center gap-2">
             <div class="rounded-full bg-yellow p-1.5 aspect-square flex items-center justify-center">
                 <img src="icons/favicon.svg" alt="Logo Budget" width="25">
@@ -22,8 +22,13 @@
                 app-button
                 shape="round"
                 variant="outline"
+                (click)="themeService.toggle()"
             >
-                <svg lucideMoon [size]="22"></svg>
+                @if (themeService.isDark()) {
+                    <svg lucideSun [size]="22"></svg>
+                } @else {
+                    <svg lucideMoon [size]="22"></svg>
+                }
             </button>
         </div>
     </header>
@@ -39,9 +44,10 @@
 
 <div class="flex min-h-screen">
     @if (authState.isAuthenticated()) {
+        <!-- VERSION DESKTOP -->
         <aside
-            class="hidden h-screen sticky top-0 px-6 py-5 lg:flex flex-col gap-6 bg-beige-lighter border-r border-gray-light">
-            <div class="flex items-center justify-between gap-2 border-b border-gray-light pb-5">
+            class="hidden h-screen sticky top-0 px-6 py-5 lg:flex flex-col gap-6 bg-surface border-r border-line">
+            <div class="flex items-center justify-between gap-2 border-b border-line pb-5">
                 <a routerLink="" class="flex items-center gap-2">
                     <div class="rounded-full bg-yellow p-1.5 aspect-square flex items-center justify-center">
                         <img src="icons/favicon.svg" alt="Logo Budget" width="25">
@@ -53,8 +59,13 @@
                     app-button
                     shape="round"
                     variant="outline"
+                    (click)="themeService.toggle()"
                 >
-                    <svg lucideMoon [size]="22"></svg>
+                    @if (themeService.isDark()) {
+                        <svg lucideSun [size]="22"></svg>
+                    } @else {
+                        <svg lucideMoon [size]="22"></svg>
+                    }
                 </button>
             </div>
 
@@ -64,7 +75,7 @@
                 (valueChange)="periodService.setMonth($event)"
             ></app-select>
 
-            <hr class="text-gray-light">
+            <hr class="text-line">
 
             <button app-button variant="secondary" class="text-md! font-bold whitespace-nowrap" shape="bigPill"
                     (click)="modalService.transaction.openCreate()">
@@ -79,10 +90,10 @@
                             <a
                                 app-button
                                 routerLink="{{ link.path }}"
-                                routerLinkActive="bg-blue/50 text-black-dark! [&>svg]:bg-yellow"
+                                routerLinkActive="bg-blue/50 text-ink! [&>svg]:bg-yellow dark:[&>svg]:border-line dark:[&>svg]:text-line"
                                 [routerLinkActiveOptions]="{exact: true}"
                                 variant="sidebar"
-                                class="font-bold text-md! [&>svg]:rounded-full [&>svg]:p-1.5 [&>svg]:border [&>svg]:border-black-dark [&>svg]:text-black-dark"
+                                class="font-bold text-md! [&>svg]:rounded-full [&>svg]:p-1.5 [&>svg]:border [&>svg]:border-ink [&>svg]:text-ink"
                             >
                                 @switch (link.icon) {
                                     @case ('lucideHome') {
@@ -116,8 +127,9 @@
 </div>
 
 @if (authState.isAuthenticated()) {
+    <!-- VERSION MOBILE -->
     <nav
-        class="lg:hidden z-2 fixed left-0 right-0 bottom-5 mx-5 bg-black-dark text-beige-light rounded-full py-2 px-6 flex items-center justify-evenly gap-2">
+        class="lg:hidden z-2 fixed left-0 right-0 bottom-5 mx-5 bg-ink text-base rounded-full py-2 px-6 flex items-center justify-evenly gap-2">
         @for (link of links; track link.label; let i = $index; let isLast = $last) {
             @if (!isLast) {
                 @if (i === 2) {
@@ -125,7 +137,7 @@
                         app-button
                         variant="secondary"
                         shape="round"
-                        class="-translate-y-6 text-black-dark p-3"
+                        class="-translate-y-6 text-ink p-3"
                         (click)="modalService.transaction.openCreate()"
                     >
                         <svg lucidePlus [size]="34"></svg>
@@ -136,7 +148,7 @@
                     routerLink="{{ link.path }}"
                     routerLinkActive="text-yellow"
                     [routerLinkActiveOptions]="{exact: true}"
-                    class="flex flex-col items-center gap-1 transition-all hover:text-gray-light/75"
+                    class="flex flex-col items-center gap-1 transition-all hover:text-line/75"
                 >
                     @switch (link.icon) {
                         @case ('lucideHome') {

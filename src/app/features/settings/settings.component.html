@@ -47,10 +47,10 @@
 </app-modal>
 
 <section>
-    <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-3 lg:space-y-0">
+    <div class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-3 lg:space-y-0">
         <div>
             <h1>Paramètres</h1>
-            <p class="text-gray">Gestion de l'application : catégories, tags, devises, abonnements...</p>
+            <p class="text-muted">Gestion de l'application : catégories, tags, devises, abonnements...</p>
         </div>
 
         <div class="lg:hidden">
@@ -68,7 +68,7 @@
 } @else {
     <section class="flex flex-col lg:flex-row gap-8 *:flex-1">
         <div class="space-y-8">
-            <div class="bg-yellow/50 border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
+            <div class="bg-yellow/50 border border-line shadow-md shadow-muted/10 rounded p-5 space-y-4">
                 <div class="flex items-center justify-between gap-3">
                     <h2 class="flex items-center gap-2">
                         <svg lucideCoins [size]="20"></svg>
@@ -84,7 +84,7 @@
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-2">
                     @for (currency of currencies(); track currency.currency_id) {
                         <div
-                            class="p-3 border rounded flex items-center gap-2 cursor-pointer bg-beige-lighter transition-all hover:bg-beige-light"
+                            class="p-3 border rounded flex items-center gap-2 cursor-pointer bg-surface transition-all hover:bg-base"
                             (click)="modalService.currency.openEdit(currency)"
                             (keydown.enter)="modalService.currency.openEdit(currency)"
                             (keydown.space)="modalService.currency.openEdit(currency)"
@@ -92,26 +92,26 @@
                             role="button"
                         >
                             <div
-                                class="size-10 rounded-full border p-1 text-md font-medium font-display bg-purple flex justify-center items-center gap-3">
+                                class="size-10 rounded-full border dark:border-ink p-1 text-md font-medium font-display bg-purple dark:text-surface flex justify-center items-center gap-3">
                                 {{ currency.symbol }}
                             </div>
                             <div class="flex-1">
                                 <div class="flex items-center gap-2">
                                     <h3>{{ currency.label }}</h3>
                                     @if (currency.is_default) {
-                                        <div class="text-xs text-semibold py-0.5 px-1.5 border rounded-xs bg-green">
+                                        <div class="text-xs text-semibold py-0.5 px-1.5 border rounded-xs bg-green dark:text-surface">
                                             par défaut
                                         </div>
                                     }
                                 </div>
-                                <p class="text-sm text-gray">{{ currency.code }}</p>
+                                <p class="text-sm text-muted">{{ currency.code }}</p>
                             </div>
                         </div>
                     }
                 </div>
             </div>
 
-            <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
+            <div class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-4">
                 <h2 class="flex items-center gap-2">
                     <svg lucideTag [size]="20"></svg>
                     Tags
@@ -137,7 +137,7 @@
             </div>
         </div>
 
-        <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
+        <div class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-4">
             <div class="flex items-center justify-between gap-3">
                 <h2 class="flex items-center gap-2">
                     <svg lucideSparkles [size]="20"></svg>
@@ -153,7 +153,7 @@
             <div class="lg:max-h-88 lg:overflow-y-auto">
                 @for (subscription of subscriptions(); track subscription.id) {
                     <div
-                        class="flex items-center justify-between gap-6 rounded px-2 py-4 cursor-pointer transition-all hover:bg-beige-light"
+                        class="flex items-center justify-between gap-6 rounded px-2 py-4 cursor-pointer transition-all hover:bg-base"
                         (click)="modalService.subscription.openEdit(subscription)"
                         (keydown.enter)="modalService.subscription.openEdit(subscription)"
                         (keydown.space)="modalService.subscription.openEdit(subscription)"
@@ -165,7 +165,7 @@
                         </label>
                         <div class="flex-1">
                             <h3>{{ subscription.label }}</h3>
-                            <p class="text-sm text-gray">
+                            <p class="text-sm text-muted">
                                 @if (subscription.category) {
                                     <span
                                         class="font-semibold underline decoration-2 underline-offset-3 {{ colorService.getDecoration(subscription.category.color) }}">
@@ -183,7 +183,7 @@
                         <div class="text-right">
                             <p class="font-display text-md">{{ subscription.amount|currency:subscription.currency.code }}</p>
                             @if (subscription.currency.code !== currencyService.defaultCurrency() && currencyService.canConvert(subscription.currency.code)) {
-                                <p class="text-sm text-gray">
+                                <p class="text-sm text-muted">
                                     ≈ {{ currencyService.convertToDefault(subscription.amount, subscription.currency.code)|currency:currencyService.defaultCurrency() }}</p>
                             }
                         </div>
@@ -194,7 +194,7 @@
     </section>
 
     <section class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8">
-        <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-6">
+        <div class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-6">
             <h2 class="flex items-center gap-2">
                 <svg lucideLayers [size]="20"></svg>
                 Catégories
@@ -204,11 +204,11 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2">
                 @for (category of categories(); track category.id) {
-                    <div class="flex items-center gap-3 bg-beige-light border p-3 rounded">
+                    <div class="flex items-center gap-3 bg-base border p-3 rounded">
                         <div class="size-10 border rounded-full {{ colorService.getBackground(category.color) }}"></div>
                         <div class="flex-1">
                             <h3>{{ category.label }}</h3>
-                            <p class="text-sm text-gray">{{ category.type === 'need' ? 'Besoin' : category.type === 'want' ? 'Envie' : '' }}</p>
+                            <p class="text-sm text-muted">{{ category.type === 'need' ? 'Besoin' : category.type === 'want' ? 'Envie' : '' }}</p>
                         </div>
                         <button
                             app-button
@@ -227,7 +227,7 @@
             </div>
         </div>
 
-        <div class="bg-green/50 border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-4">
+        <div class="bg-green/50 border border-line shadow-md shadow-muted/10 rounded p-5 space-y-4">
             <div class="flex items-center justify-between gap-3">
                 <h2 class="flex items-center gap-2">
                     <svg lucideLandmark [size]="20"></svg>
@@ -243,7 +243,7 @@
             <div class="space-y-2">
                 @for (account of accounts(); track account.id) {
                     <div
-                        class="flex items-center gap-3 bg-beige-lighter p-3 rounded border cursor-pointer transition-all hover:bg-beige-light"
+                        class="flex items-center gap-3 bg-surface p-3 rounded border cursor-pointer transition-all hover:bg-base"
                         (click)="modalService.account.openEdit(account)"
                         (keydown.enter)="modalService.account.openEdit(account)"
                         (keydown.space)="modalService.account.openEdit(account)"
@@ -256,7 +256,7 @@
                         <div class="flex items-center gap-2">
                             <h3>{{ account.label }}</h3>
                             @if (account.is_default) {
-                                <div class="text-xs text-semibold py-0.5 px-1.5 border rounded-xs bg-purple">par
+                                <div class="text-xs text-semibold py-0.5 px-1.5 border rounded-xs bg-purple dark:text-surface">par
                                     défaut
                                 </div>
                             }
@@ -268,20 +268,20 @@
     </section>
 
     <section>
-        <div class="bg-red/20 border border-red shadow-md shadow-gray/10 rounded p-5 space-y-4">
+        <div class="bg-red/20 border border-red shadow-md shadow-muted/10 rounded p-5 space-y-4">
             <div class="flex items-center gap-2">
                 <svg lucideTriangleAlert [size]="20"></svg>
                 <h2>Zone sensible</h2>
             </div>
 
-            <p class="text-gray text-sm">Note : Ne pas appuyer sur le bouton rouge ! ... Comme dans les films.</p>
+            <p class="text-muted text-sm">Note : Ne pas appuyer sur le bouton rouge ! ... Comme dans les films.</p>
 
             <div
-                class="space-y-3 *:flex *:flex-col *:[&_button]:self-end lg:*:flex-row lg:*:items-center *:justify-between *:gap-3 *:border *:border-gray/50 *:rounded *:p-4">
+                class="space-y-3 *:flex *:flex-col *:[&_button]:self-end lg:*:flex-row lg:*:items-center *:justify-between *:gap-3 *:border *:border-muted/50 *:rounded *:p-4">
                 <div>
                     <div>
                         <h3>Supprimer toutes les transactions</h3>
-                        <p class="text-sm text-gray">Y aura plus aucune transaction...</p>
+                        <p class="text-sm text-muted">Y aura plus aucune transaction...</p>
                     </div>
                     <button
                         app-button
@@ -296,7 +296,7 @@
                 <div>
                     <div>
                         <h3>Supprimer tous les tags</h3>
-                        <p class="text-sm text-gray">C'est pas très grave ça.</p>
+                        <p class="text-sm text-muted">C'est pas très grave ça.</p>
                     </div>
                     <button
                         app-button
@@ -311,7 +311,7 @@
                 <div>
                     <div>
                         <h3>Supprimer tous les abonnements</h3>
-                        <p class="text-gray text-sm">Fini le divertissement et le fun !</p>
+                        <p class="text-muted text-sm">Fini le divertissement et le fun !</p>
                     </div>
                     <button
                         app-button
@@ -326,7 +326,7 @@
                 <div>
                     <div>
                         <h3>Supprimer toutes les catégories</h3>
-                        <p class="text-gray text-sm">C'est pas bon pour mon côté maniaque, ça.</p>
+                        <p class="text-muted text-sm">C'est pas bon pour mon côté maniaque, ça.</p>
                     </div>
                     <button
                         app-button
@@ -341,7 +341,7 @@
                 <div class="bg-red/25 p-4 border border-red! rounded">
                     <div>
                         <h3>Tout réinitialiser</h3>
-                        <p class="text-gray text-sm">Transactions, catégories, comptes, abonnements, objectifs, tags...
+                        <p class="text-muted text-sm">Transactions, catégories, comptes, abonnements, objectifs, tags...
                             Tout sera supprimé, sauf les devises ! Ça fait beaucoup là non ?</p>
                     </div>
                     <button

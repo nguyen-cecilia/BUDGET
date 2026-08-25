@@ -21,11 +21,11 @@ export class ButtonComponent {
         const base = 'flex items-center gap-2 leading-4 text-sm transition-all cursor-pointer hover:scale-103 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100';
 
         const variants = {
-            primary: 'bg-black-dark text-beige-light hover:bg-black-dark/80 font-medium justify-center',
-            secondary: 'bg-pink border border-black-dark shadow-sm hover:bg-pink-dark ',
-            tertiary: 'bg-green-yellow hover:bg-green-yellow/80 font-medium justify-center',
-            outline: 'bg-beige-lighter border border-gray-light shadow-sm shadow-black-dark/5 font-medium',
-            sidebar: 'text-gray hover:bg-blue/50',
+            primary: 'bg-ink text-base hover:bg-ink/80 font-medium justify-center',
+            secondary: 'bg-pink border border-ink shadow-sm hover:bg-pink-dark dark:text-surface dark:border-surface',
+            tertiary: 'bg-green-yellow dark:text-surface hover:bg-green-yellow/80 dark:hover:text-ink font-medium justify-center',
+            outline: 'bg-surface border border-line shadow-sm shadow-ink/5 font-medium',
+            sidebar: 'text-muted hover:bg-blue/50',
             invalid: 'bg-red text-white hover:bg-red/80 font-medium justify-center'
         };
 

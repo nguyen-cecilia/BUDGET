@@ -2,11 +2,11 @@
     <app-loading/>
 } @else if (filteredTransactions().transactionsByDay.length > 0) {
     <section>
-        <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-6">
+        <div class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-6">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                 <div>
                     <h1>Transactions - {{ transactionsByMonth().month || periodService.getMonthLabel() }}</h1>
-                    <p class="text-gray">{{ filteredTransactions().count }} résultat{{ filteredTransactions().count > 1 ? 's' : '' }}</p>
+                    <p class="text-muted">{{ filteredTransactions().count }} résultat{{ filteredTransactions().count > 1 ? 's' : '' }}</p>
                 </div>
 
                 <button app-button (click)="modalService.transaction.openCreateBulk()" class="self-end">
@@ -87,7 +87,7 @@
 
     <section class="space-y-6">
         @for (dayGroup of filteredTransactions().transactionsByDay; track dayGroup.date) {
-            <div class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-3">
+            <div class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-3">
                 <div class="flex items-center justify-between gap-6">
                     <h2>{{ dayGroup.date|date:'longDate' }}</h2>
                     <p class="font-bold">{{ dayTotal(dayGroup.date) > 0 ? '+' : '' }}{{ dayTotal(dayGroup.date)|currency:defaultCurrency() }}</p>
@@ -102,7 +102,7 @@
         }
     </section>
 } @else {
-    <div class="flex flex-col items-center justify-center gap-3 px-6 py-10 text-gray">
+    <div class="flex flex-col items-center justify-center gap-3 px-6 py-10 text-muted">
         <svg lucideFrown [size]="40"></svg>
         <p>Aucun résultat trouvé ce mois-ci.</p>
     </div>

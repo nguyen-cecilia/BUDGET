@@ -41,7 +41,7 @@ export class DonutChartComponent implements AfterViewInit, OnChanges {
                     data: this.data,
                     backgroundColor: this.colors,
                     borderRadius: 20,
-                    spacing: 3,
+                    spacing: 5,
                 }],
             },
             options: {
@@ -69,7 +69,7 @@ export class DonutChartComponent implements AfterViewInit, OnChanges {
                 },
                 elements: {
                     arc: {
-                        borderWidth: 1,
+                        borderWidth: 0,
                     },
                 },
             },

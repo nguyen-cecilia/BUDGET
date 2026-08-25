@@ -18,7 +18,7 @@ import {DateService} from '../../core/date.service';
     ],
     template: `
         <div
-            class="flex items-center justify-between gap-4 rounded px-2 py-4 cursor-pointer transition-all hover:bg-beige-light"
+            class="flex items-center justify-between gap-4 rounded px-2 py-4 cursor-pointer transition-all hover:bg-base"
             [class.opacity-60]="dateService.isFuture(transaction.date)"
             (click)="modalService.transaction.openEdit(transaction)"
             (keydown.enter)="modalService.transaction.openEdit(transaction)"
@@ -28,7 +28,7 @@ import {DateService} from '../../core/date.service';
         >
             <div class="flex items-center gap-6">
                 <div
-                    class="aspect-square border rounded-full p-3 {{ colorService.getBackground(transaction.category?.color ?? 'grayMid') }}">
+                    class="aspect-square border rounded-full p-3 dark:text-surface dark:border-surface {{ colorService.getBackground(transaction.category?.color ?? 'grayLight') }}">
                     @if (transaction.type === 'income') {
                         <svg lucideArrowDownLeft [size]="20"></svg>
                     } @else {
@@ -42,10 +42,10 @@ import {DateService} from '../../core/date.service';
                             <svg lucideSparkles [size]="20"></svg>
                         }
                     </div>
-                    <p class="text-sm text-gray">
+                    <p class="text-sm text-muted">
                         {{ transaction.account.label }} ·
                         <span
-                            class="font-semibold underline decoration-2 underline-offset-3 {{ colorService.getDecoration(transaction.category?.color ?? 'gray') }}"
+                            class="font-semibold underline decoration-2 underline-offset-3 {{ colorService.getDecoration(transaction.category?.color ?? 'grayLight') }}"
                         >
                             {{ transaction.category?.label ?? 'Sans catégorie' }}
                         </span>
@@ -61,7 +61,7 @@ import {DateService} from '../../core/date.service';
             <div class="text-right">
                 <p class="font-display text-md">{{ transaction.type === 'expense' ? '-' : '+' }}{{ transaction.amount|currency:transaction.currency.code }}</p>
                 @if (transaction.currency.code !== currencyService.defaultCurrency() && currencyService.canConvert(transaction.currency.code)) {
-                    <p class="text-sm text-gray">
+                    <p class="text-sm text-muted">
                         ≈ {{ transaction.type === 'expense' ? '-' : '+' }}{{ currencyService.convertToDefault(transaction.amount, transaction.currency.code)|currency:currencyService.defaultCurrency() }}</p>
                 }
             </div>

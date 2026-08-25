@@ -42,10 +42,10 @@ export interface SelectOption {
                 } @else {
                     <button
                         type="button"
-                        class="flex-1 flex items-center gap-4 rounded-full bg-beige px-4 py-2.5 text-sm font-bold w-full"
+                        class="flex-1 flex items-center gap-4 rounded-full bg-deep px-4 py-2.5 text-sm font-bold w-full"
                     >
                         @if (label) {
-                            <p class="w-1/3 lg:w-auto text-left text-gray uppercase font-medium">{{ label }}</p>
+                            <p class="w-1/3 lg:w-auto text-left text-muted uppercase font-medium">{{ label }}</p>
                         }
                         {{ selectedLabel }}
                         <svg lucideChevronDown [size]="20" class="ml-auto pointer-events-none"></svg>
@@ -57,7 +57,7 @@ export interface SelectOption {
             @if (isOpen) {
                 <div
                     id="select-dropdown"
-                    class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-light rounded-sm shadow-md z-50 *:cursor-pointer"
+                    class="absolute top-full left-0 right-0 mt-2 bg-surface dark:bg-deep border border-line rounded-sm shadow-md z-50 *:cursor-pointer"
                     role="listbox"
                 >
                     @for (option of options; track option.value) {

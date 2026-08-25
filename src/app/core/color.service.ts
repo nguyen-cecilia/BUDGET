@@ -13,11 +13,11 @@ interface ColorConfig {
 })
 export class ColorService {
     private readonly colorMap: Record<string, ColorConfig> = {
-        grayMid: {
-            background: 'bg-gray-mid',
-            backgroundLighter: 'bg-gray-mid/70',
-            decoration: 'decoration-gray-mid',
-            color: 'text-gray-mid',
+        grayLight: {
+            background: 'bg-gray-light',
+            backgroundLighter: 'bg-gray-light/70',
+            decoration: 'decoration-gray-light',
+            color: 'text-gray-light',
         },
         gray: {
             background: 'bg-gray',
@@ -132,6 +132,6 @@ export class ColorService {
     }
 
     getAvailableColors(): string[] {
-        return Object.keys(this.colorMap).filter(color => color !== 'grayMid');
+        return Object.keys(this.colorMap).filter(color => color !== 'grayLight');
     }
 }

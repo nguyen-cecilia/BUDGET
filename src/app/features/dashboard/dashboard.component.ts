@@ -284,7 +284,7 @@ export class DashboardComponent {
             if (!this.currencyService.canConvert(t.currency.code)) continue;
 
             const label = t.category?.label ?? 'Sans catégorie';
-            const color = t.category?.color ?? 'grayMid';
+            const color = t.category?.color ?? 'grayLight';
             const key = t.category_id ?? 'none';
             const convertedAmount = this.currencyService.convertToDefault(t.amount, t.currency.code);
 

@@ -3,11 +3,11 @@
 } @else {
     <section>
         <div
-            class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 flex flex-col justify-between lg:flex-row lg:flex-wrap lg:items-center gap-3"
+            class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 flex flex-col justify-between lg:flex-row lg:flex-wrap lg:items-center gap-3"
         >
             <div>
                 <h1>Vue annuelle</h1>
-                <p class="text-gray">Bilan sur l'année.</p>
+                <p class="text-muted">Bilan sur l'année.</p>
             </div>
 
             <app-select
@@ -18,7 +18,7 @@
             ></app-select>
 
             <div class="w-full grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-green border rounded p-3">
+                <div class="bg-green dark:text-surface border dark:border-ink rounded p-3">
                     <div class="flex items-center gap-1 uppercase text-xs tracking-wide font-medium">
                         <svg lucideTrendingUp [size]="16"></svg>
                         <p>Revenus</p>
@@ -28,7 +28,7 @@
                     </p>
                 </div>
 
-                <div class="bg-pink border rounded p-3">
+                <div class="bg-pink dark:text-surface border dark:border-ink rounded p-3">
                     <div class="flex items-center gap-1 uppercase text-xs tracking-wide font-medium">
                         <svg lucideTrendingDown [size]="16"></svg>
                         <p>Dépenses</p>
@@ -38,7 +38,7 @@
                     </p>
                 </div>
 
-                <div class="bg-blue border rounded p-3">
+                <div class="bg-blue dark:text-surface border dark:border-ink rounded p-3">
                     <div class="flex items-center gap-1 uppercase text-xs tracking-wide font-medium">
                         <svg lucideEqual [size]="16"></svg>
                         <p>Net annuel</p>
@@ -48,7 +48,7 @@
                     </p>
                 </div>
 
-                <div class="bg-yellow border rounded p-3">
+                <div class="bg-yellow dark:text-surface border dark:border-ink rounded p-3">
                     <div class="flex items-center gap-1 uppercase text-xs tracking-wide font-medium">
                         <svg lucideEqualApproximately [size]="16"></svg>
                         <p>Moy. mensuelle</p>
@@ -63,7 +63,7 @@
 
     <section>
         <div
-            class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-6"
+            class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-6"
         >
             <h2>Revenus & dépenses</h2>
 
@@ -78,34 +78,34 @@
 
     <section>
         <div
-            class="bg-beige-lighter border border-gray-light shadow-md shadow-gray/10 rounded p-5 space-y-6"
+            class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-6"
         >
             <h2>Détail mois par mois</h2>
 
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 @for (m of monthlyData(); track m.index) {
                     <div
-                        class="bg-beige-light border rounded p-3 space-y-2
+                        class="bg-base border rounded p-3 space-y-2
                         {{ extremeMonths()?.best === m.index ? 'bg-green/15 border-green ring-1 ring-green' : '' }}
                         {{ extremeMonths()?.worst === m.index ? 'bg-pink/15 border-pink ring-1 ring-pink' : '' }}"
                     >
                         <h3>{{ m.label }}</h3>
 
                         <div>
-                            <p class="text-gray text-sm">Revenus</p>
+                            <p class="text-muted text-sm">Revenus</p>
                             <p class="font-display font-semibold text-md">{{ m.income|currency:currencyService.defaultCurrency() }}</p>
                         </div>
 
                         <div>
-                            <p class="text-gray text-sm">Dépenses</p>
+                            <p class="text-muted text-sm">Dépenses</p>
                             <p class="font-display font-semibold text-md">{{ m.expense|currency:currencyService.defaultCurrency() }}</p>
                         </div>
 
-                        <hr class="border-gray-light">
+                        <hr class="border-line">
 
                         <div class="flex items-center justify-between">
-                            <p class="text-gray text-sm">Net</p>
-                            <p class="font-display font-semibold text-md {{ m.net > 0 ? 'text-green' : m.net < 0 ? 'text-pink-dark' : 'text-gray' }}">
+                            <p class="text-muted text-sm">Net</p>
+                            <p class="font-display font-semibold text-md {{ m.net > 0 ? 'text-green' : m.net < 0 ? 'text-pink-dark' : 'text-muted' }}">
                                 {{ m.net > 0 ? '+ ' : m.net < 0 ? '- ' : '' }}{{ (m.net < 0 ? -m.net : m.net)|currency:currencyService.defaultCurrency() }}
                             </p>
                         </div>

@@ -33,7 +33,7 @@ Layout:
 
 - [x] Responsive
 - [x] Desktop: sidebar with menu / Mobile: floating menu bar bottom
-- [ ] Dark mode
+- [x] Dark mode
 - [x] Logo
 - [x] Better manage the loading states, error messages, delete confirmations
 - [x] Clean code and refactor

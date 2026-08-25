@@ -60,7 +60,7 @@ export class CategoryUpdateComponent {
         });
 
         this.selectedColor.set(this.categoryForm.get('color')?.value ?? 'gray');
-        this.categoryForm.get('color')?.valueChanges.subscribe(v => this.selectedColor.set(v ?? 'grayMid'));
+        this.categoryForm.get('color')?.valueChanges.subscribe(v => this.selectedColor.set(v ?? 'grayLight'));
 
         effect(() => {
             const editing = this.editingCategory();

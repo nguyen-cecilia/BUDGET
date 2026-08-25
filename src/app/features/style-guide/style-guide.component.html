@@ -1,10 +1,10 @@
 <section class="space-y-6">
-    <div class="bg-yellow/50 border border-gray-light rounded p-5">
+    <div class="bg-yellow/50 border border-line rounded p-5">
         <h1 class="text-center">Style Guide</h1>
     </div>
 
     <!-- Couleurs -->
-    <div class="bg-beige-lighter border border-gray-light rounded p-5 space-y-4">
+    <div class="bg-surface border border-line rounded p-5 space-y-4">
         <h2>Couleurs</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             @for (c of colors; track c) {
@@ -12,7 +12,7 @@
                     <div class="size-10 rounded-xs" [class]="c"></div>
                     <div>
                         <p class="font-semibold text-sm">{{ c.slice(3) }}</p>
-                        <p class="text-xs text-gray">{{ c }}</p>
+                        <p class="text-xs text-muted">{{ c }}</p>
                     </div>
                 </div>
             }
@@ -21,7 +21,7 @@
 
     <div class="flex flex-col gap-6 lg:flex-row *:flex-1">
         <!-- Typographie -->
-        <div class="bg-beige-lighter border border-gray-light rounded p-5 space-y-4">
+        <div class="bg-surface border border-line rounded p-5 space-y-4">
             <h2>Typographie</h2>
             <div class="space-y-2">
                 <p class="font-display text-2xl">Fraunces — Display</p>
@@ -37,7 +37,7 @@
 
         <div class="flex flex-col gap-6">
             <!-- Boutons -->
-            <div class="bg-beige-lighter border border-gray-light rounded p-5 space-y-4">
+            <div class="bg-surface border border-line rounded p-5 space-y-4">
                 <h2>Boutons</h2>
                 <div class="flex flex-wrap items-center gap-3">
                     @for (v of buttonVariants; track v) {
@@ -49,13 +49,13 @@
                         <button app-button [shape]="s">
                             <svg lucidePlus [size]="16"></svg>
                         </button>
-                        <span class="text-sm text-gray">{{ s }}</span>
+                        <span class="text-sm text-muted">{{ s }}</span>
                     }
                 </div>
             </div>
 
             <!-- Badges -->
-            <div class="bg-beige-lighter border border-gray-light rounded p-5 space-y-4">
+            <div class="bg-surface border border-line rounded p-5 space-y-4">
                 <h2>Badges</h2>
                 <div class="flex flex-wrap items-center gap-3">
                     @for (v of badgeVariants; track v) {
@@ -65,12 +65,12 @@
             </div>
 
             <!-- Radius -->
-            <div class="bg-beige-lighter border border-gray-light rounded p-5 space-y-4">
+            <div class="bg-surface border border-line rounded p-5 space-y-4">
                 <h2>Radius</h2>
                 <div class="flex flex-wrap items-center gap-4">
                     @for (r of radii; track r) {
                         <div
-                            class="size-20 bg-blue flex items-center justify-center text-xs font-bold text-black-dark {{ r }}">
+                            class="size-20 bg-blue flex items-center justify-center text-xs font-bold text-ink {{ r }}">
                             {{ r.slice(8) }}
                         </div>
                     }

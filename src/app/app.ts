@@ -7,6 +7,7 @@ import {
     LucideMoon,
     LucidePlus,
     LucideSettings,
+    LucideSun,
     LucideTarget
 } from '@lucide/angular';
 import {ButtonComponent} from './components/button/button.component';
@@ -16,10 +17,11 @@ import {ModalService} from './components/modal/modal.service';
 import {AuthStateService} from './core/auth/auth-state.service';
 import {SelectComponent} from './components/select/select.component';
 import {PeriodService} from './core/period.service';
+import {ThemeService} from './core/theme.service';
 
 @Component({
     selector: 'app-root',
-    imports: [RouterOutlet, LucideMoon, ButtonComponent, RouterLink, LucidePlus, LucideHouse, RouterLinkActive, LucideList, LucideTarget, LucideChartColumnIncreasing, LucideSettings, ModalComponent, TransactionUpdateComponent, SelectComponent],
+    imports: [RouterOutlet, LucideMoon, ButtonComponent, RouterLink, LucidePlus, LucideHouse, RouterLinkActive, LucideList, LucideTarget, LucideChartColumnIncreasing, LucideSettings, ModalComponent, TransactionUpdateComponent, SelectComponent, LucideSun],
     templateUrl: './app.html',
 })
 export class App {
@@ -27,6 +29,7 @@ export class App {
     protected readonly authState = inject(AuthStateService);
     protected modalService = inject(ModalService);
     protected periodService = inject(PeriodService);
+    protected themeService = inject(ThemeService);
 
     selectedMonth = this.periodService.selectedMonth;
     monthOptions = this.periodService.monthOptions;
