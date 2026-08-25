@@ -39,7 +39,11 @@
     [isOpen]="modalService.transaction.isOpen"
     [onClose]="() => modalService.transaction.close()"
 >
-    <app-update-transaction/>
+    @if (modalService.transaction.isOpen()) {
+        @defer {
+            <app-update-transaction/>
+        }
+    }
 </app-modal>
 
 <div class="flex min-h-screen">

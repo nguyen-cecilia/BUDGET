@@ -1,13 +1,7 @@
 import {Routes} from '@angular/router';
 import {LoginComponent} from './features/login/login.component';
 import {authGuard, guestGuard} from './core/auth/auth.guard';
-import {DashboardComponent} from './features/dashboard/dashboard.component';
-import {TransactionsListingComponent} from './features/transactions/transactions-listing.component';
-import {SettingsComponent} from './features/settings/settings.component';
 import {isDevMode} from '@angular/core';
-import {StyleGuideComponent} from './features/style-guide/style-guide.component';
-import {SavingsGoalsListingComponent} from './features/saving-goals/savings-goals-listing.component';
-import {YearlyViewComponent} from './features/yearly-view/yearly-view.component';
 
 export const routes: Routes = [
     {
@@ -21,28 +15,31 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                component: DashboardComponent,
+                loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
             },
             {
                 path: 'transactions',
-                component: TransactionsListingComponent,
+                loadComponent: () => import('./features/transactions/transactions-listing.component').then(m => m.TransactionsListingComponent),
             },
             {
                 path: 'objectifs',
-                component: SavingsGoalsListingComponent,
+                loadComponent: () => import('./features/saving-goals/savings-goals-listing.component').then(m => m.SavingsGoalsListingComponent),
             },
             {
                 path: 'vue-annuelle',
-                component: YearlyViewComponent,
+                loadComponent: () => import('./features/yearly-view/yearly-view.component').then(m => m.YearlyViewComponent),
             },
             {
                 path: 'parametres',
-                component: SettingsComponent,
+                loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent),
             },
         ],
     },
     ...(isDevMode() ? [
-        {path: 'style-guide', component: StyleGuideComponent}
+        {
+            path: 'style-guide',
+            loadComponent: () => import('./features/style-guide/style-guide.component').then(m => m.StyleGuideComponent),
+        }
     ] : []),
     {
         path: '**',
