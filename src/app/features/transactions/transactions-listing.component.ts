@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, signal} from '@angular/core';
+import {Component, computed, effect, inject, signal, untracked} from '@angular/core';
 import {LucideFrown, LucidePlus, LucideSearch, LucideX} from '@lucide/angular';
 import {BadgeComponent} from '../../components/badge/badge.component';
 import {TransactionsByMonth} from './transaction.model';
@@ -13,6 +13,7 @@ import {TransactionItemComponent} from './transaction-item.component';
 import {CurrencyService} from '../currencies/currency.service';
 import {ModalService} from '../../components/modal/modal.service';
 import {LoadingComponent} from '../../components/loading/loading.component';
+import {RefreshService} from '../../core/refresh.service';
 
 @Component({
     selector: 'app-transactions',
@@ -36,6 +37,7 @@ export class TransactionsListingComponent {
     private transactionService = inject(TransactionService);
     private currencyService = inject(CurrencyService);
     private optionsService = inject(TransactionOptionsService);
+    private refreshService = inject(RefreshService);
     protected modalService = inject(ModalService);
     protected periodService = inject(PeriodService);
     protected defaultCurrency = this.currencyService.defaultCurrency;
@@ -54,12 +56,16 @@ export class TransactionsListingComponent {
 
     constructor() {
         effect(() => {
-            this.transactionService.transactionRefreshTrigger();
-            this.currencyService.currencyRefreshTrigger();
+            this.refreshService.trigger();
             this.periodService.selectedMonth();
             this.periodService.selectedYear();
-            const userId = this.authState.getCurrentUser()?.id;
-            if (userId) void this.loadList(userId);
+            const key = this.refreshService.lastKey();
+            untracked(() => {
+                const userId = this.authState.getCurrentUser()?.id;
+                if (userId && (!key || key === 'transaction' || key === 'currency')) {
+                    void this.loadList(userId);
+                }
+            });
         });
     }
 

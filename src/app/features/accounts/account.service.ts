@@ -1,4 +1,4 @@
-import {inject, Injectable, signal} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {ACCOUNTS_TABLE, SUBSCRIPTIONS_TABLE, SupabaseService, TRANSACTIONS_TABLE} from '../../core/supabase.service';
 import {Account} from './account.model';
 
@@ -8,8 +8,6 @@ import {Account} from './account.model';
 export class AccountService {
     private supabaseService = inject(SupabaseService);
     private supabase = this.supabaseService.getClient();
-
-    accountRefreshTrigger = signal<boolean>(false);
 
     async getAllAccountsByUser(userId: string, includeInactive = false): Promise<Account[]> {
         let query = this.supabase

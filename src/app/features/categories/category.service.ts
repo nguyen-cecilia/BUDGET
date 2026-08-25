@@ -1,4 +1,4 @@
-import {inject, Injectable, signal} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {CATEGORIES_TABLE, SUBSCRIPTIONS_TABLE, SupabaseService, TRANSACTIONS_TABLE} from '../../core/supabase.service';
 import {Category, CategoryType} from './category.model';
 
@@ -8,8 +8,6 @@ import {Category, CategoryType} from './category.model';
 export class CategoryService {
     private supabaseService = inject(SupabaseService);
     private supabase = this.supabaseService.getClient();
-
-    categoryRefreshTrigger = signal<boolean>(false);
 
     async getAllCategoriesByUser(userId: string): Promise<Category[]> {
         const {data, error} = await this.supabase

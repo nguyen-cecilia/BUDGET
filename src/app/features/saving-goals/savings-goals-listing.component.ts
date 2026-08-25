@@ -1,4 +1,4 @@
-import {Component, effect, inject, signal} from '@angular/core';
+import {Component, effect, inject, signal, untracked} from '@angular/core';
 import {ButtonComponent} from '../../components/button/button.component';
 import {LucideFrown, LucidePencil, LucidePiggyBank, LucidePlus} from '@lucide/angular';
 import {AuthStateService} from '../../core/auth/auth-state.service';
@@ -10,6 +10,7 @@ import {SavingGoalsUpdateComponent} from './saving-goals-update.component';
 import {ModalService} from '../../components/modal/modal.service';
 import {CurrencyPipe} from '@angular/common';
 import {LoadingComponent} from '../../components/loading/loading.component';
+import {RefreshService} from '../../core/refresh.service';
 
 @Component({
     selector: 'app-saving-goals',
@@ -29,6 +30,7 @@ import {LoadingComponent} from '../../components/loading/loading.component';
 export class SavingsGoalsListingComponent {
     private authState = inject(AuthStateService);
     private goalService = inject(SavingsGoalService);
+    private refreshService = inject(RefreshService);
     protected currencyService = inject(CurrencyService);
     protected modalService = inject(ModalService);
 
@@ -38,10 +40,14 @@ export class SavingsGoalsListingComponent {
 
     constructor() {
         effect(() => {
-            this.goalService.goalRefreshTrigger();
-            this.currencyService.currencyRefreshTrigger();
-            const userId = this.authState.getCurrentUser()?.id;
-            if (userId) this.getSavingsGoals(userId);
+            this.refreshService.trigger();
+            const key = this.refreshService.lastKey();
+            untracked(() => {
+                const userId = this.authState.getCurrentUser()?.id;
+                if (userId && (!key || key === 'goal' || key === 'currency')) {
+                    this.getSavingsGoals(userId);
+                }
+            });
         });
     }
 

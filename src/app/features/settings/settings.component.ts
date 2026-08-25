@@ -1,4 +1,4 @@
-import {Component, effect, inject, signal} from '@angular/core';
+import {Component, effect, inject, signal, untracked} from '@angular/core';
 import {
     LucideCoins,
     LucideLandmark,
@@ -40,6 +40,7 @@ import {ConfirmComponent, ConfirmPayload} from '../../components/confirm/confirm
 import {SavingsGoalService} from '../saving-goals/savings-goal.service';
 import {TransactionService} from '../transactions/transaction.service';
 import {LoadingComponent} from '../../components/loading/loading.component';
+import {RefreshService} from '../../core/refresh.service';
 import {Router} from '@angular/router';
 import {AuthService} from '../../core/auth/auth.service';
 
@@ -82,6 +83,7 @@ export class SettingsComponent {
     private savingsGoalService = inject(SavingsGoalService);
     private authService = inject(AuthService);
     private router = inject(Router);
+    private refreshService = inject(RefreshService);
     protected subscriptionService = inject(SubscriptionService);
     protected currencyService = inject(CurrencyService);
     protected modalService = inject(ModalService);
@@ -101,15 +103,14 @@ export class SettingsComponent {
 
     constructor() {
         effect(() => {
-            this.currencyService.currencyRefreshTrigger();
-            this.subscriptionService.subscriptionRefreshTrigger();
-            this.accountService.accountRefreshTrigger();
-            this.tagService.tagRefreshTrigger();
-            this.categoryService.categoryRefreshTrigger();
-            const userId = this.authState.getCurrentUser()?.id;
-            if (userId) {
-                void this.loadSettings(userId);
-            }
+            this.refreshService.trigger();
+            const key = this.refreshService.lastKey();
+            untracked(() => {
+                const userId = this.authState.getCurrentUser()?.id;
+                if (userId && (!key || key !== 'goal')) {
+                    void this.loadSettings(userId);
+                }
+            });
         });
     }
 
@@ -123,7 +124,7 @@ export class SettingsComponent {
                 this.isDeleting.set(true);
                 try {
                     await this.transactionService.deleteAllTransactions(userId);
-                    this.transactionService.transactionRefreshTrigger.set(!this.transactionService.transactionRefreshTrigger());
+                    this.refreshService.refresh('transaction');
                 } finally {
                     this.isDeleting.set(false);
                 }
@@ -141,7 +142,7 @@ export class SettingsComponent {
                 this.isDeleting.set(true);
                 try {
                     await this.tagService.deleteAllTags(userId);
-                    this.tagService.tagRefreshTrigger.set(!this.tagService.tagRefreshTrigger());
+                    this.refreshService.refresh('tag');
                 } finally {
                     this.isDeleting.set(false);
                 }
@@ -159,7 +160,7 @@ export class SettingsComponent {
                 this.isDeleting.set(true);
                 try {
                     await this.subscriptionService.deleteAllSubscriptions(userId);
-                    this.subscriptionService.subscriptionRefreshTrigger.set(!this.subscriptionService.subscriptionRefreshTrigger());
+                    this.refreshService.refresh('subscription');
                 } finally {
                     this.isDeleting.set(false);
                 }
@@ -177,7 +178,7 @@ export class SettingsComponent {
                 this.isDeleting.set(true);
                 try {
                     await this.categoryService.deleteAllCategories(userId);
-                    this.categoryService.categoryRefreshTrigger.set(!this.categoryService.categoryRefreshTrigger());
+                    this.refreshService.refresh('category');
                 } finally {
                     this.isDeleting.set(false);
                 }
@@ -201,12 +202,7 @@ export class SettingsComponent {
                     await this.tagService.deleteAllTags(userId);
                     await this.accountService.deleteAllAccounts(userId);
 
-                    this.transactionService.transactionRefreshTrigger.set(!this.transactionService.transactionRefreshTrigger());
-                    this.subscriptionService.subscriptionRefreshTrigger.set(!this.subscriptionService.subscriptionRefreshTrigger());
-                    this.tagService.tagRefreshTrigger.set(!this.tagService.tagRefreshTrigger());
-                    this.categoryService.categoryRefreshTrigger.set(!this.categoryService.categoryRefreshTrigger());
-                    this.accountService.accountRefreshTrigger.set(!this.accountService.accountRefreshTrigger());
-                    this.currencyService.currencyRefreshTrigger.set(!this.currencyService.currencyRefreshTrigger());
+                    this.refreshService.refresh('transaction');
                 } finally {
                     this.isDeleting.set(false);
                 }

@@ -12,6 +12,7 @@ import {SelectOption} from '../../components/select/select.component';
 import {TransactionOptionsService} from '../transactions/transaction-options.service';
 import {FieldErrorComponent} from '../../components/form-error/field-error.component';
 import {FormErrorComponent} from '../../components/form-error/form-error.component';
+import {RefreshService} from '../../core/refresh.service';
 
 @Component({
     selector: 'app-saving-goals-update',
@@ -31,6 +32,7 @@ export class SavingGoalsUpdateComponent {
     private fb = inject(FormBuilder);
     private goalService = inject(SavingsGoalService);
     private optionsService = inject(TransactionOptionsService);
+    private refreshService = inject(RefreshService);
     protected modalService = inject(ModalService);
 
     goalForm: FormGroup;
@@ -104,9 +106,7 @@ export class SavingGoalsUpdateComponent {
                 await this.goalService.createSavingsGoal(userId, payload);
             }
 
-            this.goalService.goalRefreshTrigger.set(
-                !this.goalService.goalRefreshTrigger()
-            );
+            this.refreshService.refresh('goal');
 
             this.resetForm();
 
@@ -128,9 +128,7 @@ export class SavingGoalsUpdateComponent {
         try {
             await this.goalService.deleteSavingsGoal(editing.id, editing.user_id);
 
-            this.goalService.goalRefreshTrigger.set(
-                !this.goalService.goalRefreshTrigger()
-            );
+            this.refreshService.refresh('goal');
 
             this.modalService.goal.close();
         } catch (error) {

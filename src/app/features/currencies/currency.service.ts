@@ -11,8 +11,6 @@ export class CurrencyService {
     private supabaseService = inject(SupabaseService);
     private supabase = this.supabaseService.getClient();
 
-    currencyRefreshTrigger = signal(false);
-
     defaultCurrency = signal<string>(DEFAULT_CURRENCY);
     private baseCode = signal<string>('');
     private rates = signal<Record<string, number> | null>(null);

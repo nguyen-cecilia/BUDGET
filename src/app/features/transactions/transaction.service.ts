@@ -1,4 +1,4 @@
-import {inject, Injectable, signal} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {SupabaseService, TRANSACTION_TAGS_TABLE, TRANSACTIONS_TABLE} from '../../core/supabase.service';
 import {Transaction, TransactionsByDay, TransactionsByMonth, TransactionType} from './transaction.model';
 import {DateService} from '../../core/date.service';
@@ -10,8 +10,6 @@ export class TransactionService {
     private supabaseService = inject(SupabaseService);
     private dateService = inject(DateService);
     private supabase = this.supabaseService.getClient();
-
-    transactionRefreshTrigger = signal<boolean>(false);
 
     async getTransactionsByMonth(userId: string, monthIndex: number, year: number): Promise<TransactionsByMonth> {
         const firstDay = new Date(year, monthIndex, 1);

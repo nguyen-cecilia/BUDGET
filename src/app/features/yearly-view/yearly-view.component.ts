@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, signal} from '@angular/core';
+import {Component, computed, effect, inject, signal, untracked} from '@angular/core';
 import {LucideEqual, LucideEqualApproximately, LucideTrendingDown, LucideTrendingUp} from '@lucide/angular';
 import {CurrencyService} from '../currencies/currency.service';
 import {TransactionService} from '../transactions/transaction.service';
@@ -10,6 +10,7 @@ import {CurrencyPipe} from '@angular/common';
 import {BarChartComponent} from '../../components/chart/bar-chart.component';
 import {DateService} from '../../core/date.service';
 import {LoadingComponent} from '../../components/loading/loading.component';
+import {RefreshService} from '../../core/refresh.service';
 
 @Component({
     selector: 'app-yearly-view',
@@ -28,6 +29,7 @@ import {LoadingComponent} from '../../components/loading/loading.component';
 export class YearlyViewComponent {
     private authState = inject(AuthStateService);
     private transactionService = inject(TransactionService);
+    private refreshService = inject(RefreshService);
     protected currencyService = inject(CurrencyService);
     protected colorService = inject(ColorService);
 
@@ -41,11 +43,15 @@ export class YearlyViewComponent {
         this.yearOptions.set([{value: currentYear, label: String(currentYear)}]);
 
         effect(() => {
-            this.transactionService.transactionRefreshTrigger();
-            this.currencyService.currencyRefreshTrigger();
+            this.refreshService.trigger();
             const year = this.selectedYear();
-            const userId = this.authState.getCurrentUser()?.id;
-            if (userId) void this.loadYearlyView(userId, year);
+            const key = this.refreshService.lastKey();
+            untracked(() => {
+                const userId = this.authState.getCurrentUser()?.id;
+                if (userId && (!key || key === 'transaction' || key === 'currency')) {
+                    void this.loadYearlyView(userId, year);
+                }
+            });
         });
     }
 

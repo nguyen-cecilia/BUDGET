@@ -1,4 +1,4 @@
-import {inject, Injectable, signal} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {SupabaseService, TAGS_TABLE, TRANSACTION_TAGS_TABLE} from '../../core/supabase.service';
 import {Tag} from './tag.model';
 import {TransactionService} from '../transactions/transaction.service';
@@ -10,8 +10,6 @@ export class TagService {
     private supabaseService = inject(SupabaseService);
     private transactionService = inject(TransactionService);
     private supabase = this.supabaseService.getClient();
-
-    tagRefreshTrigger = signal<boolean>(false);
 
     async getAllTagsByUser(userId: string): Promise<Tag[]> {
         const {data, error} = await this.supabase

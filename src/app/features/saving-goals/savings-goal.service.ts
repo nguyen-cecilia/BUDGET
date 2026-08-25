@@ -1,4 +1,4 @@
-import {inject, Injectable, signal} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {SAVINGS_GOALS_TABLE, SupabaseService} from '../../core/supabase.service';
 import {SavingsGoal} from './savings-goal.model';
 
@@ -8,8 +8,6 @@ import {SavingsGoal} from './savings-goal.model';
 export class SavingsGoalService {
     private supabaseService = inject(SupabaseService);
     private supabase = this.supabaseService.getClient();
-
-    goalRefreshTrigger = signal<boolean>(false);
 
     async getAllSavingsGoalsByUser(userId: string): Promise<SavingsGoal[]> {
         const {data, error} = await this.supabase

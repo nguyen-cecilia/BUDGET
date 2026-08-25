@@ -15,6 +15,7 @@ import {CategoryService} from '../categories/category.service';
 import {CurrencyService} from '../currencies/currency.service';
 import {FieldErrorComponent} from '../../components/form-error/field-error.component';
 import {FormErrorComponent} from '../../components/form-error/form-error.component';
+import {RefreshService} from '../../core/refresh.service';
 
 @Component({
     selector: 'app-subscription-update',
@@ -38,6 +39,7 @@ export class SubscriptionUpdate {
     private accountService = inject(AccountService);
     private categoryService = inject(CategoryService);
     private currencyService = inject(CurrencyService);
+    private refreshService = inject(RefreshService);
     protected modalService = inject(ModalService);
 
     subscriptionForm: FormGroup;
@@ -80,10 +82,11 @@ export class SubscriptionUpdate {
             if (!this.authState.isLoading()) {
                 const userId = this.authState.getCurrentUser()?.id;
                 if (userId) {
-                    this.accountService.accountRefreshTrigger();
-                    this.categoryService.categoryRefreshTrigger();
-                    this.currencyService.currencyRefreshTrigger();
-                    this.initOptions(userId);
+                    this.refreshService.trigger();
+                    const key = this.refreshService.lastKey();
+                    if (!key || ['account', 'category', 'currency'].includes(key)) {
+                        this.initOptions(userId);
+                    }
                 }
             }
         });
@@ -124,9 +127,7 @@ export class SubscriptionUpdate {
                 await this.subscriptionService.createSubscription(userId, payload);
             }
 
-            this.subscriptionService.subscriptionRefreshTrigger.set(
-                !this.subscriptionService.subscriptionRefreshTrigger()
-            );
+            this.refreshService.refresh('subscription');
 
             this.resetForm();
 
@@ -148,9 +149,7 @@ export class SubscriptionUpdate {
         try {
             await this.subscriptionService.deleteSubscription(editing.id, editing.user_id);
 
-            this.subscriptionService.subscriptionRefreshTrigger.set(
-                !this.subscriptionService.subscriptionRefreshTrigger()
-            );
+            this.refreshService.refresh('subscription');
 
             this.modalService.subscription.close();
         } catch (error) {

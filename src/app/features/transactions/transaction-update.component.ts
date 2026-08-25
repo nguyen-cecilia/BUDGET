@@ -19,6 +19,7 @@ import {CurrencyService} from '../currencies/currency.service';
 import {Subscription} from '../subscriptions/subscription.model';
 import {FieldErrorComponent} from '../../components/form-error/field-error.component';
 import {FormErrorComponent} from '../../components/form-error/form-error.component';
+import {RefreshService} from '../../core/refresh.service';
 
 @Component({
     selector: 'app-update-transaction',
@@ -46,6 +47,7 @@ export class TransactionUpdateComponent {
     private currencyService = inject(CurrencyService);
     private tagService = inject(TagService);
     private subscriptionService = inject(SubscriptionService);
+    private refreshService = inject(RefreshService);
     protected modalService = inject(ModalService);
 
     transactionForm: FormGroup;
@@ -94,12 +96,11 @@ export class TransactionUpdateComponent {
             if (!this.authState.isLoading()) {
                 const userId = this.authState.getCurrentUser()?.id;
                 if (userId) {
-                    this.accountService.accountRefreshTrigger();
-                    this.tagService.tagRefreshTrigger();
-                    this.categoryService.categoryRefreshTrigger();
-                    this.currencyService.currencyRefreshTrigger();
-                    this.subscriptionService.subscriptionRefreshTrigger();
-                    this.initOptions(userId);
+                    this.refreshService.trigger();
+                    const key = this.refreshService.lastKey();
+                    if (!key || ['account', 'tag', 'category', 'currency', 'subscription'].includes(key)) {
+                        this.initOptions(userId);
+                    }
                 }
             }
         });
@@ -282,9 +283,7 @@ export class TransactionUpdateComponent {
                 }
             }
 
-            this.transactionService.transactionRefreshTrigger.set(
-                !this.transactionService.transactionRefreshTrigger()
-            );
+            this.refreshService.refresh('transaction');
 
             this.resetForm();
         } catch (error) {
@@ -304,9 +303,7 @@ export class TransactionUpdateComponent {
         try {
             await this.transactionService.deleteTransaction(editing.id, editing.user_id);
 
-            this.transactionService.transactionRefreshTrigger.set(
-                !this.transactionService.transactionRefreshTrigger()
-            );
+            this.refreshService.refresh('transaction');
 
             this.modalService.transaction.close();
         } catch (error) {

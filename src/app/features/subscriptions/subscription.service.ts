@@ -1,4 +1,4 @@
-import {inject, Injectable, signal} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {SUBSCRIPTIONS_TABLE, SupabaseService, TRANSACTIONS_TABLE} from '../../core/supabase.service';
 import {Subscription} from './subscription.model';
 import {DateService} from '../../core/date.service';
@@ -10,8 +10,6 @@ export class SubscriptionService {
     private supabaseService = inject(SupabaseService);
     private dateService = inject(DateService);
     private supabase = this.supabaseService.getClient();
-
-    subscriptionRefreshTrigger = signal<boolean>(false);
 
     async getAllSubscriptionsByUser(userId: string, includeInactive = false): Promise<Subscription[]> {
         let query = this.supabase

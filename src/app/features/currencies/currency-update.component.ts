@@ -9,6 +9,7 @@ import {ButtonComponent} from '../../components/button/button.component';
 import {LucideLoaderCircle, LucideSave, LucideTrash2} from '@lucide/angular';
 import {FORM_ERRORS, creationError, deletionError} from '../../core/form-errors.service';
 import {FormErrorComponent} from '../../components/form-error/form-error.component';
+import {RefreshService} from '../../core/refresh.service';
 
 @Component({
     selector: 'app-currency-update',
@@ -28,6 +29,7 @@ export class CurrencyUpdateComponent {
     private authState = inject(AuthStateService);
     private fb = inject(FormBuilder);
     private currencyService = inject(CurrencyService);
+    private refreshService = inject(RefreshService);
     protected modalService = inject(ModalService);
 
     currencyForm: FormGroup;
@@ -113,9 +115,7 @@ export class CurrencyUpdateComponent {
                 await this.currencyService.createUserCurrency(userId, fv.currencyId, fv.isDefault || this.userCurrencies().length === 0);
             }
 
-            this.currencyService.currencyRefreshTrigger.set(
-                !this.currencyService.currencyRefreshTrigger()
-            );
+            this.refreshService.refresh('currency');
 
             this.selectedCurrency.set('');
             this.resetForm();
@@ -140,9 +140,7 @@ export class CurrencyUpdateComponent {
 
             await this.currencyService.deleteUserCurrency(editing.currency_id, userId);
 
-            this.currencyService.currencyRefreshTrigger.set(
-                !this.currencyService.currencyRefreshTrigger()
-            );
+            this.refreshService.refresh('currency');
 
             this.modalService.currency.close();
         } catch (error) {

@@ -9,6 +9,7 @@ import {ModalService} from '../../components/modal/modal.service';
 import {FORM_ERRORS, creationError, deletionError} from '../../core/form-errors.service';
 import {FieldErrorComponent} from '../../components/form-error/field-error.component';
 import {FormErrorComponent} from '../../components/form-error/form-error.component';
+import {RefreshService} from '../../core/refresh.service';
 
 @Component({
     selector: 'app-tag-update',
@@ -31,6 +32,7 @@ export class TagUpdateComponent {
     private authState = inject(AuthStateService);
     private fb = inject(FormBuilder);
     private tagService = inject(TagService);
+    private refreshService = inject(RefreshService);
     protected modalService = inject(ModalService);
 
     tagForm: FormGroup;
@@ -92,9 +94,7 @@ export class TagUpdateComponent {
                 await this.tagService.createTag(userId, payload);
             }
 
-            this.tagService.tagRefreshTrigger.set(
-                !this.tagService.tagRefreshTrigger()
-            );
+            this.refreshService.refresh('tag');
 
             this.resetForm();
         } catch (error) {
@@ -114,9 +114,7 @@ export class TagUpdateComponent {
         try {
             await this.tagService.deleteTag(editing.id, editing.user_id);
 
-            this.tagService.tagRefreshTrigger.set(
-                !this.tagService.tagRefreshTrigger()
-            );
+            this.refreshService.refresh('tag');
 
             this.modalService.tag.close();
         } catch (error) {

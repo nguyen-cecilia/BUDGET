@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, signal} from '@angular/core';
+import {Component, computed, effect, inject, signal, untracked} from '@angular/core';
 import {
     LucideArrowRight,
     LucideAstroid,
@@ -33,6 +33,7 @@ import {SavingsGoal} from '../saving-goals/savings-goal.model';
 import {CategoryType} from '../categories/category.model';
 import {DateService} from '../../core/date.service';
 import {LoadingComponent} from '../../components/loading/loading.component';
+import {RefreshService} from '../../core/refresh.service';
 
 const RECENT_TRANSACTIONS_NUMBER = 6;
 
@@ -70,6 +71,7 @@ export class DashboardComponent {
     private subscriptionService = inject(SubscriptionService);
     private goalService = inject(SavingsGoalService);
     private dateService = inject(DateService);
+    private refreshService = inject(RefreshService);
     protected currencyService = inject(CurrencyService);
     protected periodService = inject(PeriodService);
     protected colorService = inject(ColorService);
@@ -334,12 +336,16 @@ export class DashboardComponent {
 
     constructor() {
         effect(() => {
-            this.transactionService.transactionRefreshTrigger();
-            this.currencyService.currencyRefreshTrigger();
+            this.refreshService.trigger();
             this.periodService.selectedMonth();
             this.periodService.selectedYear();
-            const userId = this.authState.getCurrentUser()?.id;
-            if (userId) this.loadDashboard(userId);
+            const key = this.refreshService.lastKey();
+            untracked(() => {
+                const userId = this.authState.getCurrentUser()?.id;
+                if (userId && (!key || key === 'transaction' || key === 'currency')) {
+                    this.loadDashboard(userId);
+                }
+            });
         });
     }
 

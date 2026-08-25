@@ -9,6 +9,7 @@ import {Account} from './account.model';
 import {FORM_ERRORS, creationError} from '../../core/form-errors.service';
 import {FieldErrorComponent} from '../../components/form-error/field-error.component';
 import {FormErrorComponent} from '../../components/form-error/form-error.component';
+import {RefreshService} from '../../core/refresh.service';
 
 @Component({
     selector: 'app-account-update',
@@ -27,6 +28,7 @@ export class AccountUpdateComponent {
     private authState = inject(AuthStateService);
     private fb = inject(FormBuilder);
     private accountService = inject(AccountService);
+    private refreshService = inject(RefreshService);
     protected modalService = inject(ModalService);
 
     accountForm: FormGroup;
@@ -106,9 +108,7 @@ export class AccountUpdateComponent {
                 await this.accountService.createAccount(userId, payload);
             }
 
-            this.accountService.accountRefreshTrigger.set(
-                !this.accountService.accountRefreshTrigger()
-            );
+            this.refreshService.refresh('account');
 
             this.resetForm();
 

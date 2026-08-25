@@ -12,6 +12,7 @@ import {SelectComponent, SelectOption} from '../../components/select/select.comp
 import {BadgeComponent} from '../../components/badge/badge.component';
 import {FieldErrorComponent} from '../../components/form-error/field-error.component';
 import {FormErrorComponent} from '../../components/form-error/form-error.component';
+import {RefreshService} from '../../core/refresh.service';
 
 @Component({
     selector: 'app-category-update',
@@ -37,6 +38,7 @@ export class CategoryUpdateComponent {
     private authState = inject(AuthStateService);
     private fb = inject(FormBuilder);
     private categoryService = inject(CategoryService);
+    private refreshService = inject(RefreshService);
     protected modalService = inject(ModalService);
 
     categoryForm: FormGroup;
@@ -114,9 +116,7 @@ export class CategoryUpdateComponent {
                 await this.categoryService.createCategory(userId, payload);
             }
 
-            this.categoryService.categoryRefreshTrigger.set(
-                !this.categoryService.categoryRefreshTrigger()
-            );
+            this.refreshService.refresh('category');
 
             this.resetForm();
         } catch (error) {
@@ -140,9 +140,7 @@ export class CategoryUpdateComponent {
 
             await this.categoryService.deleteCategory(userId, editing.id, String(this.reassignTo()) || null);
 
-            this.categoryService.categoryRefreshTrigger.set(
-                !this.categoryService.categoryRefreshTrigger()
-            );
+            this.refreshService.refresh('category');
 
             this.modalService.category.close();
         } catch (error) {
