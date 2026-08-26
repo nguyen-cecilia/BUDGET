@@ -65,4 +65,17 @@ export class DateService {
         target.setHours(0, 0, 0, 0);
         return Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     }
+
+    formatFromDateToIso(date: string): string {
+        const [datePart, timePart] = date.split(' ');
+        const [d, m, y] = datePart.split('/');
+        return `${y}-${m}-${d}T${timePart}`;
+    }
+
+    formatFromIsoToDate(iso: string): Date {
+        const [datePart, timePart] = iso.split('T');
+        const [y, m, d] = datePart.split('-').map(Number);
+        const [h, min] = (timePart || '00:00').split(':').map(Number);
+        return new Date(y, m - 1, d, h, min);
+    }
 }

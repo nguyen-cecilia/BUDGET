@@ -61,11 +61,8 @@
 
             <label for="subscriptionNextDate">
                 <p>Prochain renouvellement</p>
-                <input
-                    type="date"
-                    id="subscriptionNextDate"
-                    formControlName="subscriptionNextDate"
-                    placeholder="jj/mm/aaaa"
+                <app-datepicker
+                    [control]="transactionForm.get('subscriptionNextDate')!"
                 />
             </label>
         </div>
@@ -135,11 +132,9 @@
 
         <label for="date">
             <p>Date</p>
-            <input
-                type="datetime-local"
-                id="date"
-                formControlName="date"
-                placeholder="jj/mm/aaaa"
+            <app-datepicker
+                [control]="transactionForm.get('date')!"
+                [hasTime]="true"
             />
         </label>
     </div>

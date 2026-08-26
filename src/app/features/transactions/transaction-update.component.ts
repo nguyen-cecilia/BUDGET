@@ -20,6 +20,7 @@ import {Subscription} from '../subscriptions/subscription.model';
 import {FieldErrorComponent} from '../../components/form-error/field-error.component';
 import {FormErrorComponent} from '../../components/form-error/form-error.component';
 import {RefreshService} from '../../core/refresh.service';
+import {DatePickerComponent} from '../../components/datepicker/datepicker.component';
 
 @Component({
     selector: 'app-update-transaction',
@@ -34,6 +35,7 @@ import {RefreshService} from '../../core/refresh.service';
         LucideTrash2,
         FieldErrorComponent,
         FormErrorComponent,
+        DatePickerComponent,
     ],
     templateUrl: './transaction-update.component.html',
 })

@@ -16,6 +16,7 @@ import {CurrencyService} from '../currencies/currency.service';
 import {FieldErrorComponent} from '../../components/form-error/field-error.component';
 import {FormErrorComponent} from '../../components/form-error/form-error.component';
 import {RefreshService} from '../../core/refresh.service';
+import {DatePickerComponent} from '../../components/datepicker/datepicker.component';
 
 @Component({
     selector: 'app-subscription-update',
@@ -27,7 +28,8 @@ import {RefreshService} from '../../core/refresh.service';
         LucideSave,
         LucideTrash2,
         FieldErrorComponent,
-        FormErrorComponent
+        FormErrorComponent,
+        DatePickerComponent
     ],
     templateUrl: './subscription-update.component.html',
 })

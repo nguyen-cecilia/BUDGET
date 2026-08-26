@@ -59,4 +59,65 @@
     label:has(input[type="checkbox"]:disabled) {
         @apply cursor-not-allowed opacity-60;
     }
+
+    /* Datetime picker */
+    .flatpickr-calendar {
+        @apply bg-surface! border! border-line! rounded-sm! shadow-lg!;
+
+        .flatpickr-months {
+            .flatpickr-prev-month,
+            .flatpickr-month,
+            .flatpickr-next-month {
+                @apply text-ink! fill-ink!;
+            }
+
+            .flatpickr-monthDropdown-months,
+            .numInputWrapper .numInput {
+                @apply font-bold! bg-surface! text-ink!;
+            }
+
+            .flatpickr-weekday {
+                @apply text-muted!;
+            }
+
+            .flatpickr-current-month {
+                @apply text-sm!;
+            }
+        }
+
+        .flatpickr-innerContainer {
+            .flatpickr-day {
+                @apply font-medium! text-ink!;
+
+                &:hover {
+                    @apply bg-blue! border-blue!;
+                }
+
+                &.prevMonthDay,
+                &.nextMonthDay {
+                    @apply text-soft!;
+                }
+            }
+
+            .flatpickr-day.selected {
+                @apply bg-pink! border-pink!;
+            }
+        }
+
+        .flatpickr-time {
+            @apply border-line!;
+
+            .numInputWrapper:first-child .numInput {
+                @apply rounded-bl-sm! hover:bg-surface!;
+            }
+
+            .flatpickr-time-separator {
+                @apply text-ink!;
+            }
+
+            .numInputWrapper:last-child .numInput {
+                @apply rounded-br-sm! hover:bg-surface!;
+            }
+        }
+    }
 }

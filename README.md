@@ -24,6 +24,18 @@ npm run lint
 
 ## Planning
 
+### V2 (tickets)
+
+- [ ] For categories, budget and tags: take into account the future transactions or not (new setting)
+- [ ] Scroll position shared between pages
+- [ ] Less padding on transaction item
+- [ ] Dashboard > Budget: remaining amount available
+- [ ] Yearly view: dark mode, chart not visible
+- [ ] Yearly view > Detail: less padding, gap
+- [ ] Mobile: sticky header
+- [ ] Datepicker: change it or add more style because it's ugly...
+- [ ] Dark mode: top bar with battery changing depending on the theme colour
+
 ### V1
 
 [Wireframe 1](https://id-preview-4a937b51--3100ca05-ec40-4340-b75f-a960c655361f.lovable.app/)
@@ -40,8 +52,7 @@ Layout:
 - [x] Bug: scroll when a modal is open
 - [x] When doing get requests, do it in bulk with Promise
 - [x] Messages: type success
-- [ ] Datepicker
-- [ ] Dark mode: top bar with battery not in black
+- [x] Datepicker
 
 Auth:
 
@@ -59,7 +70,6 @@ Dashboard:
 - [x] Based on month earnings, do the 50/30/20 rule
 - [x] View per month: depending on the global month chosen
 - [x] Subscriptions: "dans Xj - 00/00"
-- [ ] For categories, budget and tags: take into account the future transactions or not (new setting)
 
 Transactions:
 
