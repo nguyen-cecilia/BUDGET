@@ -1,15 +1,20 @@
 @if (isLoading()) {
     <app-loading/>
 } @else if (filteredTransactions().transactionsByDay.length > 0) {
-    <section>
+    <section class="space-y-4">
+        <button app-button (click)="modalService.transaction.openCreateBulk()" class="lg:hidden ml-auto">
+            <svg lucidePlus [size]="16"></svg>
+            Ajouter plusieurs
+        </button>
+
         <div class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-6">
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div class="flex items-center justify-between gap-3">
                 <div>
-                    <h1>Transactions - {{ transactionsByMonth().month || periodService.getMonthLabel() }}</h1>
-                    <p class="text-muted">{{ filteredTransactions().count }} résultat{{ filteredTransactions().count > 1 ? 's' : '' }}</p>
+                    <p class="uppercase text-muted font-semibold">{{ transactionsByMonth().month || periodService.getMonthLabel() }}</p>
+                    <h1>Transactions</h1>
                 </div>
 
-                <button app-button (click)="modalService.transaction.openCreateBulk()" class="self-end">
+                <button app-button (click)="modalService.transaction.openCreateBulk()" class="hidden lg:flex">
                     <svg lucidePlus [size]="16"></svg>
                     Ajouter plusieurs
                 </button>
@@ -86,6 +91,10 @@
     </section>
 
     <section class="space-y-6">
+        <p class="text-muted">
+            {{ filteredTransactions().count }} résultat{{ filteredTransactions().count > 1 ? 's' : '' }}
+        </p>
+
         @for (dayGroup of filteredTransactions().transactionsByDay; track dayGroup.date) {
             <div class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-3">
                 <div class="flex items-center justify-between gap-6">

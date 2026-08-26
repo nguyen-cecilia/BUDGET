@@ -40,6 +40,8 @@ Layout:
 - [x] Bug: scroll when a modal is open
 - [x] When doing get requests, do it in bulk with Promise
 - [x] Messages: type success
+- [ ] Datepicker
+- [ ] Dark mode: top bar with battery not in black
 
 Auth:
 
@@ -56,6 +58,8 @@ Dashboard:
 - [x] Savings goals
 - [x] Based on month earnings, do the 50/30/20 rule
 - [x] View per month: depending on the global month chosen
+- [ ] Subscriptions: "dans Xj - 00/00"
+- [ ] For categories, budget and tags: take into account the future transactions or not (new setting)
 
 Transactions:
 

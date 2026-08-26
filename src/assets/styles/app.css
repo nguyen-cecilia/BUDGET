@@ -46,8 +46,10 @@
     --text-lg: 24px;
     --text-xl: 30px;
     --text-2xl: 48px;
-    --text-3xl: 64px;
-    --text-4xl: 72px;
+    --text-3xl: 54px;
+    --text-4xl: 64px;
+
+    --tracking-tightest: -0.075em;
 
     --radius-*: initial;
     --radius-xxs: 5px;

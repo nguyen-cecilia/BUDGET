@@ -13,7 +13,7 @@ export interface BarChartDataset {
     selector: 'app-bar-chart',
     providers: [CurrencyPipe],
     template: '<canvas #canvas class="block"></canvas>',
-    host: {'class': 'block relative w-full min-h-80'},
+    host: {'class': 'block relative mx-auto w-98/100 lg:w-full min-h-80'},
 })
 export class BarChartComponent implements AfterViewInit, OnChanges {
     @Input() labels: string[] = [];

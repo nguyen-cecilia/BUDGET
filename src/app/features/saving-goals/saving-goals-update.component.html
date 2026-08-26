@@ -1,5 +1,5 @@
 <form class="space-y-4" [formGroup]="goalForm" (ngSubmit)="submitSavingsGoal()">
-    <div class="flex items-center gap-3 *:flex-1">
+    <div class="flex items-start gap-3 *:flex-1">
         <label for="targetAmount">
             <p>Objectif</p>
             <input id="targetAmount" type="number" placeholder="0.00" min="0" formControlName="targetAmount"
@@ -20,7 +20,7 @@
         </label>
     </div>
 
-    <div class="flex items-center gap-3 *:flex-1">
+    <div class="flex items-start gap-3 *:flex-1">
         <label for="amountPerMonth">
             <p>Par mois</p>
             <input id="amountPerMonth" type="number" placeholder="0.00" min="0" formControlName="amountPerMonth">

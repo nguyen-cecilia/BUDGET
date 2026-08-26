@@ -1,23 +1,34 @@
 @if (isLoading()) {
     <app-loading/>
 } @else {
-    <section>
-        <div
-            class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 flex flex-col justify-between lg:flex-row lg:flex-wrap lg:items-center gap-3"
-        >
-            <div>
-                <h1>Vue annuelle</h1>
-                <p class="text-muted">Bilan sur l'année.</p>
-            </div>
-
+    <section class="space-y-4">
+        <div class="lg:hidden ml-auto w-fit">
             <app-select
                 label="Année"
                 [options]="yearOptions()"
                 [value]="selectedYear()"
                 (valueChange)="setYear($event)"
             ></app-select>
+        </div>
 
-            <div class="w-full grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div
+            class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 flex flex-col justify-between lg:flex-row lg:flex-wrap lg:items-center gap-6"
+        >
+            <div>
+                <h1>Vue annuelle</h1>
+                <p class="text-muted">Bilan sur l'année.</p>
+            </div>
+
+            <div class="hidden lg:block">
+                <app-select
+                    label="Année"
+                    [options]="yearOptions()"
+                    [value]="selectedYear()"
+                    (valueChange)="setYear($event)"
+                ></app-select>
+            </div>
+
+            <div class="w-full grid grid-cols-2 lg:grid-cols-4 gap-2 *:flex *:flex-col *:justify-between">
                 <div class="bg-green dark:text-surface border dark:border-ink rounded p-3">
                     <div class="flex items-center gap-1 uppercase text-xs tracking-wide font-medium">
                         <svg lucideTrendingUp [size]="16"></svg>
@@ -87,7 +98,7 @@
                     <div
                         class="bg-base border rounded p-3 space-y-2
                         {{ extremeMonths()?.best === m.index ? 'bg-green/15 border-green ring-1 ring-green' : '' }}
-                        {{ extremeMonths()?.worst === m.index ? 'bg-pink/15 border-pink ring-1 ring-pink' : '' }}"
+                        {{ extremeMonths()?.worst != null && extremeMonths()?.worst === m.index ? 'bg-pink/15 border-pink ring-1 ring-pink' : '' }}"
                     >
                         <h3>{{ m.label }}</h3>
 
@@ -103,9 +114,9 @@
 
                         <hr class="border-line">
 
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between">
                             <p class="text-muted text-sm">Net</p>
-                            <p class="font-display font-semibold text-md {{ m.net > 0 ? 'text-green' : m.net < 0 ? 'text-pink-dark' : 'text-muted' }}">
+                            <p class="font-display font-semibold text-md text-right {{ m.net > 0 ? 'text-green' : m.net < 0 ? 'text-pink-dark' : 'text-muted' }}">
                                 {{ m.net > 0 ? '+ ' : m.net < 0 ? '- ' : '' }}{{ (m.net < 0 ? -m.net : m.net)|currency:currencyService.defaultCurrency() }}
                             </p>
                         </div>

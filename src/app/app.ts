@@ -36,7 +36,7 @@ export class App {
 
     links = [
         {icon: 'lucideHome', path: '', label: 'Tableau de bord', shortLabel: 'Accueil'},
-        {icon: 'lucideList', path: 'transactions', label: 'Transactions', shortLabel: 'Transactions'},
+        {icon: 'lucideList', path: 'transactions', label: 'Transactions', shortLabel: 'Transac.'},
         {icon: 'lucideTarget', path: 'objectifs', label: 'Objectifs', shortLabel: 'Objectifs'},
         {icon: 'lucideChartColumnIncreasing', path: 'vue-annuelle', label: 'Vue annuelle', shortLabel: 'Année'},
         {icon: 'lucideSettings', path: 'parametres', label: 'Paramètres', shortLabel: 'Paramètres'},

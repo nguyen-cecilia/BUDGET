@@ -5,10 +5,10 @@ import {
     LucideCalendarDays,
     LucideChartPie,
     LucideCheck,
+    LucideCircleStar,
     LucideLayers,
     LucidePartyPopper,
     LucidePiggyBank,
-    LucideSnail,
     LucideSparkles,
     LucideTag,
     LucideWallet,
@@ -58,10 +58,10 @@ const RECENT_TRANSACTIONS_NUMBER = 6;
         LucideX,
         LucideCalendarDays,
         LucidePartyPopper,
-        LucideSnail,
         LucidePiggyBank,
         LucideChartPie,
         LoadingComponent,
+        LucideCircleStar,
     ],
     templateUrl: './dashboard.component.html',
 })
@@ -313,7 +313,7 @@ export class DashboardComponent {
 
         const map = new Map<string, number>();
 
-        for (const t of transactions.filter(t => t.type === 'expense')) {
+        for (const t of transactions.filter(t => t.type === 'expense').filter(t => this.dateService.isPastOrToday(t.date))) {
             if (!this.currencyService.canConvert(t.currency.code)) continue;
 
             for (const tag of t.tags ?? []) {
