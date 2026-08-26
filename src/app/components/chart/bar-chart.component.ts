@@ -2,6 +2,7 @@ import {CurrencyPipe} from "@angular/common";
 import {AfterViewInit, Component, ElementRef, inject, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {Chart} from 'chart.js';
 import './chart-setup';
+import {ThemeService} from '../../core/theme.service';
 
 export interface BarChartDataset {
     label: string;
@@ -23,6 +24,7 @@ export class BarChartComponent implements AfterViewInit, OnChanges {
     private el = inject(ElementRef);
     private chart?: Chart;
     private currencyPipe = inject(CurrencyPipe);
+    private themeService = inject(ThemeService);
 
     ngAfterViewInit() {
         this.createChart();
@@ -53,6 +55,7 @@ export class BarChartComponent implements AfterViewInit, OnChanges {
                         position: 'bottom',
                         align: 'start',
                         labels: {
+                            color: this.themeService.isDark() ? '#e0e0e0' : '#515869',
                             usePointStyle: true,
                             pointStyle: 'circle',
                             boxWidth: 8,
@@ -78,13 +81,24 @@ export class BarChartComponent implements AfterViewInit, OnChanges {
                 },
                 scales: {
                     x: {
-                        grid: {display: false},
+                        grid: {
+                            display: false,
+                        },
+                        ticks: {
+                            color: this.themeService.isDark() ? '#a6adc8' : '#515869',
+                        },
                     },
                     y: {
+                        ticks: {
+                            color: this.themeService.isDark() ? '#a6adc8' : '#515869',
+                        },
                         beginAtZero: true,
                         border: {
                             dash: [5, 4],
-                        }
+                        },
+                        grid: {
+                            color: this.themeService.isDark() ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.1)',
+                        },
                     },
                 },
                 elements: {

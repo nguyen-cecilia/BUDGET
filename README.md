@@ -27,12 +27,12 @@ npm run lint
 ### V2 (tickets)
 
 - [ ] For categories, budget and tags: take into account the future transactions or not (new setting)
-- [ ] Scroll position shared between pages
-- [ ] Less padding on transaction item
+- [x] Scroll position shared between pages
+- [x] Less padding on transaction item
 - [ ] Dashboard > Budget: remaining amount available
-- [ ] Yearly view: dark mode, chart not visible
-- [ ] Yearly view > Detail: less padding, gap
-- [ ] Mobile: sticky header
+- [x] Yearly view: dark mode, chart not visible
+- [x] Yearly view > Detail: less padding, gap
+- [x] Mobile: sticky header
 - [ ] Datepicker: change it or add more style because it's ugly...
 - [ ] Dark mode: top bar with battery changing depending on the theme colour
 
