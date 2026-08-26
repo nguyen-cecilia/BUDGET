@@ -130,7 +130,7 @@
                             }
                             <div class="flex items-center gap-0.75 text-xs text-muted font-medium">
                                 <svg lucideArrowRight [size]="12"></svg>
-                                Prochain paiement : {{ sub.next_payment_date|date:'dd/MM/yyyy' }}
+                                {{ nextPaymentDate(sub.next_payment_date) }} · {{ sub.next_payment_date|date:'dd/MM' }}
                             </div>
                         </div>
                         <div class="text-right">

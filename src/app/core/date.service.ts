@@ -53,4 +53,16 @@ export class DateService {
 
         return date > today;
     }
+
+    /**
+     * @param dateStr
+     * @return Le nombre de jours avant d'arriver au jour donné
+     */
+    daysUntil(dateStr: string): number {
+        const target = new Date(dateStr);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        target.setHours(0, 0, 0, 0);
+        return Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    }
 }

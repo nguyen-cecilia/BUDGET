@@ -334,6 +334,16 @@ export class DashboardComponent {
             : 0;
     }
 
+    nextPaymentDate(date: string): string {
+        const remainingDays = this.dateService.daysUntil(date);
+
+        if (remainingDays < 0) return 'Paiement passé';
+        if (remainingDays == 0) return 'À payer aujourd\'hui';
+        if (remainingDays == 1) return 'Suivant demain';
+
+        return `Suivant dans ${remainingDays}j`;
+    }
+
     constructor() {
         effect(() => {
             this.refreshService.trigger();
