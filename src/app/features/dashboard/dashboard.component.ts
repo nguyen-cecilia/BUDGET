@@ -30,10 +30,10 @@ import {TransactionItemComponent} from '../transactions/transaction-item.compone
 import {CurrencyService} from '../currencies/currency.service';
 import {SavingsGoalService} from '../saving-goals/savings-goal.service';
 import {SavingsGoal} from '../saving-goals/savings-goal.model';
-import {CategoryType} from '../categories/category.model';
 import {DateService} from '../../core/date.service';
 import {LoadingComponent} from '../../components/loading/loading.component';
 import {RefreshService} from '../../core/refresh.service';
+import {PreferencesService} from '../../core/preferences.service';
 
 const RECENT_TRANSACTIONS_NUMBER = 6;
 
@@ -72,6 +72,7 @@ export class DashboardComponent {
     private goalService = inject(SavingsGoalService);
     private dateService = inject(DateService);
     private refreshService = inject(RefreshService);
+    private preferencesService = inject(PreferencesService);
     protected currencyService = inject(CurrencyService);
     protected periodService = inject(PeriodService);
     protected colorService = inject(ColorService);
@@ -87,7 +88,7 @@ export class DashboardComponent {
         this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions)
             .filter(t => t.type === 'expense')
-            .filter(t => this.dateService.isPastOrToday(t.date))
+            .filter(t => this.preferencesService.includeFutureTransactions() || this.dateService.isPastOrToday(t.date))
             .filter(t => this.currencyService.canConvert(t.currency.code))
             .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0) ?? 0
     );
@@ -96,7 +97,7 @@ export class DashboardComponent {
         this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions)
             .filter(t => t.type === 'income')
-            .filter(t => this.dateService.isPastOrToday(t.date))
+            .filter(t => this.preferencesService.includeFutureTransactions() || this.dateService.isPastOrToday(t.date))
             .filter(t => this.currencyService.canConvert(t.currency.code))
             .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0) ?? 0
     );
@@ -143,14 +144,14 @@ export class DashboardComponent {
 
     expensesRatio = computed(() =>
         this.totalIncomes() > 0
-            ? Math.round((this.totalExpenses() / this.totalIncomes()) * 100)
+            ? Math.min(100, Math.round((this.totalExpenses() / this.totalIncomes()) * 100))
             : 0
     );
 
     recentTransactions = computed(() =>
         (this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions) ?? [])
-            .filter(t => this.dateService.isPastOrToday(t.date))
+            .filter(t => this.preferencesService.includeFutureTransactions() || this.dateService.isPastOrToday(t.date))
             .slice(0, RECENT_TRANSACTIONS_NUMBER)
     );
 
@@ -174,6 +175,16 @@ export class DashboardComponent {
             })
             .sort((a, b) => Number(a.checked) - Number(b.checked));
     });
+
+    nextPaymentDate(date: string): string {
+        const remainingDays = this.dateService.daysUntil(date);
+
+        if (remainingDays < 0) return 'Paiement passé';
+        if (remainingDays == 0) return 'À payer aujourd\'hui';
+        if (remainingDays == 1) return 'Suivant demain';
+
+        return `Suivant dans ${remainingDays}j`;
+    }
 
     upcomingPayments = computed(() => {
         const days = new Map<string, {
@@ -228,57 +239,53 @@ export class DashboardComponent {
     });
 
     budget = computed(() => {
-        const transactions = this.transactionsByMonth()?.transactionsByDay
-            .flatMap(d => d.transactions) ?? [];
+        const income = this.totalIncomes();
+        const transactions = (this.transactionsByMonth()?.transactionsByDay
+            .flatMap(d => d.transactions) ?? [])
+            .filter(t => this.preferencesService.includeFutureTransactions() || this.dateService.isPastOrToday(t.date));
 
-        const income = transactions
-            .filter(t => t.type === 'income')
-            .filter(t => this.currencyService.canConvert(t.currency.code))
-            .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0);
+        let needs = 0;
+        let wants = 0;
+        const needCategories = new Set<string>();
+        const wantCategories = new Set<string>();
 
-        const expensesByType = (type: CategoryType) =>
-            transactions
-                .filter(t => t.type === 'expense')
-                .filter(t => t.category?.type === type)
-                .filter(t => this.currencyService.canConvert(t.currency.code))
-                .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0);
+        for (const t of transactions) {
+            if (t.type !== 'expense') continue;
+            if (!this.currencyService.canConvert(t.currency.code)) continue;
+            const amount = this.currencyService.convertToDefault(t.amount, t.currency.code);
 
-        const categoriesByType = (type: CategoryType): string[] => {
-            const labels = new Set<string>();
-            for (const t of transactions) {
-                if (t.type !== 'expense') continue;
-                if (t.category?.type !== type) continue;
-                labels.add(t.category.label);
+            if (t.category?.type === 'need') {
+                needs += amount;
+                needCategories.add(t.category.label);
+            } else if (t.category?.type === 'want') {
+                wants += amount;
+                wantCategories.add(t.category.label);
             }
-            return Array.from(labels).sort((a, b) => a.localeCompare(b, 'fr'));
-        };
+        }
 
-        const needs = expensesByType('need');
-        const wants = expensesByType('want');
         const savings = income - needs - wants;
 
-        const buckets = [
-            {key: 'needs', label: 'Besoins', percent: 50, allocated: income * 0.5, spent: needs, bg: 'bg-blue', categories: categoriesByType('need')},
-            {key: 'wants', label: 'Envies', percent: 30, allocated: income * 0.3, spent: wants, bg: 'bg-pink', categories: categoriesByType('want')},
-            {key: 'savings', label: 'Épargne', percent: 20, allocated: income * 0.2, spent: savings, bg: 'bg-green', categories: []},
-        ].map(bucket => {
-            const progress = bucket.allocated > 0
-                ? Math.max(0, Math.round((bucket.spent / bucket.allocated) * 100))
-                : 0;
+        const makeBucket = (key: string, label: string, percent: number, spent: number, bg: string, categories: string[]) => {
+            const allocated = income * (percent / 100);
+            const progress = allocated > 0 ? Math.max(0, Math.round((spent / allocated) * 100)) : 0;
+            return {key, label, percent, allocated, spent, bg, categories, progress, remaining: allocated - spent, barWidth: Math.min(100, progress)};
+        };
 
-            return {
-                ...bucket,
-                progress,
-                barWidth: Math.min(100, progress),
-            };
-        });
+        const sortFr = (a: string, b: string) => a.localeCompare(b, 'fr');
 
-        return {income, buckets};
+        return {
+            budgets: [
+                makeBucket('needs', 'Besoins', 50, needs, 'bg-blue', Array.from(needCategories).sort(sortFr)),
+                makeBucket('wants', 'Envies', 30, wants, 'bg-pink', Array.from(wantCategories).sort(sortFr)),
+            ],
+            savingsBudget: makeBucket('savings', 'Épargne', 20, savings, 'bg-green', []),
+        };
     });
 
     categoriesData = computed(() => {
-        const transactions = this.transactionsByMonth()?.transactionsByDay
-            .flatMap(d => d.transactions) ?? [];
+        const transactions = (this.transactionsByMonth()?.transactionsByDay
+            .flatMap(d => d.transactions) ?? [])
+            .filter(t => this.preferencesService.includeFutureTransactions() || this.dateService.isPastOrToday(t.date));
 
         const map = new Map<string, { label: string; color: string; total: number }>();
 
@@ -313,7 +320,7 @@ export class DashboardComponent {
 
         const map = new Map<string, number>();
 
-        for (const t of transactions.filter(t => t.type === 'expense').filter(t => this.dateService.isPastOrToday(t.date))) {
+        for (const t of transactions.filter(t => t.type === 'expense').filter(t => this.preferencesService.includeFutureTransactions() || this.dateService.isPastOrToday(t.date))) {
             if (!this.currencyService.canConvert(t.currency.code)) continue;
 
             for (const tag of t.tags ?? []) {
@@ -334,25 +341,16 @@ export class DashboardComponent {
             : 0;
     }
 
-    nextPaymentDate(date: string): string {
-        const remainingDays = this.dateService.daysUntil(date);
-
-        if (remainingDays < 0) return 'Paiement passé';
-        if (remainingDays == 0) return 'À payer aujourd\'hui';
-        if (remainingDays == 1) return 'Suivant demain';
-
-        return `Suivant dans ${remainingDays}j`;
-    }
-
     constructor() {
         effect(() => {
             this.refreshService.trigger();
             this.periodService.selectedMonth();
             this.periodService.selectedYear();
             const key = this.refreshService.lastKey();
-            untracked(() => {
+            untracked(async () => {
                 const userId = this.authState.getCurrentUser()?.id;
                 if (userId && (!key || key === 'transaction' || key === 'currency')) {
+                    await this.authState.awaitSessionReady();
                     this.loadDashboard(userId);
                 }
             });

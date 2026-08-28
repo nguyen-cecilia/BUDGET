@@ -13,10 +13,10 @@ export class TransactionService {
 
     async getTransactionsByMonth(userId: string, monthIndex: number, year: number): Promise<TransactionsByMonth> {
         const firstDay = new Date(year, monthIndex, 1);
-        const lastDay = new Date(year, monthIndex + 1, 0);
+        const firstDayNextMonth = new Date(year, monthIndex + 1, 1);
 
         const startDate = this.dateService.formatDateToString(firstDay);
-        const endDate = this.dateService.formatDateToString(lastDay);
+        const endDate = this.dateService.formatDateToString(firstDayNextMonth);
 
         const {data, error} = await this.supabase
             .from(TRANSACTIONS_TABLE)
@@ -29,7 +29,7 @@ export class TransactionService {
             `)
             .eq('user_id', userId)
             .gte('date', startDate)
-            .lte('date', endDate)
+            .lt('date', endDate)
             .order('date', {ascending: false})
         ;
 

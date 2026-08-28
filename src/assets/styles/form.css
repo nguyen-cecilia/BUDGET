@@ -48,7 +48,7 @@
         }
 
         input[type="checkbox"].switch {
-            @apply appearance-none bg-base relative m-0 w-10 h-5.5 border border-line rounded-full transition-all checked:bg-blue checked:border-blue before:absolute before:top-0.5 before:left-0.5 before:transition-all before:border before:border-line before:w-4 before:h-4 before:bg-white before:rounded-full checked:before:translate-x-4.5 disabled:cursor-not-allowed;
+            @apply appearance-none cursor-pointer bg-base relative m-0 w-10 h-5.5 border border-line rounded-full transition-all checked:bg-blue checked:border-blue before:absolute before:top-0.5 before:left-0.5 before:transition-all before:border before:border-line before:w-4 before:h-4 before:bg-white before:rounded-full checked:before:translate-x-4.5 disabled:cursor-not-allowed;
 
             &.pink {
                 @apply disabled:checked:bg-pink-dark disabled:checked:border-pink-dark;
@@ -62,9 +62,17 @@
 
     /* Datetime picker */
     .flatpickr-calendar {
-        @apply bg-surface! border! border-line! rounded-sm! shadow-lg!;
+        @apply w-auto! bg-surface! border! border-line! rounded-sm! shadow-lg!;
 
         .flatpickr-months {
+            .flatpickr-prev-month {
+                @apply left-2! top-2!;
+            }
+
+            .flatpickr-next-month {
+                @apply right-2! top-2!;
+            }
+
             .flatpickr-prev-month,
             .flatpickr-month,
             .flatpickr-next-month {
@@ -81,11 +89,17 @@
             }
 
             .flatpickr-current-month {
-                @apply text-sm!;
+                @apply text-sm! mt-2!;
             }
         }
 
         .flatpickr-innerContainer {
+            @apply p-2!;
+
+            .flatpickr-weekday {
+                @apply text-muted!;
+            }
+
             .flatpickr-day {
                 @apply font-medium! text-ink!;
 
@@ -106,6 +120,10 @@
 
         .flatpickr-time {
             @apply border-line!;
+
+            .numInput {
+                @apply text-ink!;
+            }
 
             .numInputWrapper:first-child .numInput {
                 @apply rounded-bl-sm! hover:bg-surface!;

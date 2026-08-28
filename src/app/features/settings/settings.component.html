@@ -78,6 +78,25 @@
 } @else {
     <section class="flex flex-col lg:flex-row gap-8 *:flex-1">
         <div class="space-y-8">
+            <div class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-4">
+                <h2 class="flex items-center gap-2">
+                    <svg lucideHome [size]="20"></svg>
+                    Tableau de bord
+                </h2>
+
+                <div class="grid grid-cols-[2fr_1fr] items-center gap-2">
+                    <p class="text-muted text-sm">Inclure les transactions futures dans les statistiques</p>
+                    <label class="justify-self-end">
+                        <input
+                            type="checkbox"
+                            class="switch"
+                            [checked]="preferencesService.includeFutureTransactions()"
+                            (change)="preferencesService.toggle()"
+                        >
+                    </label>
+                </div>
+            </div>
+
             <div class="bg-yellow/50 border border-line shadow-md shadow-muted/10 rounded p-5 space-y-4">
                 <div class="flex items-center justify-between gap-3">
                     <h2 class="flex items-center gap-2">
@@ -160,10 +179,10 @@
                 </button>
             </div>
 
-            <div class="lg:max-h-88 lg:overflow-y-auto">
+            <div class="space-y-1">
                 @for (subscription of subscriptions(); track subscription.id) {
                     <div
-                        class="flex flex-wrap lg:flex-nowrap flex-row items-center justify-between gap-x-6 gap-y-2 rounded px-2 py-4 cursor-pointer transition-all hover:bg-base"
+                        class="flex flex-wrap lg:flex-nowrap flex-row items-center justify-between gap-x-6 gap-y-2 rounded px-2 py-3 cursor-pointer transition-all hover:bg-base"
                         (click)="modalService.subscription.openEdit(subscription)"
                         (keydown.enter)="modalService.subscription.openEdit(subscription)"
                         (keydown.space)="modalService.subscription.openEdit(subscription)"

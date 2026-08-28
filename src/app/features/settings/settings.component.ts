@@ -1,6 +1,7 @@
 import {Component, effect, inject, signal, untracked} from '@angular/core';
 import {
     LucideCoins,
+    LucideHouse,
     LucideKey,
     LucideLandmark,
     LucideLayers,
@@ -47,6 +48,7 @@ import {AuthService} from '../../core/auth/auth.service';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {FormErrorComponent} from '../../components/form-error/form-error.component';
 import {FieldErrorComponent} from '../../components/form-error/field-error.component';
+import {PreferencesService} from '../../core/preferences.service';
 
 @Component({
     selector: 'app-settings',
@@ -78,7 +80,8 @@ import {FieldErrorComponent} from '../../components/form-error/field-error.compo
         FormErrorComponent,
         LucideKey,
         ReactiveFormsModule,
-        FieldErrorComponent
+        FieldErrorComponent,
+        LucideHouse
     ],
     templateUrl: './settings.component.html',
 })
@@ -98,6 +101,7 @@ export class SettingsComponent {
     protected modalService = inject(ModalService);
     protected periodService = inject(PeriodService);
     protected colorService = inject(ColorService);
+    protected preferencesService = inject(PreferencesService);
 
     selectedMonth = this.periodService.selectedMonth;
     monthOptions = this.periodService.monthOptions;
@@ -123,9 +127,10 @@ export class SettingsComponent {
         effect(() => {
             this.refreshService.trigger();
             const key = this.refreshService.lastKey();
-            untracked(() => {
+            untracked(async () => {
                 const userId = this.authState.getCurrentUser()?.id;
                 if (userId && (!key || key !== 'goal')) {
+                    await this.authState.awaitSessionReady();
                     void this.loadSettings(userId);
                 }
             });

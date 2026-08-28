@@ -1,8 +1,9 @@
-import {Component, ElementRef, inject, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, DestroyRef, ElementRef, inject, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {AbstractControl, ReactiveFormsModule} from '@angular/forms';
 import flatpickr from 'flatpickr';
 import {French} from 'flatpickr/dist/l10n/fr';
 import {DateService} from '../../core/date.service';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'app-datepicker',
@@ -24,6 +25,7 @@ export class DatePickerComponent implements OnInit, OnDestroy {
 
     private flatpickrInstance?: flatpickr.Instance;
     private dateService = inject(DateService);
+    private destroyRef = inject(DestroyRef);
 
     ngOnInit() {
         const initialValue = this.control.value;
@@ -31,19 +33,26 @@ export class DatePickerComponent implements OnInit, OnDestroy {
 
         this.flatpickrInstance = flatpickr(this.inputRef.nativeElement, {
             locale: French,
-            dateFormat: `d/m/Y${this.hasTime ? ' H:i' : ''}`,
+            dateFormat: this.hasTime ? 'd/m/Y H:i' : 'd/m/Y',
             enableTime: this.hasTime,
             defaultDate: parsed,
             onChange: (_dates, dateStr) => {
-                this.control.setValue(this.dateService.formatFromDateToIso(dateStr), {emitEvent: false});
+                this.control.setValue(this.dateService.formatFromDateToIso(dateStr, this.hasTime), {emitEvent: false});
             },
         });
 
         if (!initialValue) {
+            const format = this.hasTime ? 'd/m/Y H:i' : 'd/m/Y';
             this.control.setValue(this.dateService.formatFromDateToIso(
-                this.flatpickrInstance.formatDate(new Date(), `d/m/Y${this.hasTime ? ' H:i' : ''}`)
+                this.flatpickrInstance.formatDate(new Date(), format), this.hasTime
             ), {emitEvent: false});
         }
+
+        this.control.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(value => {
+            if (this.flatpickrInstance && value) {
+                this.flatpickrInstance.setDate(this.dateService.formatFromIsoToDate(value), true);
+            }
+        });
     }
 
     ngOnDestroy() {

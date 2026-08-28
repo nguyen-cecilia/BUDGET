@@ -19,7 +19,7 @@
             <div class="relative z-1">
                 <p class="uppercase text-muted font-semibold">{{ periodService.getMonthLabel() }}</p>
                 <p class="font-display text-xl lg:text-2xl leading-8 lg:leading-12">Il reste</p>
-                <p class="tracking-tightest font-display text-3xl leading-16 lg:text-4xl lg:leading-20 font-medium">{{ balance()|currency:defaultCurrency() }}</p>
+                <p class="tracking-tighter font-display text-3xl leading-16 lg:text-4xl lg:leading-20 font-medium">{{ balance()|currency:defaultCurrency() }}</p>
             </div>
 
             <div class="space-y-1">
@@ -43,8 +43,8 @@
                         class="w-12 aspect-square flex justify-center items-center bg-surface rounded-full font-display text-lg font-semibold">
                         <svg lucideAstroid [size]="24"></svg>
                     </div>
-                    <div class="dark:text-surface">
-                        <p class="font-display text-lg leading-5 font-semibold">{{ transactionCount() }}</p>
+                    <div class="dark:text-surface leading-5">
+                        <p class="font-display text-lg font-semibold">{{ transactionCount() }}</p>
                         <p class="font-medium">transaction{{ transactionCount() > 1 ? 's' : '' }}</p>
                     </div>
                 </div>
@@ -54,8 +54,8 @@
                         class="w-12 aspect-square flex justify-center items-center bg-surface rounded-full font-display text-lg font-semibold">
                         <svg lucideZap [size]="24"></svg>
                     </div>
-                    <div class="dark:text-surface">
-                        <p class="font-display text-lg leading-5 font-semibold">{{ subscriptionTotal()|currency:defaultCurrency() }}</p>
+                    <div class="dark:text-surface leading-5">
+                        <p class="font-display text-lg font-semibold">{{ subscriptionTotal()|currency:defaultCurrency() }}</p>
                         <p class="font-medium">d'abonnement</p>
                     </div>
                 </div>
@@ -65,8 +65,8 @@
                         class="w-12 aspect-square flex justify-center items-center bg-surface rounded-full font-display text-lg font-semibold">
                         <svg lucideCircleStar [size]="24"></svg>
                     </div>
-                    <div class="dark:text-surface">
-                        <p class="font-display text-lg leading-5 font-semibold">{{ remainingToPay()|currency:defaultCurrency() }}</p>
+                    <div class="dark:text-surface leading-5">
+                        <p class="font-display text-lg font-semibold">{{ remainingToPay()|currency:defaultCurrency() }}</p>
                         <p class="font-medium">reste à payer</p>
                     </div>
                 </div>
@@ -88,7 +88,7 @@
                 </button>
             </div>
 
-            <div>
+            <div class="space-y-1">
                 @for (transaction of recentTransactions(); track transaction.id) {
                     <app-transaction-item [transaction]="transaction" [hasDate]="true"></app-transaction-item>
                 } @empty {
@@ -236,28 +236,53 @@
                     Budget 50/30/20
                 </h2>
 
-                @if (budget().income > 0) {
+                @if (totalIncomes() > 0) {
                     <p class="text-muted text-sm">
-                        Basé sur les revenus du mois : <strong class="text-ink">{{ budget().income|currency:defaultCurrency() }}</strong>
+                        Basé sur les revenus du mois : <strong class="text-ink">{{ totalIncomes()|currency:defaultCurrency() }}</strong>
                     </p>
 
-                    @for (bucket of budget().buckets; track bucket.key) {
+                    @for (bucket of budget().budgets; track bucket.key) {
                         <div class="rounded bg-base border p-4 flex flex-col items-start gap-1">
-                            <div class="{{ bucket.bg }} rounded border px-2 py-0.5 font-semibold text-xs">{{ bucket.percent }}%</div>
-                            <p class="text-xl font-semibold font-display leading-9">{{ bucket.allocated|currency:defaultCurrency() }}</p>
+                            <div class="{{ bucket.bg }} rounded border px-2 py-0.5 font-semibold text-xs">
+                                {{ bucket.percent }}%
+                            </div>
+                            <div>
+                                <p class="text-md font-display text-muted">Il reste</p>
+                                <p class="text-xl font-semibold font-display leading-9">
+                                    {{ bucket.remaining|currency:defaultCurrency() }}
+                                </p>
+                            </div>
                             <div>
                                 <p class="font-semibold">{{ bucket.label }}</p>
                                 @if (bucket.categories.length > 0) {
                                     <p class="text-muted text-xs">{{ bucket.categories.join(' · ') }}</p>
                                 }
                             </div>
-                            <p class="w-full text-right text-muted text-sm">{{ bucket.progress }}% {{ bucket.key === 'savings' ? 'épargnés' : 'dépensés' }}</p>
+                            <p class="w-full text-right text-muted text-sm">{{ bucket.progress }}% dépensés</p>
                             <div class="w-full h-3 rounded border bg-deep">
                                 <div class="h-full rounded {{ bucket.bg }}" [style.width.%]="bucket.barWidth"></div>
                             </div>
                             <p class="font-semibold">{{ bucket.spent|currency:defaultCurrency() }} <span class="text-xs text-muted font-normal">/ {{ bucket.allocated|currency:defaultCurrency() }}</span></p>
                         </div>
                     }
+
+                    <div class="rounded bg-base border p-4 flex flex-col items-start gap-1">
+                        <div class="{{ budget().savingsBudget.bg }} rounded border px-2 py-0.5 font-semibold text-xs">{{ budget().savingsBudget.percent }}%</div>
+                        <div>
+                            <p class="font-display text-muted">Objectif</p>
+                            <p class="text-xl font-semibold font-display leading-9">
+                                {{ budget().savingsBudget.allocated|currency:defaultCurrency() }}
+                            </p>
+                        </div>
+                        <div>
+                            <p class="font-semibold">{{ budget().savingsBudget.label }}</p>
+                        </div>
+                        <p class="w-full text-right text-muted text-sm">{{ budget().savingsBudget.progress }}% épargnés</p>
+                        <div class="w-full h-3 rounded border bg-deep">
+                            <div class="h-full rounded {{ budget().savingsBudget.bg }}" [style.width.%]="budget().savingsBudget.barWidth"></div>
+                        </div>
+                        <p class="font-semibold">{{ budget().savingsBudget.spent|currency:defaultCurrency() }} <span class="text-xs text-muted font-normal">/ {{ budget().savingsBudget.allocated|currency:defaultCurrency() }}</span></p>
+                    </div>
                 } @else {
                     <p class="text-muted text-sm">Aucun revenu ce mois-ci.</p>
                 }

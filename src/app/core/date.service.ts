@@ -66,10 +66,14 @@ export class DateService {
         return Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     }
 
-    formatFromDateToIso(date: string): string {
-        const [datePart, timePart] = date.split(' ');
-        const [d, m, y] = datePart.split('/');
-        return `${y}-${m}-${d}T${timePart}`;
+    formatFromDateToIso(date: string, withTime = true): string {
+        if (withTime) {
+            const [datePart, timePart] = date.split(' ');
+            const [d, m, y] = datePart.split('/');
+            return `${y}-${m}-${d}T${timePart}`;
+        }
+        const [d, m, y] = date.split('/');
+        return `${y}-${m}-${d}`;
     }
 
     formatFromIsoToDate(iso: string): Date {

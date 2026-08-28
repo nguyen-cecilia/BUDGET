@@ -67,6 +67,9 @@ import {DateService} from '../../core/date.service';
             </div>
         </div>
     `,
+    host: {
+        'class': 'block',
+    }
 })
 export class TransactionItemComponent {
     @Input({required: true}) transaction!: Transaction;

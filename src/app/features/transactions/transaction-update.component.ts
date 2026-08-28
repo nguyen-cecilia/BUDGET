@@ -13,9 +13,6 @@ import {SubscriptionService} from '../subscriptions/subscription.service';
 import positiveNumber from '../../core/validators';
 import {FORM_ERRORS, creationError, deletionError} from '../../core/form-errors.service';
 import {Transaction} from './transaction.model';
-import {AccountService} from '../accounts/account.service';
-import {CategoryService} from '../categories/category.service';
-import {CurrencyService} from '../currencies/currency.service';
 import {Subscription} from '../subscriptions/subscription.model';
 import {FieldErrorComponent} from '../../components/form-error/field-error.component';
 import {FormErrorComponent} from '../../components/form-error/form-error.component';
@@ -44,9 +41,6 @@ export class TransactionUpdateComponent {
     private fb = inject(FormBuilder);
     private optionsService = inject(TransactionOptionsService);
     private transactionService = inject(TransactionService);
-    private accountService = inject(AccountService);
-    private categoryService = inject(CategoryService);
-    private currencyService = inject(CurrencyService);
     private tagService = inject(TagService);
     private subscriptionService = inject(SubscriptionService);
     private refreshService = inject(RefreshService);
@@ -88,10 +82,12 @@ export class TransactionUpdateComponent {
             selectedSubscriptionId: [''],
         });
 
-        this.transactionForm.get('subscriptionFrequency')?.valueChanges.subscribe(() => this.handleNextDate());
+        this.transactionForm.get('subscriptionFrequency')?.valueChanges.subscribe(() => {
+            if (!this.modalService.transaction.editing()) this.handleNextDate();
+        });
 
         this.transactionForm.get('date')?.valueChanges.subscribe(() => {
-            if (this.mode() === 'subscription') this.handleNextDate();
+            if (this.mode() === 'subscription' && !this.modalService.transaction.editing()) this.handleNextDate();
         });
 
         effect(() => {
@@ -332,13 +328,13 @@ export class TransactionUpdateComponent {
             this.tagsOptions.set(tags);
             this.subscriptions.set(subscriptions);
 
-            if (currencies.length > 0) {
+            if (currencies.length > 0 && !this.transactionForm.get('amountCurrency')?.value) {
                 this.transactionForm.get('amountCurrency')?.setValue(currencies[0].value);
             }
-            if (accounts.length > 0) {
+            if (accounts.length > 0 && !this.transactionForm.get('account')?.value) {
                 this.transactionForm.get('account')?.setValue(accounts[0].value);
             }
-            if (categories.length > 0) {
+            if (categories.length > 0 && !this.transactionForm.get('category')?.value) {
                 this.transactionForm.get('category')?.setValue(categories[0].value);
             }
             this.selectDefaultSubscription();

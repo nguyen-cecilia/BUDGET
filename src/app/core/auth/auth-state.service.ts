@@ -18,9 +18,11 @@ export class AuthStateService {
     loading$ = this.loadingSignal.asReadonly();
 
     ready: Promise<void>;
+    private sessionRefreshPromise: Promise<void> = Promise.resolve();
 
     constructor() {
         this.ready = this.initializeAuth();
+        this.setupVisibilityListener();
     }
 
     private async initializeAuth() {
@@ -37,6 +39,41 @@ export class AuthStateService {
             this.userSignal.set(session?.user ?? null);
             this.isAuthenticatedSignal.set(!!session?.user);
         });
+    }
+
+    private setupVisibilityListener() {
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                this.sessionRefreshPromise = this.refreshSession();
+            }
+        });
+    }
+
+    private async refreshSession(): Promise<void> {
+        try {
+            const {data: {session}, error} = await this.supabase.getClient().auth.refreshSession();
+            if (error || !session) {
+                this.userSignal.set(null);
+                this.isAuthenticatedSignal.set(false);
+            } else {
+                this.userSignal.set(session.user);
+                this.isAuthenticatedSignal.set(true);
+            }
+        } catch {
+            this.userSignal.set(null);
+            this.isAuthenticatedSignal.set(false);
+        }
+    }
+
+    /** Must be awaited before any DB call after app resume */
+    awaitSessionReady(): Promise<void> {
+        return this.sessionRefreshPromise;
+    }
+
+    async signOut(): Promise<void> {
+        await this.supabase.getClient().auth.signOut();
+        this.userSignal.set(null);
+        this.isAuthenticatedSignal.set(false);
     }
 
     getCurrentUser(): User | null {
