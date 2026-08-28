@@ -52,6 +52,10 @@ export class App {
                 this.hasUpdate.set(true);
             }
         });
+
+        setInterval(() => {
+            void this.update.checkForUpdate();
+        }, 60000);
     }
 
     applyUpdate() {
