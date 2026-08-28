@@ -1,6 +1,7 @@
 import {Component, DestroyRef, ElementRef, inject, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {AbstractControl, ReactiveFormsModule} from '@angular/forms';
 import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 import {French} from 'flatpickr/dist/l10n/fr';
 import {DateService} from '../../core/date.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
