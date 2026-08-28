@@ -2,6 +2,12 @@ import {Injectable} from '@angular/core';
 import {createClient, SupabaseClient} from '@supabase/supabase-js';
 import {environment} from '../../environments/environment';
 
+let refreshFn: () => Promise<void> = () => Promise.resolve();
+
+export function setRefreshFn(fn: () => Promise<void>) {
+    refreshFn = fn;
+}
+
 export const ACCOUNTS_TABLE = 'accounts';
 export const CATEGORIES_TABLE = 'categories';
 export const CURRENCIES_TABLE = 'currencies';
@@ -21,7 +27,29 @@ export class SupabaseService {
     constructor() {
         this.supabase = createClient(
             environment.supabaseUrl,
-            environment.supabaseKey
+            environment.supabaseKey,
+            {
+                global: {
+                    fetch: async (input: URL | RequestInfo, init?: RequestInit) => {
+                        const response = await fetch(input, init);
+
+                        if (response.status === 401) {
+                            const cloned = response.clone();
+                            try {
+                                const body = await cloned.json();
+                                if (body?.code === 'PGRST303') {
+                                    await refreshFn();
+                                    return fetch(input, init);
+                                }
+                            } catch {
+                                // Not JSON, ignore
+                            }
+                        }
+
+                        return response;
+                    }
+                }
+            }
         );
     }
 

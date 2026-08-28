@@ -350,7 +350,6 @@ export class DashboardComponent {
             untracked(async () => {
                 const userId = this.authState.getCurrentUser()?.id;
                 if (userId && (!key || key === 'transaction' || key === 'currency')) {
-                    await this.authState.awaitSessionReady();
                     this.loadDashboard(userId);
                 }
             });

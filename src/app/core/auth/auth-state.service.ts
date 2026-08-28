@@ -1,6 +1,6 @@
 import {inject, Injectable, signal} from '@angular/core';
 import {User} from '@supabase/supabase-js';
-import {SupabaseService} from '../supabase.service';
+import {setRefreshFn, SupabaseService} from '../supabase.service';
 
 @Injectable({
     providedIn: 'root',
@@ -18,11 +18,11 @@ export class AuthStateService {
     loading$ = this.loadingSignal.asReadonly();
 
     ready: Promise<void>;
-    private sessionRefreshPromise: Promise<void> = Promise.resolve();
 
     constructor() {
         this.ready = this.initializeAuth();
         this.setupVisibilityListener();
+        setRefreshFn(() => this.refreshSession());
     }
 
     private async initializeAuth() {
@@ -44,7 +44,7 @@ export class AuthStateService {
     private setupVisibilityListener() {
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') {
-                this.sessionRefreshPromise = this.refreshSession();
+                void this.refreshSession();
             }
         });
     }
@@ -63,17 +63,6 @@ export class AuthStateService {
             this.userSignal.set(null);
             this.isAuthenticatedSignal.set(false);
         }
-    }
-
-    /** Must be awaited before any DB call after app resume */
-    awaitSessionReady(): Promise<void> {
-        return this.sessionRefreshPromise;
-    }
-
-    async signOut(): Promise<void> {
-        await this.supabase.getClient().auth.signOut();
-        this.userSignal.set(null);
-        this.isAuthenticatedSignal.set(false);
     }
 
     getCurrentUser(): User | null {

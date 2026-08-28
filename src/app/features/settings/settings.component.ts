@@ -130,7 +130,6 @@ export class SettingsComponent {
             untracked(async () => {
                 const userId = this.authState.getCurrentUser()?.id;
                 if (userId && (!key || key !== 'goal')) {
-                    await this.authState.awaitSessionReady();
                     void this.loadSettings(userId);
                 }
             });
