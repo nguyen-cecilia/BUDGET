@@ -18,6 +18,7 @@ import {AuthStateService} from './core/auth/auth-state.service';
 import {SelectComponent} from './components/select/select.component';
 import {PeriodService} from './core/period.service';
 import {ThemeService} from './core/theme.service';
+import {SwUpdate} from '@angular/service-worker';
 
 @Component({
     selector: 'app-root',
@@ -25,11 +26,14 @@ import {ThemeService} from './core/theme.service';
     templateUrl: './app.html',
 })
 export class App {
+    private update = inject(SwUpdate);
     protected readonly title = signal('budget');
     protected readonly authState = inject(AuthStateService);
     protected modalService = inject(ModalService);
     protected periodService = inject(PeriodService);
     protected themeService = inject(ThemeService);
+
+    hasUpdate = signal(false);
 
     selectedMonth = this.periodService.selectedMonth;
     monthOptions = this.periodService.monthOptions;
@@ -41,4 +45,16 @@ export class App {
         {icon: 'lucideChartColumnIncreasing', path: 'vue-annuelle', label: 'Vue annuelle', shortLabel: 'Année'},
         {icon: 'lucideSettings', path: 'parametres', label: 'Paramètres', shortLabel: 'Paramètres'},
     ];
+
+    constructor() {
+        this.update.versionUpdates.subscribe(event => {
+            if (event.type === 'VERSION_READY') {
+                this.hasUpdate.set(true);
+            }
+        });
+    }
+
+    applyUpdate() {
+        this.update.activateUpdate().then(() => location.reload());
+    }
 }

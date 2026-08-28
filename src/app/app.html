@@ -175,4 +175,13 @@
             }
         }
     </nav>
+
+    @if (hasUpdate()) {
+        <div class="fixed bottom-0 left-0 right-0 z-30 rounded-sm mx-5 mb-32 lg:mb-5 bg-yellow text-ink dark:text-deep shadow-lg shadow-muted/20 px-5 py-3 flex items-center justify-between gap-3">
+            <p class="font-semibold text-sm">Une mise à jour est disponible.</p>
+            <button app-button variant="secondary" (click)="applyUpdate()" class="font-bold">
+                Rafraîchir
+            </button>
+        </div>
+    }
 }
