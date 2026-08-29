@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@import "flatpickr/dist/flatpickr.min.css";
+
 @import "./fonts.css";
 @import "./base.css";
 @import "./form.css";
