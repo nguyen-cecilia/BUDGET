@@ -1,63 +1,62 @@
-@if (isLoading()) {
-    <app-loading/>
-} @else if (filteredTransactions().transactionsByDay.length > 0) {
-    <section class="space-y-4">
-        <button app-button (click)="modalService.transaction.openCreateBulk()" class="lg:hidden ml-auto">
-            <svg lucidePlus [size]="16"></svg>
-            Ajouter plusieurs
-        </button>
+<section class="space-y-4">
+    <button app-button (click)="modalService.transaction.openCreateBulk()" class="lg:hidden ml-auto">
+        <svg lucidePlus [size]="16"></svg>
+        Ajouter plusieurs
+    </button>
 
-        <div class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-6">
-            <div class="flex items-center justify-between gap-3">
-                <div>
-                    <p class="uppercase text-muted font-semibold">{{ transactionsByMonth().month || periodService.getMonthLabel() }}</p>
-                    <h1>Transactions</h1>
-                </div>
-
-                <button app-button (click)="modalService.transaction.openCreateBulk()" class="hidden lg:flex">
-                    <svg lucidePlus [size]="16"></svg>
-                    Ajouter plusieurs
-                </button>
+    <div class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-4">
+        <div class="flex items-center justify-between gap-3">
+            <div>
+                <p class="uppercase text-muted font-semibold">{{ transactionsByMonth().month || periodService.getMonthLabel() }}</p>
+                <h1>Transactions</h1>
             </div>
 
-            <div class="flex flex-col gap-4">
-                <div class="flex flex-col gap-4 *:flex-1 lg:flex-row lg:items-center">
-                    <label class="relative">
-                        <input
-                            type="text"
-                            placeholder="Rechercher"
-                            class="pl-9"
-                            (input)="searchQuery.set($any($event.target).value)"
-                        >
-                        <svg lucideSearch [size]="16" class="absolute bottom-0 top-3 left-3"></svg>
-                    </label>
+            <button app-button (click)="modalService.transaction.openCreateBulk()" class="hidden lg:flex">
+                <svg lucidePlus [size]="16"></svg>
+                Ajouter plusieurs
+            </button>
+        </div>
 
-                    <app-select
-                        [options]="[
+        <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-4 *:flex-1 lg:flex-row lg:items-center">
+                <label class="relative">
+                    <input
+                        type="text"
+                        placeholder="Rechercher"
+                        class="pl-9"
+                        [value]="searchQuery()"
+                        (input)="searchQuery.set($any($event.target).value)"
+                    >
+                    <svg lucideSearch [size]="16" class="absolute bottom-0 top-3 left-3"></svg>
+                </label>
+
+                <app-select
+                    [options]="[
                         { value: 'all', label: 'Tout' },
                         { value: 'expense', label: 'Dépense' },
                         { value: 'income', label: 'Revenu' }
                     ]"
-                        [value]="selectedType()"
-                        label="Type"
-                        (valueChange)="selectedType.set($event)"
-                    ></app-select>
+                    [value]="selectedType()"
+                    label="Type"
+                    (valueChange)="selectedType.set($event)"
+                ></app-select>
 
-                    <app-select
-                        [options]="accountsFilters()"
-                        [value]="selectedAccount()"
-                        label="Compte"
-                        (valueChange)="selectedAccount.set($event)"
-                    ></app-select>
+                <app-select
+                    [options]="accountsFilters()"
+                    [value]="selectedAccount()"
+                    label="Compte"
+                    (valueChange)="selectedAccount.set($event)"
+                ></app-select>
 
-                    <app-select
-                        [options]="categoriesFilters()"
-                        [value]="selectedCategory()"
-                        label="Catégorie"
-                        (valueChange)="selectedCategory.set($event)"
-                    ></app-select>
-                </div>
+                <app-select
+                    [options]="categoriesFilters()"
+                    [value]="selectedCategory()"
+                    label="Catégorie"
+                    (valueChange)="selectedCategory.set($event)"
+                ></app-select>
+            </div>
 
+            @if (tagsFilters().length > 0) {
                 <div class="flex flex-wrap items-center gap-3">
                     @for (tag of tagsFilters(); track tag.value) {
                         <button app-badge
@@ -76,7 +75,9 @@
                         </button>
                     }
                 </div>
+            }
 
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <label for="subscription" class="w-fit">
                     <input
                         type="checkbox"
@@ -86,14 +87,43 @@
                     >
                     <p>Abonnement</p>
                 </label>
+
+                @if (hasFilters()) {
+                    <button
+                        app-button
+                        variant="outline"
+                        class="self-end"
+                        (click)="resetFilters()"
+                    >
+                        <svg lucideRotateCcw [size]="16"></svg>
+                        Réinitialiser
+                    </button>
+                }
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
+@if (isLoading()) {
+    <app-loading/>
+} @else if (filteredTransactions().transactionsByDay.length > 0) {
     <section class="space-y-6">
-        <p class="text-muted">
-            {{ filteredTransactions().count }} résultat{{ filteredTransactions().count > 1 ? 's' : '' }}
-        </p>
+        <div class="flex items-center justify-between gap-3">
+            <p class="text-muted">
+                {{ filteredTransactions().count }} résultat{{ filteredTransactions().count > 1 ? 's' : '' }}
+            </p>
+
+            <button (click)="toggleSort()" class="flex items-center gap-2 rounded-full py-2.5 px-3.5 font-semibold text-muted text-sm transition-all cursor-pointer hover:bg-deep">
+                @if (sortOrder() === 'asc') {
+                    <svg lucideArrowDown [size]="16"></svg>
+                    Date croissant
+                } @else {
+                    <svg lucideArrowUp [size]="16"></svg>
+                    Date décroissant
+                }
+            </button>
+        </div>
+
 
         @for (dayGroup of filteredTransactions().transactionsByDay; track dayGroup.date) {
             <div class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-3">
@@ -112,7 +142,7 @@
     </section>
 } @else {
     <div class="flex flex-col items-center justify-center gap-3 px-6 py-10 text-muted">
-        <svg lucideFrown [size]="40"></svg>
+        <svg lucideFaceSlightlyFrowning [size]="40"></svg>
         <p>Aucun résultat trouvé ce mois-ci.</p>
     </div>
 }

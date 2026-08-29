@@ -32,7 +32,7 @@
             <button
                 type="button"
                 app-badge
-                [variant]="categoryForm.get('type')?.value === type.value ? 'secondary' : 'outline'"
+                [variant]="(categoryForm.get('type')?.value ?? '') === type.value ? 'secondary' : 'outline'"
                 (click)="categoryForm.get('type')?.setValue(type.value)"
             >
                 {{ type.label }}

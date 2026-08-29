@@ -24,7 +24,6 @@ export class DonutChartComponent implements AfterViewInit, OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
         if (this.chart && (changes['data'] || changes['labels'] || changes['colors'])) {
-
             this.chart.data.labels = this.labels;
             this.chart.data.datasets[0].data = this.data;
             this.chart.data.datasets[0].backgroundColor = this.colors;
@@ -40,7 +39,7 @@ export class DonutChartComponent implements AfterViewInit, OnChanges {
                 datasets: [{
                     data: this.data,
                     backgroundColor: this.colors,
-                    borderRadius: 20,
+                    borderRadius: 15,
                     spacing: 5,
                 }],
             },

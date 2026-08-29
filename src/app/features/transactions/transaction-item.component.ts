@@ -59,7 +59,7 @@ import {DateService} from '../../core/date.service';
                 </div>
             </div>
             <div class="text-right">
-                <p class="font-display text-md">{{ transaction.type === 'expense' ? '-' : '+' }}{{ transaction.amount|currency:transaction.currency.code }}</p>
+                <p class="font-display text-md{{ transaction.type === 'income' ? ' text-green' : '' }}">{{ transaction.type === 'expense' ? '-' : '+' }}{{ transaction.amount|currency:transaction.currency.code }}</p>
                 @if (transaction.currency.code !== currencyService.defaultCurrency() && currencyService.canConvert(transaction.currency.code)) {
                     <p class="text-sm text-muted">
                         ≈ {{ transaction.type === 'expense' ? '-' : '+' }}{{ currencyService.convertToDefault(transaction.amount, transaction.currency.code)|currency:currencyService.defaultCurrency() }}</p>

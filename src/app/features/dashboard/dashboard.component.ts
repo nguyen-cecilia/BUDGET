@@ -35,7 +35,8 @@ import {LoadingComponent} from '../../components/loading/loading.component';
 import {RefreshService} from '../../core/refresh.service';
 import {PreferencesService} from '../../core/preferences.service';
 
-const RECENT_TRANSACTIONS_NUMBER = 6;
+const RECENT_TRANSACTIONS_NUMBER = 7;
+const RECENT_SAVINGS_GOALS_NUMBER = 3;
 
 @Component({
     selector: 'app-dashboard',
@@ -366,7 +367,7 @@ export class DashboardComponent {
             this.transactionService.getTransactionsByMonth(userId, monthIndex, year),
             this.subscriptionService.getAllSubscriptionsByUser(userId),
             this.transactionService.getUpcomingTransactions(userId),
-            this.goalService.getRecentSavingsGoals(userId, 3),
+            this.goalService.getRecentSavingsGoals(userId, RECENT_SAVINGS_GOALS_NUMBER),
         ]);
 
         this.transactionsByMonth.set(transactions);

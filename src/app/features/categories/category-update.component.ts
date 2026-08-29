@@ -50,7 +50,11 @@ export class CategoryUpdateComponent {
     isDeleting = signal(false);
     reassignTo = signal<string | number>('');
     reassignOptions = signal<SelectOption[]>([]);
-    typeOptions = [{value: 'need', label: 'Besoin'}, {value: 'want', label: 'Envie'}];
+    typeOptions = [
+        {value: '', label: 'Aucun'},
+        {value: 'need', label: 'Besoin'},
+        {value: 'want', label: 'Envie'},
+    ];
 
     @Input() createOnly = false;
 
@@ -58,7 +62,7 @@ export class CategoryUpdateComponent {
         this.categoryForm = this.fb.group({
             label: ['', [Validators.required]],
             color: ['gray', [Validators.required]],
-            type: ['need'],
+            type: [],
         });
 
         this.selectedColor.set(this.categoryForm.get('color')?.value ?? 'gray');
@@ -155,7 +159,7 @@ export class CategoryUpdateComponent {
         this.categoryForm.patchValue({
             label: category.label,
             color: category.color,
-            type: category.type,
+            type: category.type ?? '',
         });
     }
 
@@ -163,7 +167,7 @@ export class CategoryUpdateComponent {
         this.categoryForm.reset({
             label: '',
             color: 'gray',
-            type: 'need',
+            type: '',
         });
     }
 

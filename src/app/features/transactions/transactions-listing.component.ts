@@ -1,5 +1,13 @@
 import {Component, computed, effect, inject, signal, untracked} from '@angular/core';
-import {LucideFrown, LucidePlus, LucideSearch, LucideX} from '@lucide/angular';
+import {
+    LucideArrowDown,
+    LucideArrowUp,
+    LucideFaceSlightlyFrowning,
+    LucidePlus,
+    LucideRotateCcw,
+    LucideSearch,
+    LucideX
+} from '@lucide/angular';
 import {BadgeComponent} from '../../components/badge/badge.component';
 import {TransactionsByMonth} from './transaction.model';
 import {TransactionService} from './transaction.service';
@@ -23,12 +31,15 @@ import {RefreshService} from '../../core/refresh.service';
         DatePipe,
         CurrencyPipe,
         SelectComponent,
-        LucideFrown,
         LucideX,
         ButtonComponent,
         TransactionItemComponent,
         LucidePlus,
         LoadingComponent,
+        LucideFaceSlightlyFrowning,
+        LucideRotateCcw,
+        LucideArrowUp,
+        LucideArrowDown,
     ],
     templateUrl: './transactions-listing.component.html',
 })
@@ -53,6 +64,7 @@ export class TransactionsListingComponent {
     categoriesFilters = signal<SelectOption[]>([]);
     tagsFilters = signal<SelectOption[]>([]);
     searchQuery = signal('');
+    sortOrder = signal<'asc' | 'desc'>('desc');
 
     constructor() {
         effect(() => {
@@ -85,7 +97,10 @@ export class TransactionsListingComponent {
                     if (query && !t.label.toLowerCase().includes(query)) return false;
                     if (type !== 'all' && t.type !== type) return false;
                     if (account !== 'all' && t.account_id !== account) return false;
-                    if (category !== 'all' && t.category_id !== category) return false;
+                    if (category !== 'all') {
+                        const expected = category === '' ? null : category;
+                        if (t.category_id !== expected) return false;
+                    }
                     if (tags.size > 0) {
                         const transactionTags = new Set((t.tags || []).map(tag => String(tag.id)));
                         const hasAny = Array.from(tags).some(id => transactionTags.has(id));
@@ -96,13 +111,33 @@ export class TransactionsListingComponent {
             }))
             .filter(day => day.transactions.length > 0);
 
-        const totalCount = filteredDays.reduce((sum, d) => sum + d.transactions.length, 0);
-        return {...data, count: totalCount, transactionsByDay: filteredDays};
+        const sortAsc = this.sortOrder() === 'asc';
+        const noFilter =
+            !query &&
+            type === 'all' &&
+            account === 'all' &&
+            category === 'all' &&
+            tags.size === 0 &&
+            !subscription;
+
+        const days = (noFilter ? data.transactionsByDay : filteredDays)
+            .map(day => ({
+                ...day,
+                transactions: [...day.transactions].sort((a, b) =>
+                    sortAsc ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date)
+                ),
+            }))
+            .sort((a, b) =>
+                sortAsc ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date)
+            );
+
+        const totalCount = days.reduce((sum, d) => sum + d.transactions.length, 0);
+        return {...data, count: totalCount, transactionsByDay: days};
     });
 
     convertedDayTotals = computed(() => {
         const totals = new Map<string, number>();
-        for (const day of this.transactionsByMonth().transactionsByDay) {
+        for (const day of this.filteredTransactions().transactionsByDay) {
             totals.set(day.date, day.transactions.reduce((acc, t) => {
                 if (!this.currencyService.canConvert(t.currency.code)) return acc;
                 return acc + this.currencyService.convertToDefault(
@@ -134,6 +169,28 @@ export class TransactionsListingComponent {
 
     clearSelectedTags(): void {
         this.selectedTags.set(new Set());
+    }
+
+    hasFilters = computed(() =>
+        this.searchQuery() !== '' ||
+        this.selectedType() !== 'all' ||
+        this.selectedAccount() !== 'all' ||
+        this.selectedCategory() !== 'all' ||
+        this.selectedTags().size > 0 ||
+        this.selectedSubscription()
+    );
+
+    resetFilters(): void {
+        this.searchQuery.set('');
+        this.selectedType.set('all');
+        this.selectedAccount.set('all');
+        this.selectedCategory.set('all');
+        this.selectedTags.set(new Set());
+        this.selectedSubscription.set(false);
+    }
+
+    toggleSort(): void {
+        this.sortOrder.update(order => (order === 'asc' ? 'desc' : 'asc'));
     }
 
     private async loadList(userId: string): Promise<void> {

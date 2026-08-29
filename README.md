@@ -55,6 +55,13 @@ Layout:
 - [x] When doing get requests, do it in bulk with Promise
 - [x] Messages: type success
 - [x] Datepicker
+- [x] Transactions listing: sort by date
+- [x] Transactions listing: reset filters
+- [x] Transaction item: color amount depending on expense or income?
+- [x] Donut chart: reduce radius
+- [x] Donut chart: "travail" category color
+- [x] Transactions listing: can't filter on "no category"; more generally when no transaction, filters disappear
+- [x] Dashboard: scroll for subscriptions
 
 Auth:
 

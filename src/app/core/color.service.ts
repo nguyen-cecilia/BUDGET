@@ -43,6 +43,12 @@ export class ColorService {
             decoration: 'decoration-blue',
             color: 'text-blue',
         },
+        teal: {
+            background: 'bg-teal',
+            backgroundLighter: 'bg-teal/30',
+            decoration: 'decoration-teal',
+            color: 'text-teal',
+        },
         green: {
             background: 'bg-green',
             backgroundLighter: 'bg-green/30',
@@ -73,12 +79,18 @@ export class ColorService {
             decoration: 'decoration-pink',
             color: 'text-pink',
         },
-        pinkDark: {
+        pinkDarker: {
             background: 'bg-pink-darker',
             backgroundLighter: 'bg-pink-darker/30',
             decoration: 'decoration-pink-darker',
             color: 'text-pink-darker',
         },
+        brown: {
+            background: 'bg-brown',
+            backgroundLighter: 'bg-brown/30',
+            decoration: 'decoration-brown',
+            color: 'text-brown',
+        }
     };
 
     getBackground(color: string | null): string {
