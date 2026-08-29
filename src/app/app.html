@@ -39,7 +39,7 @@
     [isOpen]="modalService.transaction.isOpen"
     [onClose]="() => modalService.transaction.close()"
 >
-    @defer (when modalService.transaction.isOpen()) {
+    @defer (on idle; when modalService.transaction.isOpen()) {
         @if (modalService.transaction.isOpen()) {
             <app-update-transaction/>
         }
