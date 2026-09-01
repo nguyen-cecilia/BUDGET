@@ -46,26 +46,6 @@
                 }
             </select>
         </label>
-
-        <div class="flex flex-col lg:flex-row lg:items-start gap-3 *:flex-1">
-            <label for="subscriptionFrequency">
-                <p>Fréquence</p>
-                <select name="subscriptionFrequency" id="subscriptionFrequency" formControlName="subscriptionFrequency"
-                        class="custom-select">
-                    <option value="daily">Quotidien</option>
-                    <option value="weekly">Hebdomadaire</option>
-                    <option value="monthly">Mensuel</option>
-                    <option value="yearly">Annuel</option>
-                </select>
-            </label>
-
-            <label for="subscriptionNextDate">
-                <p>Prochain renouvellement</p>
-                <app-datepicker
-                    [control]="transactionForm.get('subscriptionNextDate')!"
-                />
-            </label>
-        </div>
     }
 
     <label for="amount">
@@ -173,6 +153,26 @@
                 }
             </div>
         </label>
+    } @else {
+        <div class="flex flex-col lg:flex-row lg:items-start gap-3 *:flex-1">
+            <label for="subscriptionFrequency">
+                <p>Fréquence</p>
+                <select name="subscriptionFrequency" id="subscriptionFrequency" formControlName="subscriptionFrequency"
+                        class="custom-select">
+                    <option value="daily">Quotidien</option>
+                    <option value="weekly">Hebdomadaire</option>
+                    <option value="monthly">Mensuel</option>
+                    <option value="yearly">Annuel</option>
+                </select>
+            </label>
+
+            <label for="subscriptionNextDate">
+                <p>Prochain renouvellement</p>
+                <app-datepicker
+                    [control]="transactionForm.get('subscriptionNextDate')!"
+                />
+            </label>
+        </div>
     }
 
     @if (!modalService.transaction.editing()) {

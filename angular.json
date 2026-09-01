@@ -21,7 +21,7 @@
           "options": {
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
-            "allowedCommonJsDependencies": ["flatpickr"],
+            "allowedCommonJsDependencies": ["flatpickr", "masonry-layout"],
             "assets": [
               {
                 "glob": "**/*",

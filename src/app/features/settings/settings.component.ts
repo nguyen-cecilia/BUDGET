@@ -8,6 +8,7 @@ import {
     LucideLogOut,
     LucidePencil,
     LucidePlus,
+    LucideRotateCcw,
     LucideSkull,
     LucideSparkles,
     LucideTag,
@@ -49,6 +50,7 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {FormErrorComponent} from '../../components/form-error/form-error.component';
 import {FieldErrorComponent} from '../../components/form-error/field-error.component';
 import {PreferencesService} from '../../core/preferences.service';
+import {MasonryGridComponent} from '../../components/masonry-grid/masonry-grid.component';
 
 @Component({
     selector: 'app-settings',
@@ -81,7 +83,9 @@ import {PreferencesService} from '../../core/preferences.service';
         LucideKey,
         ReactiveFormsModule,
         FieldErrorComponent,
-        LucideHouse
+        LucideHouse,
+        LucideRotateCcw,
+        MasonryGridComponent
     ],
     templateUrl: './settings.component.html',
 })
@@ -134,6 +138,19 @@ export class SettingsComponent {
                 }
             });
         });
+
+        // effect(() => {
+        //     this.currencies();
+        //     this.subscriptions();
+        //     this.categories();
+        //     this.tags();
+        //     this.accounts();
+        //     untracked(() => {
+        //         if (this.masonry) {
+        //             this.masonry.layout();
+        //         }
+        //     });
+        // });
     }
 
     async updatePassword(): Promise<void> {

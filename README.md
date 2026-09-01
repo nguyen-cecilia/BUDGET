@@ -62,6 +62,13 @@ Layout:
 - [x] Donut chart: "travail" category color
 - [x] Transactions listing: can't filter on "no category"; more generally when no transaction, filters disappear
 - [x] Dashboard: scroll for subscriptions
+- [x] Donut chart: not take into account savings type null categories
+- [ ] Dashboard: add subs in one click
+- [x] Settings: subs display
+- [x] Subs form: move date fields
+- [ ] Add cute calculator
+- [ ] Savings goals: save in 6 months, how many per month
+- [ ] Refacto: add balances for accounts
 
 Auth:
 

@@ -286,6 +286,7 @@ export class DashboardComponent {
     categoriesData = computed(() => {
         const transactions = (this.transactionsByMonth()?.transactionsByDay
             .flatMap(d => d.transactions) ?? [])
+            .filter(t => t.category?.type !== null)
             .filter(t => this.preferencesService.includeFutureTransactions() || this.dateService.isPastOrToday(t.date));
 
         const map = new Map<string, { label: string; color: string; total: number }>();
