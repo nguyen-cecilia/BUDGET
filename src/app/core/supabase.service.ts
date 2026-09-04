@@ -8,6 +8,7 @@ export function setRefreshFn(fn: () => Promise<void>) {
     refreshFn = fn;
 }
 
+export const ACCOUNT_BALANCES_TABLE = 'account_balances';
 export const ACCOUNTS_TABLE = 'accounts';
 export const CATEGORIES_TABLE = 'categories';
 export const CURRENCIES_TABLE = 'currencies';

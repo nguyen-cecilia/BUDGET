@@ -10,6 +10,9 @@ import {FORM_ERRORS, creationError} from '../../core/form-errors.service';
 import {FieldErrorComponent} from '../../components/form-error/field-error.component';
 import {FormErrorComponent} from '../../components/form-error/form-error.component';
 import {RefreshService} from '../../core/refresh.service';
+import {CurrencyService} from '../currencies/currency.service';
+import {UserCurrencies} from '../currencies/currency.model';
+import {SelectComponent, SelectOption} from '../../components/select/select.component';
 
 @Component({
     selector: 'app-account-update',
@@ -20,7 +23,8 @@ import {RefreshService} from '../../core/refresh.service';
         FormsModule,
         ReactiveFormsModule,
         FieldErrorComponent,
-        FormErrorComponent
+        FormErrorComponent,
+        SelectComponent,
     ],
     templateUrl: './account-update.component.html',
 })
@@ -30,18 +34,29 @@ export class AccountUpdateComponent {
     private accountService = inject(AccountService);
     private refreshService = inject(RefreshService);
     protected modalService = inject(ModalService);
+    private currencyService = inject(CurrencyService);
 
     accountForm: FormGroup;
 
     errorMessage = signal<string | null>(null);
     isSubmitting = signal(false);
     accounts = signal<Account[]>([])
+    currencies = signal<UserCurrencies[]>([]);
+    selectedCurrency = signal<string | number>('');
+
+    currencyOptions = computed<SelectOption[]>(() =>
+        this.currencies().map(c => ({
+            value: c.currency_id,
+            label: `${c.label} (${c.symbol})`,
+        }))
+    );
 
     constructor() {
         this.accountForm = this.fb.group({
             label: ['', [Validators.required]],
             isDefault: [false],
             isActive: [true],
+            currencyId: [''],
         });
 
         effect(() => {
@@ -59,6 +74,8 @@ export class AccountUpdateComponent {
                 if (userId) {
                     this.accountService.getAllAccountsByUser(userId, true)
                         .then(data => this.accounts.set(data));
+                    this.currencyService.getUserCurrencies(userId)
+                        .then(data => this.currencies.set(data));
                 }
             }
         });
@@ -98,6 +115,7 @@ export class AccountUpdateComponent {
                 label: fv.label || '',
                 is_default: fv.isDefault,
                 is_active: fv.isActive,
+                currency_id: this.selectedCurrency() ? String(this.selectedCurrency()) : null,
             }
 
             if (editing) {
@@ -122,18 +140,22 @@ export class AccountUpdateComponent {
     }
 
     private fillForm(account: Account): void {
+        this.selectedCurrency.set(account.currency_id ?? '');
         this.accountForm.patchValue({
             label: account.label,
             isDefault: account.is_default,
             isActive: account.is_active,
+            currencyId: account.currency_id ?? '',
         });
     }
 
     private resetForm(): void {
+        this.selectedCurrency.set('');
         this.accountForm.reset({
             label: '',
             isDefault: false,
             isActive: true,
+            currencyId: '',
         });
     }
 
@@ -143,7 +165,7 @@ export class AccountUpdateComponent {
 
         if (this.hasAnotherDefault() || !isActiveValue) {
             if (!isActiveValue) {
-                control?.setValue(false, {emitEvent: false});   // décoche automatiquement
+                control?.setValue(false, {emitEvent: false});
             }
             control?.disable();
         } else {

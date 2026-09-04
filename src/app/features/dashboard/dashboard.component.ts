@@ -6,7 +6,7 @@ import {
     LucideChartPie,
     LucideCheck,
     LucideCircleStar,
-    LucideLayers,
+    LucideLayers, LucideMoonStar,
     LucidePartyPopper,
     LucidePiggyBank,
     LucideSparkles,
@@ -34,6 +34,8 @@ import {DateService} from '../../core/date.service';
 import {LoadingComponent} from '../../components/loading/loading.component';
 import {RefreshService} from '../../core/refresh.service';
 import {PreferencesService} from '../../core/preferences.service';
+import {AccountBalanceService} from '../accounts/account-balance.service';
+import {AccountBalanceWithAccount} from '../accounts/account-balance.model';
 
 const RECENT_TRANSACTIONS_NUMBER = 7;
 const RECENT_SAVINGS_GOALS_NUMBER = 3;
@@ -63,6 +65,7 @@ const RECENT_SAVINGS_GOALS_NUMBER = 3;
         LucideChartPie,
         LoadingComponent,
         LucideCircleStar,
+        LucideMoonStar,
     ],
     templateUrl: './dashboard.component.html',
 })
@@ -74,6 +77,7 @@ export class DashboardComponent {
     private dateService = inject(DateService);
     private refreshService = inject(RefreshService);
     private preferencesService = inject(PreferencesService);
+    private accountBalanceService = inject(AccountBalanceService);
     protected currencyService = inject(CurrencyService);
     protected periodService = inject(PeriodService);
     protected colorService = inject(ColorService);
@@ -83,6 +87,7 @@ export class DashboardComponent {
     subscriptions = signal<Subscription[]>([]);
     upcomingTransactions = signal<Transaction[]>([]);
     savingsGoals = signal<SavingsGoal[]>([]);
+    accountBalances = signal<AccountBalanceWithAccount[]>([]);
     protected defaultCurrency = this.currencyService.defaultCurrency;
 
     totalExpenses = computed(() =>
@@ -103,7 +108,15 @@ export class DashboardComponent {
             .reduce((sum, t) => sum + this.currencyService.convertToDefault(t.amount, t.currency.code), 0) ?? 0
     );
 
-    balance = computed(() => this.totalIncomes() - this.totalExpenses());
+    openingBalance = computed(() =>
+        this.accountBalances().reduce((sum, b) => {
+            const code = b.account?.currency?.code;
+            if (!code || !this.currencyService.canConvert(code)) return sum;
+            return sum + this.currencyService.convertToDefault(b.balance, code);
+        }, 0)
+    );
+
+    balance = computed(() => this.openingBalance() + this.totalIncomes() - this.totalExpenses());
 
     transactionCount = computed(() =>
         this.transactionsByMonth()?.count ?? 0
@@ -351,7 +364,7 @@ export class DashboardComponent {
             const key = this.refreshService.lastKey();
             untracked(async () => {
                 const userId = this.authState.getCurrentUser()?.id;
-                if (userId && (!key || key === 'transaction' || key === 'currency')) {
+                if (userId && (!key || key === 'transaction' || key === 'currency' || key === 'balance')) {
                     this.loadDashboard(userId);
                 }
             });
@@ -364,17 +377,19 @@ export class DashboardComponent {
         const monthIndex = this.periodService.getMonth();
         const year = this.periodService.getYear();
 
-        const [transactions, subs, upcoming, goals] = await Promise.all([
+        const [transactions, subs, upcoming, goals, balances] = await Promise.all([
             this.transactionService.getTransactionsByMonth(userId, monthIndex, year),
             this.subscriptionService.getAllSubscriptionsByUser(userId),
             this.transactionService.getUpcomingTransactions(userId),
             this.goalService.getRecentSavingsGoals(userId, RECENT_SAVINGS_GOALS_NUMBER),
+            this.accountBalanceService.getBalancesForMonth(userId, year, monthIndex + 1),
         ]);
 
         this.transactionsByMonth.set(transactions);
         this.subscriptions.set(subs);
         this.upcomingTransactions.set(upcoming);
         this.savingsGoals.set(goals);
+        this.accountBalances.set(balances);
         await this.currencyService.loadDefaultCurrency(userId);
 
         this.isLoading.set(false);

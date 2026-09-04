@@ -12,6 +12,20 @@
         />
     </label>
 
+    <label for="currency">
+        <p>Devise</p>
+        <app-select
+            id="currency"
+            [options]="currencyOptions()"
+            [value]="selectedCurrency()"
+            (valueChange)="selectedCurrency.set($event)"
+            [disabled]="currencies().length === 0"
+        ></app-select>
+        @if (currencies().length === 0) {
+            <p class="text-muted text-xs mt-1">Ajoutez d'abord une devise dans les paramètres.</p>
+        }
+    </label>
+
     <label for="isDefault">
         <input id="isDefault" type="checkbox" formControlName="isDefault">
         <p>Par défaut</p>

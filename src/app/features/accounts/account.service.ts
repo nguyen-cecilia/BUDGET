@@ -1,5 +1,11 @@
 import {inject, Injectable} from '@angular/core';
-import {ACCOUNTS_TABLE, SUBSCRIPTIONS_TABLE, SupabaseService, TRANSACTIONS_TABLE} from '../../core/supabase.service';
+import {
+    ACCOUNT_BALANCES_TABLE,
+    ACCOUNTS_TABLE,
+    SUBSCRIPTIONS_TABLE,
+    SupabaseService,
+    TRANSACTIONS_TABLE
+} from '../../core/supabase.service';
 import {Account} from './account.model';
 
 @Injectable({
@@ -12,7 +18,7 @@ export class AccountService {
     async getAllAccountsByUser(userId: string, includeInactive = false): Promise<Account[]> {
         let query = this.supabase
             .from(ACCOUNTS_TABLE)
-            .select('*')
+            .select('*, currency:currencies(id, code, label, symbol)')
             .eq('user_id', userId);
 
         if (!includeInactive) {
@@ -35,6 +41,7 @@ export class AccountService {
         label: string,
         is_active: boolean,
         is_default: boolean,
+        currency_id: string | null,
     }): Promise<Account> {
         const {data, error} = await this.supabase
             .from(ACCOUNTS_TABLE)
@@ -44,9 +51,10 @@ export class AccountService {
                     label: account.label,
                     is_active: account.is_active,
                     is_default: account.is_default,
+                    currency_id: account.currency_id,
                 }
             ])
-            .select()
+            .select('*, currency:currencies(id, code, label, symbol)')
             .single();
 
         if (error) {
@@ -61,6 +69,7 @@ export class AccountService {
         label: string;
         is_active: boolean;
         is_default: boolean;
+        currency_id: string | null;
     }): Promise<Account> {
         const {data, error} = await this.supabase
             .from(ACCOUNTS_TABLE)
@@ -68,10 +77,11 @@ export class AccountService {
                 label: account.label,
                 is_active: account.is_active,
                 is_default: account.is_default,
+                currency_id: account.currency_id,
             })
             .eq('id', id)
             .eq('user_id', userId)
-            .select()
+            .select('*, currency:currencies(id, code, label, symbol)')
             .single();
 
         if (error) throw error;
@@ -91,6 +101,11 @@ export class AccountService {
             .update({account_id: null})
             .eq('user_id', userId)
             .not('account_id', 'is', null);
+
+        await this.supabase
+            .from(ACCOUNT_BALANCES_TABLE)
+            .delete()
+            .eq('user_id', userId);
 
         const {error} = await this.supabase
             .from(ACCOUNTS_TABLE)

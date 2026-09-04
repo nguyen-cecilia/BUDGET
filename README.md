@@ -68,7 +68,7 @@ Layout:
 - [x] Subs form: move date fields
 - [ ] Add cute calculator
 - [ ] Savings goals: save in 6 months, how many per month
-- [ ] Refacto: add balances for accounts
+- [x] Refacto: add balances for accounts
 
 Auth:
 

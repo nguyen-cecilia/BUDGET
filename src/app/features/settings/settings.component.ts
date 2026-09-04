@@ -9,6 +9,8 @@ import {
     LucidePencil,
     LucidePlus,
     LucideRotateCcw,
+    LucideSave,
+    LucideLoaderCircle,
     LucideSkull,
     LucideSparkles,
     LucideTag,
@@ -51,6 +53,9 @@ import {FormErrorComponent} from '../../components/form-error/form-error.compone
 import {FieldErrorComponent} from '../../components/form-error/field-error.component';
 import {PreferencesService} from '../../core/preferences.service';
 import {MasonryGridComponent} from '../../components/masonry-grid/masonry-grid.component';
+import {AccountBalanceService} from '../accounts/account-balance.service';
+import {AccountBalanceWithAccount} from '../accounts/account-balance.model';
+import {MonthNavigatorComponent} from '../../components/month-navigator/month-navigator.component';
 
 @Component({
     selector: 'app-settings',
@@ -85,7 +90,10 @@ import {MasonryGridComponent} from '../../components/masonry-grid/masonry-grid.c
         FieldErrorComponent,
         LucideHouse,
         LucideRotateCcw,
-        MasonryGridComponent
+        MasonryGridComponent,
+        LucideSave,
+        LucideLoaderCircle,
+        MonthNavigatorComponent,
     ],
     templateUrl: './settings.component.html',
 })
@@ -100,6 +108,7 @@ export class SettingsComponent {
     private router = inject(Router);
     private refreshService = inject(RefreshService);
     private fb = inject(FormBuilder);
+    private accountBalanceService = inject(AccountBalanceService);
     protected subscriptionService = inject(SubscriptionService);
     protected currencyService = inject(CurrencyService);
     protected modalService = inject(ModalService);
@@ -109,14 +118,20 @@ export class SettingsComponent {
 
     selectedMonth = this.periodService.selectedMonth;
     monthOptions = this.periodService.monthOptions;
+    now = new Date();
 
     isLoading = signal(false);
     isDeleting = signal(false);
+    isSavingBalances = signal(false);
     currencies = signal<UserCurrencies[]>([]);
     subscriptions = signal<Subscription[]>([]);
     accounts = signal<Account[]>([]);
     tags = signal<Tag[]>([]);
     categories = signal<Category[]>([]);
+    balanceMonth = signal<number>(new Date().getMonth() + 1);
+    balanceYear = signal<number>(new Date().getFullYear());
+    accountBalances = signal<AccountBalanceWithAccount[]>([]);
+    balanceValues = signal<Record<string, number>>({});
 
     passwordForm: FormGroup;
     passwordMessage = signal<{text: string; type: 'error' | 'success'} | null>(null);
@@ -131,7 +146,7 @@ export class SettingsComponent {
         effect(() => {
             this.refreshService.trigger();
             const key = this.refreshService.lastKey();
-            untracked(async () => {
+            void untracked(async () => {
                 const userId = this.authState.getCurrentUser()?.id;
                 if (userId && (!key || key !== 'goal')) {
                     void this.loadSettings(userId);
@@ -139,18 +154,55 @@ export class SettingsComponent {
             });
         });
 
-        // effect(() => {
-        //     this.currencies();
-        //     this.subscriptions();
-        //     this.categories();
-        //     this.tags();
-        //     this.accounts();
-        //     untracked(() => {
-        //         if (this.masonry) {
-        //             this.masonry.layout();
-        //         }
-        //     });
-        // });
+        effect(() => {
+            this.balanceMonth();
+            this.balanceYear();
+            void untracked(async () => {
+                const userId = this.authState.getCurrentUser()?.id;
+                if (userId && !this.isLoading()) {
+                    await this.loadBalances();
+                }
+            });
+        });
+    }
+
+    onMonthChange(month: number): void {
+        this.balanceMonth.set(month);
+    }
+
+    onYearChange(year: number): void {
+        this.balanceYear.set(year);
+    }
+
+    getBalance(accountId: string): number {
+        return this.balanceValues()[accountId] ?? 0;
+    }
+
+    setBalance(accountId: string, event: Event): void {
+        const input = event.target as HTMLInputElement;
+        const value = parseFloat(input.value) || 0;
+        this.balanceValues.update(v => ({...v, [accountId]: value}));
+    }
+
+    async submitBalances(): Promise<void> {
+        const userId = this.authState.getCurrentUser()?.id;
+        if (!userId) return;
+
+        this.isSavingBalances.set(true);
+        try {
+            const year = this.balanceYear();
+            const month = this.balanceMonth();
+            const activeAccounts = this.accounts().filter(a => a.is_active);
+
+            for (const account of activeAccounts) {
+                const balance = this.balanceValues()[account.id] ?? 0;
+                await this.accountBalanceService.upsertBalance(userId, account.id, year, month, balance);
+            }
+
+            this.refreshService.refresh('balance');
+        } finally {
+            this.isSavingBalances.set(false);
+        }
     }
 
     async updatePassword(): Promise<void> {
@@ -249,7 +301,7 @@ export class SettingsComponent {
     deleteAllData(): void {
         this.confirmDelete({
             title: 'Supprimer toutes les données',
-            message: 'Cette action supprime définitivement (presque) toutes les données : transactions, catégories, comptes, abonnements, tags et objectifs d\'épargne. Opération irréversible.',
+            message: 'Cette action supprime définitivement (presque) toutes les données : transactions, catégories, comptes, abonnements, tags, objectifs d\'épargne et soldes. Opération irréversible.',
             onConfirm: async () => {
                 const userId = this.authState.getCurrentUser()?.id;
                 if (!userId) return;
@@ -260,6 +312,7 @@ export class SettingsComponent {
                     await this.savingsGoalService.deleteAllSavingsGoals(userId);
                     await this.categoryService.deleteAllCategories(userId);
                     await this.tagService.deleteAllTags(userId);
+                    await this.accountBalanceService.deleteAllBalances(userId);
                     await this.accountService.deleteAllAccounts(userId);
 
                     this.refreshService.refresh('transaction');
@@ -291,11 +344,31 @@ export class SettingsComponent {
             this.categories.set(categories);
             this.tags.set(tags);
             this.accounts.set(accounts);
+
+            await this.loadBalances();
         } catch (error) {
             console.error('Erreur lors du chargement des paramètres:', error);
         } finally {
             this.isLoading.set(false);
         }
+    }
+
+    private async loadBalances(): Promise<void> {
+        const userId = this.authState.getCurrentUser()?.id;
+        if (!userId) return;
+
+        const balances = await this.accountBalanceService.getBalancesForMonth(
+            userId,
+            this.balanceYear(),
+            this.balanceMonth(),
+        );
+        this.accountBalances.set(balances);
+
+        const values: Record<string, number> = {};
+        for (const b of balances) {
+            values[b.account_id] = b.balance;
+        }
+        this.balanceValues.set(values);
     }
 
     private confirmDelete(payload: ConfirmPayload): void {

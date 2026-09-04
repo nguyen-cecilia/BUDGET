@@ -5,6 +5,7 @@ export type RefreshKey =
     | 'tag'
     | 'category'
     | 'account'
+    | 'balance'
     | 'currency'
     | 'subscription'
     | 'goal';

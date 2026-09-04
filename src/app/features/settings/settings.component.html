@@ -259,39 +259,91 @@
                 <div class="flex items-center justify-between gap-3">
                     <h2 class="flex items-center gap-2">
                         <svg lucideLandmark [size]="20"></svg>
-                        Comptes
+                        Comptes & Soldes
                     </h2>
 
-                    <button app-button (click)="modalService.account.openCreate()">
-                        <svg lucidePlus [size]="16"></svg>
-                        <span class="hidden lg:inline">Ajouter</span>
-                    </button>
+                    <div class="flex justify-between lg:justify-end items-center gap-3">
+                        <app-month-navigator
+                            [month]="balanceMonth()"
+                            [year]="balanceYear()"
+                            [maxMonth]="{ month: now.getMonth() + 1, year: now.getFullYear() }"
+                            (monthChange)="onMonthChange($event)"
+                            (yearChange)="onYearChange($event)"
+                            class="hidden lg:block"
+                        ></app-month-navigator>
+
+                        <button app-button (click)="modalService.account.openCreate()">
+                            <svg lucidePlus [size]="16"></svg>
+                            <span class="hidden lg:inline">Ajouter</span>
+                        </button>
+                    </div>
                 </div>
+
+                <app-month-navigator
+                    [month]="balanceMonth()"
+                    [year]="balanceYear()"
+                    [maxMonth]="{ month: now.getMonth() + 1, year: now.getFullYear() }"
+                    (monthChange)="onMonthChange($event)"
+                    (yearChange)="onYearChange($event)"
+                    class="block *:justify-end lg:hidden"
+                ></app-month-navigator>
+
+                <p class="text-muted text-sm">Saisissez le solde de chaque compte au 1er du mois.</p>
 
                 <div class="space-y-2">
                     @for (account of accounts(); track account.id) {
                         <div
-                            class="flex items-center gap-3 bg-surface p-3 rounded border cursor-pointer transition-all hover:bg-base"
+                            class="flex flex-col lg:flex-row lg:items-center gap-x-3 gap-y-4 bg-surface p-3 rounded border cursor-pointer transition-all hover:bg-base"
                             (click)="modalService.account.openEdit(account)"
                             (keydown.enter)="modalService.account.openEdit(account)"
                             (keydown.space)="modalService.account.openEdit(account)"
                             tabindex="0"
                             role="button"
                         >
-                            <label>
-                                <input type="checkbox" class="switch pink" disabled [checked]="account.is_active">
-                            </label>
-                            <div class="flex flex-col items-start lg:flex-row lg:items-center gap-1">
+                            <div class="flex-1 flex items-center gap-2">
+                                <label>
+                                    <input type="checkbox" class="switch pink" disabled [checked]="account.is_active">
+                                </label>
+
                                 <h3>{{ account.label }}</h3>
+
                                 @if (account.is_default) {
-                                    <div class="text-xs text-semibold py-0.5 px-1.5 border rounded-xs bg-purple dark:text-surface">par
-                                        défaut
-                                    </div>
+                                    <div class="ml-auto text-xs text-semibold py-0.5 px-1.5 border rounded-xs bg-purple dark:text-surface">par défaut</div>
                                 }
                             </div>
+
+                            @if (account.is_active) {
+                                <div class="w-full relative lg:w-30">
+                                    <input
+                                        type="number"
+                                        class="text-right pr-8"
+                                        [value]="getBalance(account.id)"
+                                        (change)="setBalance(account.id, $event)"
+                                        (click)="$event.stopPropagation()"
+                                        (keydown)="$event.stopPropagation()"
+                                        placeholder="0"
+                                    >
+                                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-muted text-sm pointer-events-none">{{ account.currency?.symbol ?? '' }}</span>
+                                </div>
+                            }
                         </div>
                     }
                 </div>
+
+                <button
+                    app-button
+                    (click)="submitBalances()"
+                    [disabled]="isSavingBalances()"
+                    class="ml-auto"
+                >
+                    @if (isSavingBalances()) {
+                        <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
+                        Envoi...
+                    } @else {
+                        <svg lucideSave [size]="16"></svg>
+                        Sauvegarder
+                    }
+                </button>
             </div>
 
             <div class="grid-item bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-4">

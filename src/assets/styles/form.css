@@ -16,6 +16,12 @@
         @apply form-input w-full text-sm bg-transparent border border-line shadow-sm shadow-ink/5 rounded px-3 py-1.5 focus:border-line focus:ring-offset-0 focus:ring-2 focus:ring-pink;
     }
 
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
     select {
         @apply py-3 px-4 cursor-pointer focus:outline-none;
 
