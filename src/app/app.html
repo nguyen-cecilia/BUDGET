@@ -130,7 +130,19 @@
     </main>
 </div>
 
+<app-calculator #calculator/>
+
 @if (authState.isAuthenticated()) {
+    <button
+        app-button
+        variant="secondary"
+        shape="round"
+        class="fixed bottom-30 right-5 lg:bottom-8 lg:right-8 z-10 p-3 shadow-lg! shadow-soft/75"
+        (click)="calculator.open()"
+    >
+        <svg lucideCalculator [size]="30"></svg>
+    </button>
+
     <!-- VERSION MOBILE -->
     <nav
         class="lg:hidden z-2 fixed left-0 right-0 bottom-5 mx-5 bg-ink text-base dark:bg-deep dark:text-ink dark:border dark:border-line rounded-full py-2 px-6 flex items-center justify-evenly gap-2">

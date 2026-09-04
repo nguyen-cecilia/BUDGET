@@ -66,7 +66,7 @@ Layout:
 - [ ] Dashboard: add subs in one click
 - [x] Settings: subs display
 - [x] Subs form: move date fields
-- [ ] Add cute calculator
+- [x] Add cute calculator
 - [ ] Savings goals: save in 6 months, how many per month
 - [x] Refacto: add balances for accounts
 

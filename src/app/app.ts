@@ -1,6 +1,7 @@
-import {Component, inject, signal} from '@angular/core';
+import {Component, inject, signal, ViewChild} from '@angular/core';
 import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 import {
+    LucideCalculator,
     LucideChartColumnIncreasing,
     LucideHouse,
     LucideList,
@@ -19,10 +20,11 @@ import {SelectComponent} from './components/select/select.component';
 import {PeriodService} from './core/period.service';
 import {ThemeService} from './core/theme.service';
 import {SwUpdate} from '@angular/service-worker';
+import {CalculatorComponent} from './components/calculator/calculator.component';
 
 @Component({
     selector: 'app-root',
-    imports: [RouterOutlet, LucideMoon, ButtonComponent, RouterLink, LucidePlus, LucideHouse, RouterLinkActive, LucideList, LucideTarget, LucideChartColumnIncreasing, LucideSettings, ModalComponent, TransactionUpdateComponent, SelectComponent, LucideSun],
+    imports: [RouterOutlet, LucideMoon, ButtonComponent, RouterLink, LucidePlus, LucideHouse, RouterLinkActive, LucideList, LucideTarget, LucideChartColumnIncreasing, LucideSettings, ModalComponent, TransactionUpdateComponent, SelectComponent, LucideSun, CalculatorComponent, LucideCalculator],
     templateUrl: './app.html',
 })
 export class App {
@@ -32,6 +34,8 @@ export class App {
     protected modalService = inject(ModalService);
     protected periodService = inject(PeriodService);
     protected themeService = inject(ThemeService);
+
+    @ViewChild('calculator') calculator!: CalculatorComponent;
 
     hasUpdate = signal(false);
 
