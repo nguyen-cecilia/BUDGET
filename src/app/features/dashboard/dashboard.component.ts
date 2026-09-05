@@ -187,7 +187,12 @@ export class DashboardComponent {
                     checked: isPast && paidThisMonth,
                 };
             })
-            .sort((a, b) => Number(a.checked) - Number(b.checked));
+            .sort((a, b) => {
+                if (a.checked !== b.checked) {
+                    return Number(a.checked) - Number(b.checked);
+                }
+                return a.next_payment_date.localeCompare(b.next_payment_date);
+            });
     });
 
     nextPaymentDate(date: string): string {
@@ -369,6 +374,42 @@ export class DashboardComponent {
                 }
             });
         });
+    }
+
+    async toggleSubscription(sub: Subscription & { checked: boolean }): Promise<void> {
+        const userId = this.authState.getCurrentUser()?.id;
+        if (!userId) return;
+
+        if (sub.checked) {
+            await this.transactionService.deleteTransactionsBySubscriptionForMonth(
+                userId, sub.id,
+                this.periodService.getYear(),
+                this.periodService.getMonth(),
+            );
+        } else {
+            const date = this.dateService.formatDateTimeToString(new Date());
+            await this.transactionService.createTransaction(userId, {
+                type: 'expense',
+                amount: sub.amount,
+                amount_currency_id: sub.currency_id,
+                label: sub.label,
+                date,
+                account_id: sub.account_id!,
+                category_id: sub.category_id ?? undefined,
+                is_subscription: true,
+                subscription_id: sub.id,
+            });
+
+            const nextDate = this.subscriptionService.computeNextDateFrom(
+                sub.next_payment_date,
+                sub.frequency,
+            );
+            await this.subscriptionService.updateSubscription(sub.id, {
+                next_payment_date: nextDate,
+            });
+        }
+
+        this.refreshService.refresh('transaction');
     }
 
     private async loadDashboard(userId: string) {

@@ -127,7 +127,14 @@
                 @for (sub of subscriptionsStatus(); track sub.id) {
                     <div class="flex items-center gap-3 bg-surface border border-ink p-3 rounded">
                         <div
-                            class="size-10 border rounded-full flex justify-center items-center font-display text-md dark:text-surface dark:border-surface {{ sub.checked ? 'bg-green' : 'bg-pink' }}">
+                            class="size-10 border rounded-full flex justify-center items-center cursor-pointer transition-all hover:scale-110 font-display text-md dark:text-surface dark:border-surface {{ sub.checked ? 'bg-green' : 'bg-pink' }}"
+                            (click)="toggleSubscription(sub)"
+                            (keydown.enter)="toggleSubscription(sub)"
+                            (keydown.space)="toggleSubscription(sub)"
+                            tabindex="0"
+                            role="button"
+                            [attr.aria-label]="sub.checked ? 'Marquer comme non payé' : 'Marquer comme payé'"
+                        >
                             @if (sub.checked) {
                                 <svg lucideCheck [size]="16"></svg>
                             } @else {

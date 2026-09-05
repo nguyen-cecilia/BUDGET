@@ -237,6 +237,28 @@ export class TransactionService {
         if (error) throw error;
     }
 
+    async deleteTransactionsBySubscriptionForMonth(
+        userId: string,
+        subscriptionId: string,
+        year: number,
+        monthIndex: number,
+    ): Promise<void> {
+        const firstDay = new Date(year, monthIndex, 1);
+        const firstDayNextMonth = new Date(year, monthIndex + 1, 1);
+        const startDate = this.dateService.formatDateToString(firstDay);
+        const endDate = this.dateService.formatDateToString(firstDayNextMonth);
+
+        const {error} = await this.supabase
+            .from(TRANSACTIONS_TABLE)
+            .delete()
+            .eq('user_id', userId)
+            .eq('subscription_id', subscriptionId)
+            .gte('date', startDate)
+            .lt('date', endDate);
+
+        if (error) throw error;
+    }
+
     private groupByDay(transactions: Transaction[]): TransactionsByDay[] {
         const grouped = new Map<string, Transaction[]>();
 
