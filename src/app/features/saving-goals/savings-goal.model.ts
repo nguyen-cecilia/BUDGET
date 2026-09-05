@@ -4,6 +4,7 @@ export interface SavingsGoal {
     target_amount: number;
     current_amount: number;
     amount_per_month: number;
+    duration_months: number;
     currency_id: string;
     currency: {
         label: string;

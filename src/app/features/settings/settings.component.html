@@ -300,7 +300,7 @@
                             tabindex="0"
                             role="button"
                         >
-                            <div class="flex-1 flex items-center gap-2">
+                            <div class="flex-1 flex flex-wrap items-center gap-2">
                                 <label>
                                     <input type="checkbox" class="switch pink" disabled [checked]="account.is_active">
                                 </label>
@@ -308,7 +308,7 @@
                                 <h3>{{ account.label }}</h3>
 
                                 @if (account.is_default) {
-                                    <div class="ml-auto text-xs text-semibold py-0.5 px-1.5 border rounded-xs bg-purple dark:text-surface">par défaut</div>
+                                    <div class="text-xs text-semibold py-0.5 px-1.5 border rounded-xs bg-purple dark:text-surface">par défaut</div>
                                 }
                             </div>
 

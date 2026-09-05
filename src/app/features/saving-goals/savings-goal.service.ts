@@ -52,6 +52,7 @@ export class SavingsGoalService {
         target_amount: number,
         current_amount: number,
         amount_per_month: number,
+        duration_months: number,
         currency_id: string,
     }): Promise<SavingsGoal> {
         const {data, error} = await this.supabase
@@ -63,6 +64,7 @@ export class SavingsGoalService {
                     target_amount: goal.target_amount,
                     current_amount: goal.current_amount,
                     amount_per_month: goal.amount_per_month,
+                    duration_months: goal.duration_months,
                     currency_id: goal.currency_id,
                 }
             ])
@@ -82,6 +84,7 @@ export class SavingsGoalService {
         target_amount: number;
         current_amount: number;
         amount_per_month: number;
+        duration_months: number;
         currency_id: string;
     }): Promise<SavingsGoal> {
         const {data, error} = await this.supabase
@@ -91,6 +94,7 @@ export class SavingsGoalService {
                 target_amount: goal.target_amount,
                 current_amount: goal.current_amount,
                 amount_per_month: goal.amount_per_month,
+                duration_months: goal.duration_months,
                 currency_id: goal.currency_id,
             })
             .eq('id', id)

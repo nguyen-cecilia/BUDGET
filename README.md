@@ -67,7 +67,7 @@ Layout:
 - [x] Settings: subs display
 - [x] Subs form: move date fields
 - [x] Add cute calculator
-- [ ] Savings goals: save in 6 months, how many per month
+- [x] Savings goals: save in 6 months, how many per month
 - [x] Refacto: add balances for accounts
 
 Auth:

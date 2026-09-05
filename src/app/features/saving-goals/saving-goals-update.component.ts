@@ -5,7 +5,7 @@ import {ModalService} from '../../components/modal/modal.service';
 import {SavingsGoalService} from './savings-goal.service';
 import {SavingsGoal} from './savings-goal.model';
 import {ButtonComponent} from '../../components/button/button.component';
-import {LucideLoaderCircle, LucideSave, LucideTrash2} from '@lucide/angular';
+import {LucideLoaderCircle, LucideRotateCcw, LucideSave, LucideTrash2} from '@lucide/angular';
 import {nonNegativeNumber} from '../../core/validators';
 import {FORM_ERRORS, creationError, deletionError} from '../../core/form-errors.service';
 import {SelectOption} from '../../components/select/select.component';
@@ -13,6 +13,8 @@ import {TransactionOptionsService} from '../transactions/transaction-options.ser
 import {FieldErrorComponent} from '../../components/form-error/field-error.component';
 import {FormErrorComponent} from '../../components/form-error/form-error.component';
 import {RefreshService} from '../../core/refresh.service';
+import {CurrencyPipe} from '@angular/common';
+import {CurrencyService} from '../currencies/currency.service';
 
 @Component({
     selector: 'app-saving-goals-update',
@@ -23,7 +25,9 @@ import {RefreshService} from '../../core/refresh.service';
         ReactiveFormsModule,
         LucideTrash2,
         FieldErrorComponent,
-        FormErrorComponent
+        FormErrorComponent,
+        CurrencyPipe,
+        LucideRotateCcw
     ],
     templateUrl: './saving-goals-update.component.html',
 })
@@ -33,6 +37,7 @@ export class SavingGoalsUpdateComponent {
     private goalService = inject(SavingsGoalService);
     private optionsService = inject(TransactionOptionsService);
     private refreshService = inject(RefreshService);
+    private currencyService = inject(CurrencyService);
     protected modalService = inject(ModalService);
 
     goalForm: FormGroup;
@@ -42,13 +47,18 @@ export class SavingGoalsUpdateComponent {
     currenciesOptions = signal<SelectOption[]>([]);
     confirmDelete = signal(false);
     isDeleting = signal(false);
+    private userCurrencies = signal<{ currency_id: string; code: string }[]>([]);
+
+    resetCurrentAmount(): void {
+        this.goalForm.get('currentAmount')?.setValue(0);
+    }
 
     constructor() {
         this.goalForm = this.fb.group({
             label: ['', [Validators.required]],
             targetAmount: ['', [Validators.required, nonNegativeNumber]],
             currentAmount: ['', [nonNegativeNumber]],
-            amountPerMonth: ['', [Validators.required, nonNegativeNumber]],
+            durationMonths: [1, [Validators.required, Validators.min(1)]],
             currencyId: [''],
         });
 
@@ -70,6 +80,17 @@ export class SavingGoalsUpdateComponent {
                 this.confirmDelete.set(false);
             }
         });
+    }
+
+    get amountPerMonth(): number {
+        const target = Number(this.goalForm.get('targetAmount')?.value) || 0;
+        const months = Number(this.goalForm.get('durationMonths')?.value) || 1;
+        return months > 0 ? Math.round((target / months) * 100) / 100 : 0;
+    }
+
+    get selectedCurrencyCode(): string {
+        const id = String(this.goalForm?.get('currencyId')?.value);
+        return this.userCurrencies().find(c => String(c.currency_id) === id)?.code ?? 'EUR';
     }
 
     async submitSavingsGoal() {
@@ -94,7 +115,8 @@ export class SavingGoalsUpdateComponent {
                 label: fv.label || '',
                 target_amount: parseFloat(fv.targetAmount),
                 current_amount: parseFloat(fv.currentAmount) || 0,
-                amount_per_month: parseFloat(fv.amountPerMonth),
+                amount_per_month: this.amountPerMonth,
+                duration_months: Number(fv.durationMonths),
                 currency_id: fv.currencyId,
             };
 
@@ -144,7 +166,7 @@ export class SavingGoalsUpdateComponent {
             label: goal.label,
             targetAmount: goal.target_amount,
             currentAmount: goal.current_amount,
-            amountPerMonth: goal.amount_per_month,
+            durationMonths: goal.duration_months,
             currencyId: goal.currency_id,
         });
     }
@@ -156,7 +178,7 @@ export class SavingGoalsUpdateComponent {
             label: '',
             targetAmount: '',
             currentAmount: '',
-            amountPerMonth: '',
+            durationMonths: 1,
             currencyId: currencies.length > 0 ? currencies[0].value : '',
         });
     }
@@ -168,6 +190,9 @@ export class SavingGoalsUpdateComponent {
             ]);
 
             this.currenciesOptions.set(currencies);
+
+            const userCurrencies = await this.currencyService.getUserCurrencies(userId);
+            this.userCurrencies.set(userCurrencies.map(c => ({ currency_id: c.currency_id, code: c.code })));
 
             if (currencies.length > 0) {
                 this.goalForm.get('currencyId')?.setValue(currencies[0].value);

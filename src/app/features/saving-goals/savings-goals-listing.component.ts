@@ -1,6 +1,6 @@
 import {Component, effect, inject, signal, untracked} from '@angular/core';
 import {ButtonComponent} from '../../components/button/button.component';
-import {LucideFrown, LucidePencil, LucidePiggyBank, LucidePlus} from '@lucide/angular';
+import {LucideFaceSlightlyFrowning, LucidePencil, LucidePiggyBank, LucidePlus} from '@lucide/angular';
 import {AuthStateService} from '../../core/auth/auth-state.service';
 import {SavingsGoalService} from './savings-goal.service';
 import {CurrencyService} from '../currencies/currency.service';
@@ -19,7 +19,7 @@ import {RefreshService} from '../../core/refresh.service';
         LucidePlus,
         LucidePencil,
         LucidePiggyBank,
-        LucideFrown,
+        LucideFaceSlightlyFrowning,
         ModalComponent,
         SavingGoalsUpdateComponent,
         CurrencyPipe,
@@ -76,6 +76,7 @@ export class SavingsGoalsListingComponent {
                 target_amount: goal.target_amount,
                 current_amount: newCurrentAmount,
                 amount_per_month: goal.amount_per_month,
+                duration_months: goal.duration_months,
                 currency_id: goal.currency_id,
             });
 

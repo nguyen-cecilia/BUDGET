@@ -1,4 +1,9 @@
 <form class="space-y-4" [formGroup]="goalForm" (ngSubmit)="submitSavingsGoal()">
+    <label for="label">
+        <p>Label</p>
+        <input id="label" type="text" placeholder="Ex : Vacances" formControlName="label">
+    </label>
+
     <div class="flex items-start gap-3 *:flex-1">
         <label for="targetAmount">
             <p>Objectif</p>
@@ -20,17 +25,29 @@
         </label>
     </div>
 
-    <div class="flex items-start gap-3 *:flex-1">
-        <label for="amountPerMonth">
-            <p>Par mois</p>
-            <input id="amountPerMonth" type="number" placeholder="0.00" min="0" formControlName="amountPerMonth">
+    <div class="flex items-center gap-3">
+        <label for="durationMonths" class="flex-1">
+            <p>Nombre de mois</p>
+            <input
+                id="durationMonths"
+                type="number"
+                placeholder="12"
+                min="1"
+                formControlName="durationMonths"
+            >
             <app-field-error
-                [control]="goalForm.controls['amountPerMonth']"
-                [messages]="{required: 'Le montant par mois est requis.', nonNegativeNumber: 'Le montant doit être un nombre positif ou nul.'}"
+                [control]="goalForm.controls['durationMonths']"
+                [messages]="{required: 'Ce champ est requis.', min: 'Minimum 1 mois.'}"
             />
         </label>
 
-        <label for="currentAmount">
+        <p class="mt-5 text-muted text-sm">
+            soit <strong>{{ amountPerMonth|currency:selectedCurrencyCode }}</strong> / mois
+        </p>
+    </div>
+
+    <div class="flex items-end gap-3">
+        <label for="currentAmount" class="flex-1">
             <p>Déjà épargné</p>
             <input id="currentAmount" type="number" placeholder="0.00" min="0" formControlName="currentAmount">
             <app-field-error
@@ -38,12 +55,17 @@
                 [messages]="{nonNegativeNumber: 'Le montant doit être un nombre positif ou nul.'}"
             />
         </label>
+
+        <button
+            app-button
+            variant="tertiary"
+            (click)="resetCurrentAmount()"
+        >
+            <svg lucideRotateCcw [size]="16"></svg>
+            Mettre à 0
+        </button>
     </div>
 
-    <label for="label">
-        <p>Label</p>
-        <input id="label" type="text" placeholder="Ex : Vacances" formControlName="label">
-    </label>
 
     <app-form-error [message]="errorMessage()"/>
 
