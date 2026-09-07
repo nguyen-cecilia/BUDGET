@@ -115,7 +115,7 @@
                 <div class="space-y-1">
                     @for (subscription of subscriptions(); track subscription.id) {
                         <div
-                            class="flex flex-wrap lg:flex-nowrap flex-row items-center justify-between gap-x-6 gap-y-2 rounded px-2 py-3 cursor-pointer transition-all hover:bg-base"
+                            class="flex flex-wrap lg:flex-nowrap flex-row items-center justify-between gap-x-6 gap-y-2 rounded px-2 py-3 cursor-pointer transition-all hover:bg-canvas"
                             (click)="modalService.subscription.openEdit(subscription)"
                             (keydown.enter)="modalService.subscription.openEdit(subscription)"
                             (keydown.space)="modalService.subscription.openEdit(subscription)"
@@ -170,7 +170,7 @@
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-2">
                     @for (currency of currencies(); track currency.currency_id) {
                         <div
-                            class="p-3 border rounded flex items-center gap-2 cursor-pointer bg-surface transition-all hover:bg-base"
+                            class="p-3 border rounded flex items-center gap-2 cursor-pointer bg-surface transition-all hover:bg-canvas"
                             (click)="modalService.currency.openEdit(currency)"
                             (keydown.enter)="modalService.currency.openEdit(currency)"
                             (keydown.space)="modalService.currency.openEdit(currency)"
@@ -232,7 +232,7 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-2">
                     @for (category of categories(); track category.id) {
-                        <div class="flex items-center gap-3 bg-base border p-3 rounded">
+                        <div class="flex items-center gap-3 bg-canvas border p-3 rounded">
                             <div class="size-10 border rounded-full {{ colorService.getBackground(category.color) }}"></div>
                             <div class="flex-1">
                                 <h3>{{ category.label }}</h3>
@@ -293,7 +293,7 @@
                 <div class="space-y-2">
                     @for (account of accounts(); track account.id) {
                         <div
-                            class="flex flex-col lg:flex-row lg:items-center gap-x-3 gap-y-4 bg-surface p-3 rounded border cursor-pointer transition-all hover:bg-base"
+                            class="flex flex-col lg:flex-row lg:items-center gap-x-3 gap-y-4 bg-surface p-3 rounded border cursor-pointer transition-all hover:bg-canvas"
                             (click)="modalService.account.openEdit(account)"
                             (keydown.enter)="modalService.account.openEdit(account)"
                             (keydown.space)="modalService.account.openEdit(account)"

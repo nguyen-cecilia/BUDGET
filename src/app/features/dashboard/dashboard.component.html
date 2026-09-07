@@ -178,7 +178,7 @@
             @if (upcomingPayments().length > 0) {
                 <div class="grid grid-cols-2 lg:grid-cols-7 gap-3">
                     @for (day of upcomingPayments(); track day.dateString) {
-                        <div class="border rounded p-3 space-y-1.5 {{ $first ? 'col-span-2 lg:col-span-1 bg-yellow/50' : 'bg-base' }}">
+                        <div class="border rounded p-3 space-y-1.5 {{ $first ? 'col-span-2 lg:col-span-1 bg-yellow/50' : 'bg-canvas' }}">
                             <div>
                                 <p class="text-xs text-muted uppercase">{{ day.dayLabel }}</p>
                                 <p class="text-lg font-semibold leading-7 font-display">{{ day.dayNumber }}</p>
@@ -226,7 +226,7 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 @for (cat of categoriesData().categories; track cat.label) {
-                    <div class="bg-base rounded p-4 space-y-3 border">
+                    <div class="bg-canvas rounded p-4 space-y-3 border">
                         <div class="flex items-center gap-2">
                             <div class="size-3 rounded-full {{ colorService.getBackground(cat.color) }}"></div>
                             <h3 class="flex-1">{{ cat.label }}</h3>
@@ -262,7 +262,7 @@
                     </p>
 
                     @for (bucket of budget().budgets; track bucket.key) {
-                        <div class="rounded bg-base border p-4 flex flex-col items-start gap-1">
+                        <div class="rounded bg-canvas border p-4 flex flex-col items-start gap-1">
                             <div class="{{ bucket.bg }} rounded border px-2 py-0.5 font-semibold text-xs">
                                 {{ bucket.percent }}%
                             </div>
@@ -286,7 +286,7 @@
                         </div>
                     }
 
-                    <div class="rounded bg-base border p-4 flex flex-col items-start gap-1">
+                    <div class="rounded bg-canvas border p-4 flex flex-col items-start gap-1">
                         <div class="{{ budget().savingsBudget.bg }} rounded border px-2 py-0.5 font-semibold text-xs">{{ budget().savingsBudget.percent }}%</div>
                         <div>
                             <p class="font-display text-muted">Objectif</p>
@@ -326,7 +326,7 @@
                 <div class="relative z-1 grid grid-cols-[1fr_3fr_1fr] lg:grid-cols-[1fr_4fr_1fr] items-center gap-3">
                     @for (tag of tagsData().tags; track tag.label) {
                         <div class="text-muted text-sm">#{{ tag.label }}</div>
-                        <div class="w-full h-3 bg-base rounded-full border">
+                        <div class="w-full h-3 bg-canvas rounded-full border">
                             <div
                                 class="h-full bg-yellow rounded-full transition-all"
                                 [style.width.%]="(tag.total / totalExpenses()) * 100"

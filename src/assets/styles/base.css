@@ -1,6 +1,6 @@
 @layer base {
     body {
-        @apply bg-base text-ink text-base;
+        @apply bg-canvas text-ink text-base;
     }
 
     h1 {

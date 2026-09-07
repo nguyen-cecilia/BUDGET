@@ -20,7 +20,7 @@ export class BadgeComponent {
         const base = 'flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold text-muted cursor-pointer transition-all';
 
         const variants = {
-            primary: 'bg-base hover:bg-green dark:hover:text-surface',
+            primary: 'bg-canvas hover:bg-green dark:hover:text-surface',
             secondary: 'bg-yellow dark:text-surface hover:bg-pink',
             outline: 'border border-muted/25 hover:border-muted/50',
         };

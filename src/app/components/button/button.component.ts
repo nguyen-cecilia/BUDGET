@@ -21,7 +21,7 @@ export class ButtonComponent {
         const base = 'flex items-center gap-2 leading-4 text-sm transition-all cursor-pointer hover:scale-103 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100';
 
         const variants = {
-            primary: 'bg-ink text-base hover:bg-ink/80 font-medium justify-center',
+            primary: 'bg-ink text-canvas hover:bg-ink/80 font-medium justify-center',
             secondary: 'bg-pink border border-ink shadow-sm hover:bg-pink-dark dark:text-surface dark:border-surface',
             tertiary: 'bg-green-yellow dark:text-surface hover:bg-green-yellow/80 dark:hover:text-ink font-medium justify-center',
             outline: 'bg-surface border border-line shadow-sm shadow-ink/5 font-medium',

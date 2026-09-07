@@ -18,7 +18,7 @@ import {DateService} from '../../core/date.service';
     ],
     template: `
         <div
-            class="flex flex-col lg:flex-row lg:items-center justify-between gap-x-4 gap-y-1 rounded p-2 cursor-pointer transition-all hover:bg-base"
+            class="flex flex-col lg:flex-row lg:items-center justify-between gap-x-4 gap-y-1 rounded p-2 cursor-pointer transition-all hover:bg-canvas"
             [class.opacity-60]="dateService.isFuture(transaction.date)"
             (click)="modalService.transaction.openEdit(transaction)"
             (keydown.enter)="modalService.transaction.openEdit(transaction)"

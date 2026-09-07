@@ -1,5 +1,5 @@
 @if (authState.isAuthenticated()) {
-    <header class="lg:hidden sticky top-0 z-9 bg-base/50 backdrop-blur-md shadow-lg shadow-muted/5 border-b border-line py-3 px-5 flex justify-between">
+    <header class="lg:hidden sticky top-0 z-9 bg-canvas/50 backdrop-blur-md shadow-lg shadow-muted/5 border-b border-line py-3 px-5 flex justify-between">
         <a routerLink="" class="flex items-center gap-2">
             <div class="rounded-full bg-yellow p-1.5 aspect-square flex items-center justify-center">
                 <img src="icons/favicon.svg" alt="Logo Budget" width="25">
@@ -145,7 +145,7 @@
 
     <!-- VERSION MOBILE -->
     <nav
-        class="lg:hidden z-2 fixed left-0 right-0 bottom-5 mx-5 bg-ink text-base dark:bg-deep dark:text-ink dark:border dark:border-line rounded-full py-2 px-6 flex items-center justify-evenly gap-2">
+        class="lg:hidden z-2 fixed left-0 right-0 bottom-5 mx-5 bg-ink text-canvas dark:bg-deep dark:text-ink dark:border dark:border-line rounded-full py-2 px-6 flex items-center justify-evenly gap-2">
         @for (link of links; track link.label; let i = $index; let isLast = $last) {
             @if (!isLast) {
                 @if (i === 2) {

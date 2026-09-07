@@ -96,7 +96,7 @@
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
                 @for (m of monthlyData(); track m.index) {
                     <div
-                        class="bg-base border rounded p-3 space-y-2
+                        class="bg-canvas border rounded p-3 space-y-2
                         {{ extremeMonths()?.best === m.index ? 'bg-green/15 border-green ring-1 ring-green' : '' }}
                         {{ extremeMonths()?.worst !== null && extremeMonths()?.worst === m.index ? 'bg-pink/15 border-pink ring-1 ring-pink' : '' }}"
                     >
