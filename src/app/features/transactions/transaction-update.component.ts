@@ -1,7 +1,15 @@
 import {Component, computed, effect, inject, signal, untracked} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {BadgeComponent} from '../../components/badge/badge.component';
-import {LucideLoaderCircle, LucidePlus, LucideSave, LucideTrash2, LucideX} from '@lucide/angular';
+import {
+    LucideCircleMinus,
+    LucideCirclePlus,
+    LucideLoaderCircle,
+    LucidePlus,
+    LucideSave,
+    LucideTrash2,
+    LucideX
+} from '@lucide/angular';
 import {ButtonComponent} from '../../components/button/button.component';
 import {SelectOption} from '../../components/select/select.component';
 import {AuthStateService} from '../../core/auth/auth-state.service';
@@ -33,6 +41,8 @@ import {DatePickerComponent} from '../../components/datepicker/datepicker.compon
         FieldErrorComponent,
         FormErrorComponent,
         DatePickerComponent,
+        LucideCircleMinus,
+        LucideCirclePlus,
     ],
     templateUrl: './transaction-update.component.html',
 })

@@ -27,12 +27,14 @@
 
     @if (mode() === 'transaction') {
         <div class="tab-switch-input">
-            <label for="expense" class="has-checked:bg-pink">
+            <label for="expense" class="has-checked:bg-pink flex justify-center items-center gap-2">
                 <input type="radio" id="expense" value="expense" name="type" formControlName="type">
+                <svg lucideCircleMinus [size]="16" class="m-0"></svg>
                 <p>Dépense</p>
             </label>
-            <label for="income" class="has-checked:bg-green">
+            <label for="income" class="has-checked:bg-green flex justify-center items-center gap-2">
                 <input type="radio" id="income" value="income" name="type" formControlName="type">
+                <svg lucideCirclePlus [size]="16" class="m-0"></svg>
                 <p>Revenu</p>
             </label>
         </div>
