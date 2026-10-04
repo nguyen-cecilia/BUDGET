@@ -25,6 +25,7 @@ export class ModalController<T> {
 
     open(data?: T): void {
         this.editing.set(data ?? null);
+        this.bulk.set(false);
         this.isOpen.set(true);
     }
 

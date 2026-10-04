@@ -38,21 +38,14 @@
     <app-subscription-update/>
 </app-modal>
 
-<app-modal
-    title="{{ modalService.confirm.editing()?.title ?? 'Confirmer' }}"
-    [isOpen]="modalService.confirm.isOpen"
-    [onClose]="() => modalService.confirm.close()"
->
-    <app-confirm/>
-</app-modal>
-
 <section class="space-y-6">
     <button app-button variant="outline" (click)="logout()" class="lg:hidden ml-auto">
         <svg lucideLogOut [size]="16"></svg>
         Se déconnecter
     </button>
 
-    <div class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-3 lg:space-y-0 lg:flex lg:justify-between lg:items-start">
+    <div
+        class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-3 lg:space-y-0 lg:flex lg:justify-between lg:items-start">
         <div>
             <h1>Paramètres</h1>
             <p class="text-muted">Gestion de l'application : catégories, tags, devises, abonnements...</p>
@@ -185,7 +178,8 @@
                                 <div class="flex items-center gap-2">
                                     <h3>{{ currency.label }}</h3>
                                     @if (currency.is_default) {
-                                        <div class="text-xs text-semibold py-0.5 px-1.5 border rounded-xs bg-green dark:text-surface">
+                                        <div
+                                            class="text-xs text-semibold py-0.5 px-1.5 border rounded-xs bg-green dark:text-surface">
                                             par défaut
                                         </div>
                                     }
@@ -233,7 +227,8 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-2">
                     @for (category of categories(); track category.id) {
                         <div class="flex items-center gap-3 bg-canvas border p-3 rounded">
-                            <div class="size-10 border rounded-full {{ colorService.getBackground(category.color) }}"></div>
+                            <div
+                                class="size-10 border rounded-full {{ colorService.getBackground(category.color) }}"></div>
                             <div class="flex-1">
                                 <h3>{{ category.label }}</h3>
                                 <p class="text-sm text-muted">{{ category.type === 'need' ? 'Besoin' : category.type === 'want' ? 'Envie' : '' }}</p>

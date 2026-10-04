@@ -1,5 +1,6 @@
 @if (authState.isAuthenticated()) {
-    <header class="lg:hidden sticky top-0 z-9 bg-canvas/50 backdrop-blur-md shadow-lg shadow-muted/5 border-b border-line py-3 px-5 flex justify-between">
+    <header
+        class="lg:hidden sticky top-0 z-9 bg-canvas/50 backdrop-blur-md shadow-lg shadow-muted/5 border-b border-line py-3 px-5 flex justify-between">
         <a routerLink="" class="flex items-center gap-2">
             <div class="rounded-full bg-yellow p-1.5 aspect-square flex items-center justify-center">
                 <img src="icons/favicon.svg" alt="Logo Budget" width="25">
@@ -42,6 +43,26 @@
     @defer (on idle; when modalService.transaction.isOpen()) {
         @if (modalService.transaction.isOpen()) {
             <app-update-transaction/>
+        }
+    }
+</app-modal>
+
+<app-modal
+    title="{{ modalService.confirm.editing()?.title ?? 'Confirmer' }}"
+    [isOpen]="modalService.confirm.isOpen"
+    [onClose]="() => modalService.confirm.close()"
+>
+    <app-confirm/>
+</app-modal>
+
+<app-modal
+    title="Modifier les transactions"
+    [isOpen]="modalService.bulkTransaction.isOpen"
+    [onClose]="() => modalService.bulkTransaction.close()"
+>
+    @defer (on idle; when modalService.bulkTransaction.isOpen()) {
+        @if (modalService.bulkTransaction.isOpen()) {
+            <app-transaction-bulk-update/>
         }
     }
 </app-modal>
@@ -189,7 +210,8 @@
     </nav>
 
     @if (hasUpdate()) {
-        <div class="fixed bottom-0 left-0 right-0 z-30 rounded-sm mx-5 mb-32 lg:mb-5 bg-yellow text-ink dark:text-deep shadow-lg shadow-muted/20 px-5 py-3 flex items-center justify-between gap-3">
+        <div
+            class="fixed bottom-0 left-0 right-0 z-30 rounded-sm mx-5 mb-32 lg:mb-5 bg-yellow text-ink dark:text-deep shadow-lg shadow-muted/20 px-5 py-3 flex items-center justify-between gap-3">
             <p class="font-semibold text-sm">Une mise à jour est disponible.</p>
             <button app-button variant="secondary" (click)="applyUpdate()" class="font-bold">
                 Rafraîchir

@@ -124,36 +124,11 @@
     @if (mode() === 'transaction') {
         <label for="tags" class="flex flex-col gap-1">
             <p>Tags</p>
-            <div class="order-1 flex items-center gap-3">
-                <input
-                    #newTagInput
-                    type="text"
-                    placeholder="Ex: travaux, vacances..."
-                />
-                <button app-button variant="tertiary" (click)="addNewTag(newTagInput)">
-                    <svg lucidePlus [size]="14"></svg>
-                    Ajouter
-                </button>
-            </div>
-            <div class="relative flex flex-wrap items-center gap-2">
-                @for (tag of selectedTags(); track tag.value) {
-                    <button app-badge variant="secondary" (click)="removeTag(tag.label)">
-                        #{{ tag.label }}
-                        <svg lucideX [size]="12"></svg>
-                    </button>
-                }
-                @for (tag of newTags(); track tag) {
-                    <button app-badge variant="secondary" (click)="removeTag(tag)">
-                        #{{ tag }}
-                        <svg lucideX [size]="12" class="pointer-events-none"></svg>
-                    </button>
-                }
-            </div>
-            <div class="order-2 flex flex-wrap items-center gap-2">
-                @for (tag of availableTagsOptions(); track tag.value) {
-                    <button app-badge (click)="addExistingTag(tag)">+ {{ tag.label }}</button>
-                }
-            </div>
+            <app-tags-input
+                [options]="tagsOptions()"
+                [(selectedTags)]="selectedTags"
+                [(newTags)]="newTags"
+            />
         </label>
     } @else {
         <div class="flex flex-col lg:flex-row lg:items-start gap-3 *:flex-1">

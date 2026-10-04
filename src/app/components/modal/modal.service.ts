@@ -22,4 +22,5 @@ export class ModalService {
     readonly goal = new ModalController<SavingsGoal>();
 
     readonly confirm = new ModalController<ConfirmPayload>();
+    readonly bulkTransaction = new ModalController<{ ids: string[]; onSuccess?: () => void }>();
 }

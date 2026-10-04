@@ -5,12 +5,12 @@ import {
     LucideKey,
     LucideLandmark,
     LucideLayers,
+    LucideLoaderCircle,
     LucideLogOut,
     LucidePencil,
     LucidePlus,
     LucideRotateCcw,
     LucideSave,
-    LucideLoaderCircle,
     LucideSkull,
     LucideSparkles,
     LucideTag,
@@ -41,7 +41,7 @@ import {SubscriptionService} from '../subscriptions/subscription.service';
 import {Subscription} from '../subscriptions/subscription.model';
 import {CurrencyPipe, DatePipe} from '@angular/common';
 import {SubscriptionUpdate} from '../subscriptions/subscription-update.component';
-import {ConfirmComponent, ConfirmPayload} from '../../components/confirm/confirm.component';
+import {ConfirmPayload} from '../../components/confirm/confirm.component';
 import {SavingsGoalService} from '../saving-goals/savings-goal.service';
 import {TransactionService} from '../transactions/transaction.service';
 import {LoadingComponent} from '../../components/loading/loading.component';
@@ -81,7 +81,6 @@ import {MonthNavigatorComponent} from '../../components/month-navigator/month-na
         LucideTrash2,
         LucideLayers,
         LucideTriangleAlert,
-        ConfirmComponent,
         LoadingComponent,
         LucideLogOut,
         FormErrorComponent,
@@ -134,7 +133,7 @@ export class SettingsComponent {
     balanceValues = signal<Record<string, number>>({});
 
     passwordForm: FormGroup;
-    passwordMessage = signal<{text: string; type: 'error' | 'success'} | null>(null);
+    passwordMessage = signal<{ text: string; type: 'error' | 'success' } | null>(null);
     isSubmittingPassword = signal(false);
 
     constructor() {

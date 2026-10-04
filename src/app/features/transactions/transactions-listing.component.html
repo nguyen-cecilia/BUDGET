@@ -108,37 +108,97 @@
     <app-loading/>
 } @else if (filteredTransactions().transactionsByDay.length > 0) {
     <section class="space-y-6">
-        <div class="flex items-center justify-between gap-3">
-            <p class="text-muted">
-                {{ filteredTransactions().count }} résultat{{ filteredTransactions().count > 1 ? 's' : '' }}
-            </p>
+        <ng-template #resultsToolbar>
+            <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+                <p class="text-muted">
+                    {{ filteredTransactions().count }} résultat{{ filteredTransactions().count > 1 ? 's' : '' }}
+                </p>
+                <button (click)="toggleSort()"
+                        class="lg:order-2 flex items-center gap-2 rounded-full py-2.5 px-3.5 font-semibold text-muted text-sm transition-all cursor-pointer hover:bg-deep">
+                    @if (sortOrder() === 'asc') {
+                        <svg lucideArrowDown [size]="16"></svg>
+                        Date croissant
+                    } @else {
+                        <svg lucideArrowUp [size]="16"></svg>
+                        Date décroissant
+                    }
+                </button>
+                <div class="lg:order-1 w-full flex-1 flex flex-col lg:flex-row items-start lg:items-center gap-2">
+                    <button
+                        app-button
+                        [variant]="showCheckbox() ? 'outline' : 'tertiary'"
+                        (click)="toggleMultipleSelection()"
+                    >
+                        <svg lucideCheckCheck [size]="20"></svg>
+                        {{ showCheckbox() ? 'Terminer la sélection' : 'Sélection multiple' }}
+                    </button>
+                    @if (hasMultipleSelection()) {
+                        <div
+                            class="bg-blue/20 border border-blue rounded py-2 lg:py-1 pr-2 lg:pr-1.5 pl-2 lg:pl-3 flex flex-col lg:flex-row lg:items-center justify-between gap-2">
+                            <p class="text-center font-semibold">{{ multipleSelectionCount() }}
+                                sélectionnée{{ multipleSelectionCount() > 1 ? 's' : '' }}</p>
+                            <div class="flex flex-wrap justify-center items-center gap-2">
+                                <button app-button variant="outline" (click)="clearSelectionTransactions()">
+                                    <svg lucideRotateCcw [size]="16"></svg>
+                                    Réinitialiser
+                                </button>
+                                <button app-button (click)="bulkEdit()">
+                                    <svg lucidePencil [size]="16"></svg>
+                                    Modifier en masse
+                                </button>
+                                <button app-button variant="invalid" (click)="bulkDelete()"
+                                        [disabled]="isBulkDeleting()">
+                                    @if (isBulkDeleting()) {
+                                        <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
+                                        Suppression...
+                                    } @else {
+                                        <svg lucideTrash2 [size]="16"></svg>
+                                        Supprimer
+                                    }
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </ng-template>
 
-            <button (click)="toggleSort()" class="flex items-center gap-2 rounded-full py-2.5 px-3.5 font-semibold text-muted text-sm transition-all cursor-pointer hover:bg-deep">
-                @if (sortOrder() === 'asc') {
-                    <svg lucideArrowDown [size]="16"></svg>
-                    Date croissant
-                } @else {
-                    <svg lucideArrowUp [size]="16"></svg>
-                    Date décroissant
-                }
-            </button>
-        </div>
-
+        <ng-container [ngTemplateOutlet]="resultsToolbar"></ng-container>
 
         @for (dayGroup of filteredTransactions().transactionsByDay; track dayGroup.date) {
             <div class="bg-surface border border-line shadow-md shadow-muted/10 rounded p-5 space-y-3">
                 <div class="flex items-start justify-between gap-6">
-                    <h2>{{ dayGroup.date|date:'longDate' }}</h2>
+                    <div class="flex items-center gap-3">
+                        @if (showCheckbox()) {
+                            <label>
+                                @let state = daySelectionState(dayGroup.date);
+                                <input
+                                    type="checkbox"
+                                    [checked]="state === 'all'"
+                                    [indeterminate]="state === 'partial'"
+                                    (change)="toggleSelectAllForDay(dayGroup.date)"
+                                >
+                            </label>
+                        }
+                        <h2>{{ dayGroup.date|date:'longDate' }}</h2>
+                    </div>
                     <p class="font-bold">{{ dayTotal(dayGroup.date) > 0 ? '+' : '' }}{{ dayTotal(dayGroup.date)|currency:defaultCurrency() }}</p>
                 </div>
 
                 <div class="space-y-1">
                     @for (transaction of dayGroup.transactions; track transaction.id) {
-                        <app-transaction-item [transaction]="transaction"></app-transaction-item>
+                        <app-transaction-item
+                            [transaction]="transaction"
+                            [isSelected]="isSelectedTransaction(transaction.id)"
+                            [showCheckbox]="showCheckbox()"
+                            (selectionChange)="toggleSelect(transaction.id)"
+                        ></app-transaction-item>
                     }
                 </div>
             </div>
         }
+
+        <ng-container [ngTemplateOutlet]="resultsToolbar"></ng-container>
     </section>
 } @else {
     <div class="flex flex-col items-center justify-center gap-3 px-6 py-10 text-muted">

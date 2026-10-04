@@ -54,6 +54,22 @@ export class TransactionOptionsService {
         }));
     }
 
+    async getFormOptions(userId: string): Promise<{
+        currencies: SelectOption[];
+        accounts: SelectOption[];
+        categories: SelectOption[];
+        tags: SelectOption[];
+    }> {
+        const [currencies, accounts, categories, tags] = await Promise.all([
+            this.getCurrenciesOptions(userId),
+            this.getAccountsOptions(userId, false),
+            this.getCategoriesOptions(userId, false, true),
+            this.getTagsOptions(userId),
+        ]);
+
+        return {currencies, accounts, categories, tags};
+    }
+
     async getCurrenciesOptions(userId: string): Promise<SelectOption[]> {
         const data = await this.currencyService.getUserCurrencies(userId);
         return data.map(currency => ({

@@ -40,6 +40,16 @@ export class DateService {
     }
 
     /**
+     * @return La date/heure locale au format YYYY-MM-DDTHH:mm (valeur d'un input datetime-local)
+     */
+    nowLocalInputValue(): string {
+        const now = new Date();
+        return new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+            .toISOString()
+            .slice(0, 16);
+    }
+
+    /**
      * @param date
      * @return Le label du jour de la semaine en version courte (ex : Lun.)
      */

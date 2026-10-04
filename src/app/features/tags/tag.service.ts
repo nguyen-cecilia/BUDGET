@@ -43,6 +43,30 @@ export class TagService {
         return data;
     }
 
+    async resolveTagIds(
+        userId: string,
+        selectedTagIds: (string | number)[],
+        newTagLabels: string[],
+    ): Promise<string[]> {
+        const existingTags = await this.getAllTagsByUser(userId);
+
+        const newTagIds = await Promise.all(
+            newTagLabels.map(async (label) => {
+                const existing = existingTags.find(
+                    t => t.label.toLowerCase() === label.toLowerCase()
+                );
+                if (existing) return existing.id;
+                const created = await this.createTag(userId, {label});
+                return created.id;
+            })
+        );
+
+        return [
+            ...selectedTagIds.map(id => String(id)),
+            ...newTagIds,
+        ];
+    }
+
     async updateTag(id: string, userId: string, tag: {
         label: string;
     }): Promise<Tag> {

@@ -1,0 +1,76 @@
+<div class="flex items-center gap-3">
+    @if (showCheckbox) {
+        <label>
+            <input
+                type="checkbox"
+                [checked]="isSelected"
+                (click)="$event.stopPropagation()"
+                (change)="selectionChange.emit()"
+            >
+        </label>
+    }
+    <div
+        class="flex-1 flex flex-col lg:flex-row lg:items-center justify-between gap-x-4 gap-y-1 rounded p-2 cursor-pointer transition-all hover:bg-canvas group"
+        [class.opacity-60]="dateService.isFuture(transaction.date)"
+        (click)="modalService.transaction.openEdit(transaction)"
+        (keydown.enter)="modalService.transaction.openEdit(transaction)"
+        (keydown.space)="modalService.transaction.openEdit(transaction)"
+        tabindex="0"
+        role="button"
+    >
+        <div class="flex items-center gap-3">
+            <div
+                class="aspect-square border rounded-full p-3 dark:text-surface dark:border-surface {{ colorService.getBackground(transaction.category?.color ?? 'grayLight') }}">
+                @if (transaction.type === 'income') {
+                    <svg lucideArrowDownLeft [size]="20"></svg>
+                } @else {
+                    <svg lucideArrowUpRight [size]="20"></svg>
+                }
+            </div>
+            <div>
+                <div class="flex items-center gap-1.5">
+                    <h3>{{ transaction.label }}</h3>
+                    @if (transaction.is_subscription) {
+                        <svg lucideSparkles [size]="20"></svg>
+                    }
+                </div>
+                <p class="text-sm text-muted">
+                    {{ transaction.account.label }} ·
+                    <span
+                        class="font-semibold underline decoration-2 underline-offset-3 {{ colorService.getDecoration(transaction.category?.color ?? 'grayLight') }}"
+                    >
+                    {{ transaction.category?.label ?? 'Sans catégorie' }}
+                </span>
+                    @if (hasDate) {
+                        · {{ transaction.date|date:'dd/MM/yyyy' }}
+                    }
+                    @if (transaction.tags && transaction.tags.length > 0) {
+                        · {{ transaction.tags.map(tag => '#' + tag.label).join(', ') }}
+                    }
+                </p>
+            </div>
+        </div>
+        <div class="text-right">
+            <p class="font-display text-md{{ transaction.type === 'income' ? ' text-green' : '' }}">{{ transaction.type === 'expense' ? '-' : '+' }}{{ transaction.amount|currency:transaction.currency.code }}</p>
+            @if (transaction.currency.code !== currencyService.defaultCurrency() && currencyService.canConvert(transaction.currency.code)) {
+                <p class="text-sm text-muted">
+                    ≈ {{ transaction.type === 'expense' ? '-' : '+' }}{{ currencyService.convertToDefault(transaction.amount, transaction.currency.code)|currency:currencyService.defaultCurrency() }}</p>
+            }
+        </div>
+    </div>
+    <button
+        app-button
+        variant="outline"
+        shape="round"
+        (click)="duplicate($event)"
+        [disabled]="isDuplicating()"
+        aria-label="Dupliquer la transaction"
+    >
+        @if (isDuplicating()) {
+            <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
+        } @else {
+            <svg lucideCopy [size]="16"></svg>
+        }
+    </button>
+</div>
+

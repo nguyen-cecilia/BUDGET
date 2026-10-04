@@ -1,15 +1,6 @@
-import {Component, computed, effect, inject, signal, untracked} from '@angular/core';
+import {Component, effect, inject, signal, untracked} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {BadgeComponent} from '../../components/badge/badge.component';
-import {
-    LucideCircleMinus,
-    LucideCirclePlus,
-    LucideLoaderCircle,
-    LucidePlus,
-    LucideSave,
-    LucideTrash2,
-    LucideX
-} from '@lucide/angular';
+import {LucideCircleMinus, LucideCirclePlus, LucideLoaderCircle, LucideSave, LucideTrash2} from '@lucide/angular';
 import {ButtonComponent} from '../../components/button/button.component';
 import {SelectOption} from '../../components/select/select.component';
 import {AuthStateService} from '../../core/auth/auth-state.service';
@@ -19,30 +10,30 @@ import {ModalService} from '../../components/modal/modal.service';
 import {TagService} from '../tags/tag.service';
 import {SubscriptionService} from '../subscriptions/subscription.service';
 import positiveNumber from '../../core/validators';
-import {FORM_ERRORS, creationError, deletionError} from '../../core/form-errors.service';
+import {creationError, deletionError, FORM_ERRORS} from '../../core/form-errors.service';
 import {Transaction} from './transaction.model';
 import {Subscription} from '../subscriptions/subscription.model';
 import {FieldErrorComponent} from '../../components/form-error/field-error.component';
 import {FormErrorComponent} from '../../components/form-error/form-error.component';
 import {RefreshService} from '../../core/refresh.service';
 import {DatePickerComponent} from '../../components/datepicker/datepicker.component';
+import {TagsInputComponent} from '../../components/tags-input/tags-input.component';
+import {DateService} from '../../core/date.service';
 
 @Component({
     selector: 'app-update-transaction',
     imports: [
         ReactiveFormsModule,
-        BadgeComponent,
-        LucideX,
         LucideSave,
         ButtonComponent,
         LucideLoaderCircle,
-        LucidePlus,
         LucideTrash2,
         FieldErrorComponent,
         FormErrorComponent,
         DatePickerComponent,
         LucideCircleMinus,
         LucideCirclePlus,
+        TagsInputComponent,
     ],
     templateUrl: './transaction-update.component.html',
 })
@@ -54,6 +45,7 @@ export class TransactionUpdateComponent {
     private tagService = inject(TagService);
     private subscriptionService = inject(SubscriptionService);
     private refreshService = inject(RefreshService);
+    private dateService = inject(DateService);
     protected modalService = inject(ModalService);
 
     transactionForm: FormGroup;
@@ -74,10 +66,7 @@ export class TransactionUpdateComponent {
     isDeleting = signal(false);
 
     constructor() {
-        const now = new Date();
-        const nowLocal = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-            .toISOString()
-            .slice(0, 16);
+        const nowLocal = this.dateService.nowLocalInputValue();
 
         this.transactionForm = this.fb.group({
             type: ['expense', [Validators.required]],
@@ -88,7 +77,7 @@ export class TransactionUpdateComponent {
             account: ['', [Validators.required]],
             category: [''],
             subscriptionFrequency: ['monthly'],
-            subscriptionNextDate: [this.subscriptionService.computeNextDateFrom('today','monthly')],
+            subscriptionNextDate: [this.subscriptionService.computeNextDateFrom('today', 'monthly')],
             selectedSubscriptionId: [''],
         });
 
@@ -137,52 +126,6 @@ export class TransactionUpdateComponent {
         });
     }
 
-    availableTagsOptions = computed(() =>
-        this.tagsOptions().filter(
-            tag => !this.selectedTags().some(t => t.value === tag.value)
-        )
-    );
-
-    addNewTag(input: HTMLInputElement): void {
-        const rawValue = input.value.trim();
-        if (!rawValue) return;
-
-        const value = rawValue.charAt(0).toUpperCase() + rawValue.slice(1);
-
-        const existsInOptions = this.tagsOptions().some(
-            t => t.label.toLowerCase() === value.toLowerCase()
-        );
-        const existsInSelected = this.selectedTags().some(
-            t => t.label.toLowerCase() === value.toLowerCase()
-        );
-        const existsInNew = this.newTags().some(
-            t => t.toLowerCase() === value.toLowerCase()
-        );
-
-        if (existsInOptions || existsInSelected || existsInNew) return;
-
-        this.newTags.update(tags => [...tags, value]);
-        input.value = '';
-    }
-
-    addExistingTag(tag: SelectOption): void {
-        const isTagAlreadySelected = this.selectedTags().some(t => t.label === tag.label);
-
-        if (!isTagAlreadySelected) {
-            this.selectedTags.set([...this.selectedTags(), tag]);
-        }
-    }
-
-    removeTag(tagLabel: string | number): void {
-        this.selectedTags.set(
-            this.selectedTags().filter(tag => tag.label !== tagLabel)
-        );
-
-        this.newTags.set(
-            this.newTags().filter(tag => tag !== tagLabel)
-        );
-    }
-
     setMode(mode: 'transaction' | 'subscription'): void {
         this.mode.set(mode);
         if (mode === 'subscription') {
@@ -202,7 +145,7 @@ export class TransactionUpdateComponent {
 
     async submitTransaction() {
         if (this.transactionForm.invalid) {
-                this.errorMessage.set(FORM_ERRORS.REQUIRED);
+            this.errorMessage.set(FORM_ERRORS.REQUIRED);
             return;
         }
 
@@ -324,11 +267,8 @@ export class TransactionUpdateComponent {
 
     private async initOptions(userId: string) {
         try {
-            const [currencies, accounts, categories, tags, subscriptions] = await Promise.all([
-                this.optionsService.getCurrenciesOptions(userId),
-                this.optionsService.getAccountsOptions(userId, false),
-                this.optionsService.getCategoriesOptions(userId, false, true),
-                this.optionsService.getTagsOptions(userId),
+            const [{currencies, accounts, categories, tags}, subscriptions] = await Promise.all([
+                this.optionsService.getFormOptions(userId),
                 this.subscriptionService.getAllSubscriptionsByUser(userId),
             ]);
 
@@ -398,10 +338,7 @@ export class TransactionUpdateComponent {
         this.newTags.set([]);
         this.mode.set('transaction');
 
-        const now = new Date();
-        const nowLocal = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-            .toISOString()
-            .slice(0, 16);
+        const nowLocal = this.dateService.nowLocalInputValue();
 
         const currencies = this.currenciesOptions();
         const accounts = this.accountsOptions();
@@ -446,26 +383,14 @@ export class TransactionUpdateComponent {
     }
 
     private async handleTags(userId: string, transactionId: string) {
-        const existingTags = await this.tagService.getAllTagsByUser(userId);
-
-        const newTagIds = await Promise.all(
-            this.newTags().map(async (label) => {
-                const existing = existingTags.find(
-                    t => t.label.toLowerCase() === label.toLowerCase()
-                );
-                if (existing) return existing.id;
-                const created = await this.tagService.createTag(userId, {label});
-                return created.id;
-            })
+        const tagIds = await this.tagService.resolveTagIds(
+            userId,
+            this.selectedTags().map(t => t.value),
+            this.newTags(),
         );
 
-        const allTagIds = [
-            ...this.selectedTags().map(t => t.value),
-            ...newTagIds,
-        ];
-
-        if (allTagIds.length > 0) {
-            await this.transactionService.addTagsToTransaction(transactionId, allTagIds);
+        if (tagIds.length > 0) {
+            await this.transactionService.addTagsToTransaction(transactionId, tagIds);
         }
     }
 

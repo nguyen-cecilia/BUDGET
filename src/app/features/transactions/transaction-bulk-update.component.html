@@ -1,0 +1,152 @@
+<form class="space-y-5" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="text-muted">
+        <p>
+            <strong>{{ ids().length }}</strong> transaction{{ ids().length > 1 ? 's' : '' }}
+            sélectionnée{{ ids().length > 1 ? 's' : '' }}.
+        </p>
+        <p>Activez les champs à modifier.</p>
+    </div>
+
+    <div class="space-y-2">
+        <label>
+            <input type="checkbox" [checked]="isEnabled('type')" (change)="toggle('type')">
+            <p>Type</p>
+        </label>
+        @if (isEnabled('type')) {
+            <div
+                class="tab-switch-input"
+            >
+                <label for="bulk-expense" class="has-checked:bg-pink flex justify-center items-center gap-2">
+                    <input type="radio" id="bulk-expense" value="expense" name="bulk-type" formControlName="type">
+                    <svg lucideCircleMinus [size]="16" class="m-0"></svg>
+                    <p>Dépense</p>
+                </label>
+                <label for="bulk-income" class="has-checked:bg-green flex justify-center items-center gap-2">
+                    <input type="radio" id="bulk-income" value="income" name="bulk-type" formControlName="type">
+                    <svg lucideCirclePlus [size]="16" class="m-0"></svg>
+                    <p>Revenu</p>
+                </label>
+            </div>
+        }
+    </div>
+
+    <div class="space-y-2">
+        <label>
+            <input type="checkbox" [checked]="isEnabled('amount')" (change)="toggle('amount')">
+            <p>Montant</p>
+        </label>
+        @if (isEnabled('amount')) {
+            <input
+                type="number"
+                formControlName="amount"
+                placeholder="0.00"
+                min="0"
+                class="font-display text-md"
+            >
+        }
+    </div>
+
+    <div class="space-y-2">
+        <label>
+            <input type="checkbox" [checked]="isEnabled('currency')" (change)="toggle('currency')">
+            <p>Devise</p>
+        </label>
+        @if (isEnabled('currency')) {
+            <select class="custom-select" formControlName="amountCurrency">
+                @for (currency of currenciesOptions(); track currency.value) {
+                    <option value="{{ currency.value }}">{{ currency.label }}</option>
+                }
+            </select>
+        }
+    </div>
+
+    <div class="space-y-2">
+        <label>
+            <input type="checkbox" [checked]="isEnabled('account')" (change)="toggle('account')">
+            <p>Compte</p>
+        </label>
+        @if (isEnabled('account')) {
+            <select class="custom-select" formControlName="account">
+                @for (account of accountsOptions(); track account.value) {
+                    <option value="{{ account.value }}">{{ account.label }}</option>
+                }
+            </select>
+        }
+    </div>
+
+    <div class="space-y-2">
+        <label>
+            <input type="checkbox" [checked]="isEnabled('label')" (change)="toggle('label')">
+            <p>Label</p>
+        </label>
+        @if (isEnabled('label')) {
+            <input
+                type="text"
+                formControlName="label"
+                placeholder="Ex: Courses Carrefour"
+            >
+        }
+    </div>
+
+    <div class="space-y-2">
+        <label>
+            <input type="checkbox" [checked]="isEnabled('category')" (change)="toggle('category')">
+            <p>Catégorie</p>
+        </label>
+        @if (isEnabled('category')) {
+            <select class="custom-select" formControlName="category">
+                @for (category of categoriesOptions(); track category.value) {
+                    <option value="{{ category.value }}">{{ category.label }}</option>
+                }
+            </select>
+        }
+    </div>
+
+    <div class="space-y-2">
+        <label>
+            <input type="checkbox" [checked]="isEnabled('date')" (change)="toggle('date')">
+            <p>Date</p>
+        </label>
+        @if (isEnabled('date')) {
+            <app-datepicker
+                [control]="form.get('date')!"
+                [hasTime]="true"
+            />
+        }
+    </div>
+
+    <div class="space-y-2">
+        <label>
+            <input type="checkbox" [checked]="isEnabled('tags')" (change)="toggle('tags')">
+            <p>Tags</p>
+        </label>
+        @if (isEnabled('tags')) {
+            <div class="space-y-2">
+                <app-tags-input
+                    [options]="tagsOptions()"
+                    [(selectedTags)]="selectedTags"
+                    [(newTags)]="newTags"
+                />
+                <p class="flex items-center gap-2 text-muted text-sm">
+                    <svg lucideTriangleAlert [size]="16" class="shrink-0"></svg>
+                    Les tags choisis remplaceront les tags existants des transactions sélectionnées.
+                </p>
+            </div>
+        }
+    </div>
+
+    <app-form-error [message]="errorMessage()"/>
+
+    <div class="flex items-center justify-between gap-3">
+        <button app-button type="button" variant="outline" (click)="cancel()">Annuler</button>
+        <button app-button type="submit" [disabled]="isSubmitting()">
+            @if (isSubmitting()) {
+                <svg lucideLoaderCircle [size]="16" class="animate-spin"></svg>
+                Enregistrement...
+            } @else {
+                <svg lucideSave [size]="16"></svg>
+                Enregistrer
+            }
+        </button>
+    </div>
+</form>

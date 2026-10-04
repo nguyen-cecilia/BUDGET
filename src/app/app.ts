@@ -14,6 +14,7 @@ import {
 import {ButtonComponent} from './components/button/button.component';
 import {ModalComponent} from './components/modal/modal.component';
 import {TransactionUpdateComponent} from './features/transactions/transaction-update.component';
+import {TransactionBulkUpdateComponent} from './features/transactions/transaction-bulk-update.component';
 import {ModalService} from './components/modal/modal.service';
 import {AuthStateService} from './core/auth/auth-state.service';
 import {SelectComponent} from './components/select/select.component';
@@ -21,10 +22,11 @@ import {PeriodService} from './core/period.service';
 import {ThemeService} from './core/theme.service';
 import {SwUpdate} from '@angular/service-worker';
 import {CalculatorComponent} from './components/calculator/calculator.component';
+import {ConfirmComponent} from './components/confirm/confirm.component';
 
 @Component({
     selector: 'app-root',
-    imports: [RouterOutlet, LucideMoon, ButtonComponent, RouterLink, LucidePlus, LucideHouse, RouterLinkActive, LucideList, LucideTarget, LucideChartColumnIncreasing, LucideSettings, ModalComponent, TransactionUpdateComponent, SelectComponent, LucideSun, CalculatorComponent, LucideCalculator],
+    imports: [RouterOutlet, LucideMoon, ButtonComponent, RouterLink, LucidePlus, LucideHouse, RouterLinkActive, LucideList, LucideTarget, LucideChartColumnIncreasing, LucideSettings, ModalComponent, TransactionUpdateComponent, TransactionBulkUpdateComponent, SelectComponent, LucideSun, CalculatorComponent, LucideCalculator, ConfirmComponent],
     templateUrl: './app.html',
 })
 export class App {

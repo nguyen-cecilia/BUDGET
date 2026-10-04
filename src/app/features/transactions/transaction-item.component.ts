@@ -1,11 +1,15 @@
-import {Component, inject, Input} from '@angular/core';
+import {Component, EventEmitter, inject, Input, Output, signal} from '@angular/core';
 import {CurrencyPipe, DatePipe} from '@angular/common';
-import {LucideArrowDownLeft, LucideArrowUpRight, LucideSparkles} from '@lucide/angular';
+import {LucideArrowDownLeft, LucideArrowUpRight, LucideCopy, LucideLoaderCircle, LucideSparkles} from '@lucide/angular';
 import {Transaction} from './transaction.model';
 import {ColorService} from '../../core/color.service';
 import {ModalService} from '../../components/modal/modal.service';
 import {CurrencyService} from '../currencies/currency.service';
 import {DateService} from '../../core/date.service';
+import {AuthStateService} from '../../core/auth/auth-state.service';
+import {TransactionService} from './transaction.service';
+import {RefreshService} from '../../core/refresh.service';
+import {ButtonComponent} from '../../components/button/button.component';
 
 @Component({
     selector: 'app-transaction-item',
@@ -14,59 +18,12 @@ import {DateService} from '../../core/date.service';
         DatePipe,
         LucideArrowDownLeft,
         LucideArrowUpRight,
-        LucideSparkles
+        LucideSparkles,
+        LucideCopy,
+        LucideLoaderCircle,
+        ButtonComponent
     ],
-    template: `
-        <div
-            class="flex flex-col lg:flex-row lg:items-center justify-between gap-x-4 gap-y-1 rounded p-2 cursor-pointer transition-all hover:bg-canvas"
-            [class.opacity-60]="dateService.isFuture(transaction.date)"
-            (click)="modalService.transaction.openEdit(transaction)"
-            (keydown.enter)="modalService.transaction.openEdit(transaction)"
-            (keydown.space)="modalService.transaction.openEdit(transaction)"
-            tabindex="0"
-            role="button"
-        >
-            <div class="flex items-center gap-3">
-                <div
-                    class="aspect-square border rounded-full p-3 dark:text-surface dark:border-surface {{ colorService.getBackground(transaction.category?.color ?? 'grayLight') }}">
-                    @if (transaction.type === 'income') {
-                        <svg lucideArrowDownLeft [size]="20"></svg>
-                    } @else {
-                        <svg lucideArrowUpRight [size]="20"></svg>
-                    }
-                </div>
-                <div>
-                    <div class="flex items-center gap-1.5">
-                        <h3>{{ transaction.label }}</h3>
-                        @if (transaction.is_subscription) {
-                            <svg lucideSparkles [size]="20"></svg>
-                        }
-                    </div>
-                    <p class="text-sm text-muted">
-                        {{ transaction.account.label }} ·
-                        <span
-                            class="font-semibold underline decoration-2 underline-offset-3 {{ colorService.getDecoration(transaction.category?.color ?? 'grayLight') }}"
-                        >
-                            {{ transaction.category?.label ?? 'Sans catégorie' }}
-                        </span>
-                        @if (hasDate) {
-                            · {{ transaction.date|date:'dd/MM/yyyy' }}
-                        }
-                        @if (transaction.tags && transaction.tags.length > 0) {
-                            · {{ transaction.tags.map(tag => '#' + tag.label).join(', ') }}
-                        }
-                    </p>
-                </div>
-            </div>
-            <div class="text-right">
-                <p class="font-display text-md{{ transaction.type === 'income' ? ' text-green' : '' }}">{{ transaction.type === 'expense' ? '-' : '+' }}{{ transaction.amount|currency:transaction.currency.code }}</p>
-                @if (transaction.currency.code !== currencyService.defaultCurrency() && currencyService.canConvert(transaction.currency.code)) {
-                    <p class="text-sm text-muted">
-                        ≈ {{ transaction.type === 'expense' ? '-' : '+' }}{{ currencyService.convertToDefault(transaction.amount, transaction.currency.code)|currency:currencyService.defaultCurrency() }}</p>
-                }
-            </div>
-        </div>
-    `,
+    templateUrl: './transaction-item.component.html',
     host: {
         'class': 'block',
     }
@@ -74,9 +31,49 @@ import {DateService} from '../../core/date.service';
 export class TransactionItemComponent {
     @Input({required: true}) transaction!: Transaction;
     @Input() hasDate = false;
+    @Input() isSelected = false;
+    @Input() showCheckbox = false;
+    @Output() selectionChange = new EventEmitter<void>();
 
     protected colorService = inject(ColorService);
     protected modalService = inject(ModalService);
     protected currencyService = inject(CurrencyService);
     protected dateService = inject(DateService);
+    protected authState = inject(AuthStateService);
+    protected transactionService = inject(TransactionService);
+    protected refreshService = inject(RefreshService);
+
+    isDuplicating = signal(false);
+
+    async duplicate(event: Event): Promise<void> {
+        event.stopPropagation();
+        const userId = this.authState.getCurrentUser()?.id;
+        if (!userId || this.isDuplicating()) return;
+
+        this.isDuplicating.set(true);
+        try {
+            const created = await this.transactionService.createTransaction(userId, {
+                type: this.transaction.type,
+                amount: this.transaction.amount,
+                amount_currency_id: this.transaction.amount_currency_id,
+                label: `${this.transaction.label} copie`,
+                date: this.transaction.date,
+                account_id: this.transaction.account_id,
+                category_id: this.transaction.category_id ?? undefined,
+                is_subscription: false,
+                subscription_id: null,
+            });
+
+            const tagIds = this.transaction.tags?.map(t => t.id) ?? [];
+            if (tagIds.length > 0) {
+                await this.transactionService.addTagsToTransaction(created.id, tagIds);
+            }
+
+            this.refreshService.refresh('transaction');
+        } catch (error) {
+            console.error('Erreur lors de la duplication de la transaction:', error);
+        } finally {
+            this.isDuplicating.set(false);
+        }
+    }
 }

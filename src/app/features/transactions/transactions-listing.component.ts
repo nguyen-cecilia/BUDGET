@@ -2,16 +2,20 @@ import {Component, computed, effect, inject, signal, untracked} from '@angular/c
 import {
     LucideArrowDown,
     LucideArrowUp,
+    LucideCheckCheck,
     LucideFaceSlightlyFrowning,
+    LucideLoaderCircle,
+    LucidePencil,
     LucidePlus,
     LucideRotateCcw,
     LucideSearch,
+    LucideTrash2,
     LucideX
 } from '@lucide/angular';
 import {BadgeComponent} from '../../components/badge/badge.component';
 import {TransactionsByMonth} from './transaction.model';
 import {TransactionService} from './transaction.service';
-import {CurrencyPipe, DatePipe} from '@angular/common';
+import {CurrencyPipe, DatePipe, NgTemplateOutlet} from '@angular/common';
 import {SelectComponent, SelectOption} from '../../components/select/select.component';
 import {AuthStateService} from '../../core/auth/auth-state.service';
 import {PeriodService} from '../../core/period.service';
@@ -40,6 +44,11 @@ import {RefreshService} from '../../core/refresh.service';
         LucideRotateCcw,
         LucideArrowUp,
         LucideArrowDown,
+        LucideLoaderCircle,
+        LucideCheckCheck,
+        LucidePencil,
+        LucideTrash2,
+        NgTemplateOutlet,
     ],
     templateUrl: './transactions-listing.component.html',
 })
@@ -65,6 +74,9 @@ export class TransactionsListingComponent {
     tagsFilters = signal<SelectOption[]>([]);
     searchQuery = signal('');
     sortOrder = signal<'asc' | 'desc'>('desc');
+    selectedIds = signal<Set<string>>(new Set());
+    isBulkDeleting = signal(false);
+    showCheckbox = signal(false);
 
     constructor() {
         effect(() => {
@@ -151,6 +163,94 @@ export class TransactionsListingComponent {
 
     dayTotal(date: string): number {
         return this.convertedDayTotals().get(date) ?? 0;
+    }
+
+    toggleSelect(id: string): void {
+        this.selectedIds.update(set => {
+            const next = new Set(set);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    }
+
+    toggleMultipleSelection(): void {
+        if (this.showCheckbox()) this.clearSelectionTransactions();
+        this.showCheckbox.set(!this.showCheckbox());
+    }
+
+    isSelectedTransaction(id: string): boolean {
+        return this.selectedIds().has(id);
+    }
+
+    clearSelectionTransactions(): void {
+        this.selectedIds.set(new Set());
+    }
+
+    hasMultipleSelection(): boolean {
+        return this.selectedIds().size > 0 && this.showCheckbox();
+    }
+
+    multipleSelectionCount(): number {
+        return this.selectedIds().size;
+    }
+
+    daySelectionState(date: string): 'all' | 'none' | 'partial' {
+        const day = this.filteredTransactions().transactionsByDay.find(d => d.date === date);
+        if (!day || day.transactions.length === 0) return 'none';
+        const selected = this.selectedIds();
+        let count = 0;
+        for (const t of day.transactions) if (selected.has(t.id)) count++;
+        if (count === 0) return 'none';
+        return count === day.transactions.length ? 'all' : 'partial';
+    }
+
+    toggleSelectAllForDay(date: string): void {
+        const day = this.filteredTransactions().transactionsByDay.find(d => d.date === date);
+        if (!day) return;
+        this.selectedIds.update(set => {
+            const next = new Set(set);
+            const allSelected = this.daySelectionState(date) === 'all'
+            for (const t of day.transactions) {
+                if (allSelected) next.delete(t.id);
+                else next.add(t.id);
+            }
+            return next;
+        });
+    }
+
+    bulkDelete(): void {
+        const count = this.multipleSelectionCount();
+        if (count === 0) return;
+
+        this.modalService.confirm.open({
+            title: 'Confirmation',
+            message: `Supprimer ${count} transaction${count > 1 ? 's' : ''} ?`,
+            onConfirm: async () => {
+                const userId = this.authState.getCurrentUser()?.id;
+                if (!userId) return;
+                this.isBulkDeleting.set(true);
+                try {
+                    const ids = Array.from(this.selectedIds());
+                    await this.transactionService.deleteTransactions(ids, userId);
+                    this.clearSelectionTransactions();
+                    this.refreshService.refresh('transaction');
+                } catch (error) {
+                    console.error('Erreur lors de la suppression groupée:', error);
+                } finally {
+                    this.isBulkDeleting.set(false);
+                }
+            },
+        });
+    }
+
+    bulkEdit(): void {
+        const ids = Array.from(this.selectedIds());
+        if (ids.length === 0) return;
+        this.modalService.bulkTransaction.open({
+            ids,
+            onSuccess: () => this.clearSelectionTransactions(),
+        });
     }
 
     toggleTag(value: string | number): void {

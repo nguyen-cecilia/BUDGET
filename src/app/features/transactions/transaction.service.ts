@@ -153,6 +153,64 @@ export class TransactionService {
         if (error) throw error;
     }
 
+    async deleteTransactions(ids: string[], userId: string): Promise<void> {
+        if (ids.length === 0) return;
+
+        const {error: tagError} = await this.supabase
+            .from(TRANSACTION_TAGS_TABLE)
+            .delete()
+            .in('transaction_id', ids);
+        if (tagError) throw tagError;
+
+        const {error} = await this.supabase
+            .from(TRANSACTIONS_TABLE)
+            .delete()
+            .in('id', ids)
+            .eq('user_id', userId);
+        if (error) throw error;
+    }
+
+    async updateTransactionsBulk(
+        ids: string[],
+        userId: string,
+        patch: {
+            amount?: number;
+            amount_currency_id?: string;
+            account_id?: string;
+            category_id?: string | null;
+            date?: string;
+            type?: TransactionType;
+            label?: string;
+        }
+    ): Promise<void> {
+        if (ids.length === 0) return;
+
+        const {error} = await this.supabase
+            .from(TRANSACTIONS_TABLE)
+            .update(patch)
+            .in('id', ids)
+            .eq('user_id', userId);
+        if (error) throw error;
+    }
+
+    async updateTransactionTagsBulk(transactionIds: string[], tagIds: (string | number)[]): Promise<void> {
+        if (transactionIds.length === 0) return;
+
+        const {error: delError} = await this.supabase
+            .from(TRANSACTION_TAGS_TABLE)
+            .delete()
+            .in('transaction_id', transactionIds);
+        if (delError) throw delError;
+
+        if (tagIds.length === 0) return;
+
+        const rows = transactionIds.flatMap(tid =>
+            tagIds.map(tagId => ({transaction_id: tid, tag_id: tagId}))
+        );
+        const {error} = await this.supabase.from(TRANSACTION_TAGS_TABLE).insert(rows);
+        if (error) throw error;
+    }
+
     async getTransactionsByYear(userId: string, year: number): Promise<Transaction[]> {
         const {data, error} = await this.supabase
             .from(TRANSACTIONS_TABLE)
